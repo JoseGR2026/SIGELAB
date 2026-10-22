@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SIGELAB.iml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseLocalColorSettings">
+    <colors>
+      <entry key="8e8c47e9-98bb-40f6-91c7-3bd61bf7dd94" value="" />
+    </colors>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="8.004712116356937E-16" />
+      <entry key="MS500" value="9.564651343622328E-4" />
+      <entry key="S2" value="0.17586008789084354" />
+      <entry key="S5" value="0.49896135967146243" />
+      <entry key="S10" value="0.7063850821236635" />
+      <entry key="S30" value="0.914170976268791" />
+      <entry key="S60" value="1.0972717199117243" />
+      <entry key="M2" value="1.3633181647103705" />
+      <entry key="M5" value="1.7083843129805458" />
+      <entry key="M10" value="2.8231719313584493" />
+      <entry key="M15" value="5.1548241155696015" />
+      <entry key="M30" value="13.094154812265698" />
+      <entry key="H1" value="23.007419121766628" />
+      <entry key="H2" value="31.1622341037235" />
+      <entry key="H4" value="36.502930593894334" />
+      <entry key="D1" value="41.822883957000556" />
+      <entry key="W1" value="42.82931085988267" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.0" />
+      <entry key="S60" value="1.0000000000004023" />
+      <entry key="M2" value="1.0000012785404966" />
+      <entry key="M5" value="1.0120488273147192" />
+      <entry key="M10" value="1.2839630423990693" />
+      <entry key="M15" value="1.8527226028799553" />
+      <entry key="M30" value="3.6808077304997853" />
+      <entry key="H1" value="5.865631892514958" />
+      <entry key="H2" value="7.60082938363897" />
+      <entry key="H4" value="8.702648989521746" />
+      <entry key="D1" value="9.768714222157335" />
+      <entry key="W1" value="9.96656924246511" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="6.152654768838823E-11" />
+      <entry key="MS500" value="0.0091574326001668" />
+      <entry key="S2" value="0.4041310840737346" />
+      <entry key="S5" value="1.0156843264607056" />
+      <entry key="S10" value="1.4156523813972912" />
+      <entry key="S30" value="1.8023966413131158" />
+      <entry key="S60" value="2.0369810317189434" />
+      <entry key="M2" value="2.330430391762564" />
+      <entry key="M5" value="2.7059640197458927" />
+      <entry key="M10" value="4.098573544859986" />
+      <entry key="M15" value="7.000249979369483" />
+      <entry key="M30" value="16.768826253496524" />
+      <entry key="H1" value="28.868523415936078" />
+      <entry key="H2" value="38.76022283103904" />
+      <entry key="H4" value="45.20397507250607" />
+      <entry key="D1" value="51.59130075418697" />
+      <entry key="W1" value="52.79583681097034" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3Kw5gqSVOr5nj51btK5G8FGfGHk" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.Main.executor": "Run",
+    "Downloaded.Files.Path": "C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB",
+    "Downloaded.Files.Path.Enabled": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Jose Gonzalez/CLionProjects/SIGELAB/src/main/java/SIGELAB/view",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "C:/Users/Jose Gonzalez/CLionProjects/SIGELAB/src/Main.java",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlserver.localdb"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java\SIGELAB\view" />
+      <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java\SIGELAB\util" />
+      <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB" />
+      <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\facial-service" />
+      <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java\SIGELAB\config" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="SIGELAB.repository" />
+      <recent name="SIGELAB.model" />
+      <recent name="SIGELAB.controller" />
+      <recent name="SIGELAB.service" />
+      <recent name="SIGELAB.enums" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10968.63" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10968.63" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="" />
+      <created>1792455904632</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1792455904632</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
