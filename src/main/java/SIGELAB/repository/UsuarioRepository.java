@@ -12,19 +12,20 @@ import java.util.List;
 import java.util.Optional;
 
 public class UsuarioRepository {
-    private static final String SELECT = "SELECT u.id, u.nombre, u.apellido, u.username, u.password_hash, u.correo, r.nombre AS rol_nombre, u.estado, u.fecha_creacion " +
-            "FROM Usuario u JOIN Rol r ON r.id = u.rol_id ";
+    private static final String SELECT = "SELECT u.id, u.nombre, u.apellido, u.username, u.password_hash, u.correo, r.nombre AS rol_nombre, u.estado, u.fecha_creacion, u.referencia_facial " +
+            "FROM Usuario u LEFT JOIN Rol r ON r.id = u.rol_id ";
 
     public boolean guardar(Usuario usuario) {
-        String sql = "INSERT INTO Usuario (nombre, apellido, username, password_hash, correo, rol_id, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Usuario (nombre, apellido, username, password_hash, correo, rol_id, estado, referencia_facial) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection c = DatabaseConnection.getConnection(); PreparedStatement s = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            s.setString(1, usuario.getNombres() != null ? usuario.getNombres() : "Admin");
-            s.setString(2, usuario.getApellidos() != null ? usuario.getApellidos() : "Sistema");
+            s.setString(1, usuario.getNombres());
+            s.setString(2, usuario.getApellidos());
             s.setString(3, usuario.getUsuario());
             s.setString(4, usuario.getPasswordHash());
-            s.setString(5, usuario.getCorreo() != null ? usuario.getCorreo() : "admin@sigelab.com");
+            s.setString(5, usuario.getCorreo());
             s.setInt(6, usuario.getRol() == RolUsuario.ADMIN ? 1 : 2); // 1 = ADMIN, 2 = ENCARGADO
             s.setString(7, usuario.isActivo() ? "ACTIVO" : "INACTIVO");
+            s.setString(8, usuario.getReferenciaFacial());
 
             if (s.executeUpdate() == 0) return false;
             try (ResultSet keys = s.getGeneratedKeys()) {
@@ -40,12 +41,15 @@ public class UsuarioRepository {
     }
 
     public Optional<Usuario> buscarPorUsuario(String nombre) {
+        System.out.println("DEBUG REPO -> Buscando en BD el username: [" + nombre + "]");
         try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement s = c.prepareStatement(SELECT + "WHERE u.username = ?")) {
+             PreparedStatement s = c.prepareStatement(SELECT + " WHERE u.username = ?")) {
             s.setString(1, nombre);
             try (ResultSet rs = s.executeQuery()) {
                 return rs.next() ? Optional.of(mapear(rs)) : Optional.empty();
+
             }
+
         } catch (SQLException e) {
             throw JdbcSupport.error("buscar el usuario", e);
         }
@@ -74,7 +78,7 @@ public class UsuarioRepository {
     }
 
     public boolean actualizar(Usuario u) {
-        String sql = "UPDATE Usuario SET nombre = ?, apellido = ?, username = ?, password_hash = ?, correo = ?, rol_id = ?, estado = ? WHERE id = ?";
+        String sql = "UPDATE Usuario SET nombre = ?, apellido = ?, username = ?, password_hash = ?, correo = ?, rol_id = ?, estado = ?, referencia_facial = ? WHERE id = ?";
         try (Connection c = DatabaseConnection.getConnection(); PreparedStatement s = c.prepareStatement(sql)) {
             s.setString(1, u.getNombres());
             s.setString(2, u.getApellidos());
@@ -83,7 +87,8 @@ public class UsuarioRepository {
             s.setString(5, u.getCorreo());
             s.setInt(6, u.getRol() == RolUsuario.ADMIN ? 1 : 2);
             s.setString(7, u.isActivo() ? "ACTIVO" : "INACTIVO");
-            s.setInt(8, u.getIdUsuario());
+            s.setString(8, u.getReferenciaFacial());
+            s.setInt(9, u.getIdUsuario());
             return s.executeUpdate() > 0;
         } catch (SQLException e) {
             throw JdbcSupport.error("actualizar el usuario", e);
@@ -97,6 +102,16 @@ public class UsuarioRepository {
             return s.executeUpdate() > 0;
         } catch (SQLException e) {
             throw JdbcSupport.error("desactivar el usuario", e);
+        }
+    }
+
+    public boolean activar(int id) {
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement s = c.prepareStatement("UPDATE Usuario SET estado = 'ACTIVO' WHERE id = ?")) {
+            s.setInt(1, id);
+            return s.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw JdbcSupport.error("activar el usuario", e);
         }
     }
 
@@ -137,7 +152,7 @@ public class UsuarioRepository {
 
     private Usuario mapear(ResultSet rs) throws SQLException {
         String rolStr = rs.getString("rol_nombre");
-        RolUsuario rolEnum = "ADMIN".equalsIgnoreCase(rolStr) ? RolUsuario.ADMIN : RolUsuario.ENCARGADO;
+        RolUsuario rolEnum = ("ADMIN".equalsIgnoreCase(rolStr)) ? RolUsuario.ADMIN : RolUsuario.ENCARGADO;
         boolean activo = "ACTIVO".equalsIgnoreCase(rs.getString("estado"));
 
         Usuario usuario = new Usuario();
@@ -149,10 +164,27 @@ public class UsuarioRepository {
         usuario.setCorreo(rs.getString("correo"));
         usuario.setRol(rolEnum);
         usuario.setActivo(activo);
+
+        try {
+            usuario.setReferenciaFacial(rs.getString("referencia_facial"));
+        } catch (Exception ignored) {}
+
         try {
             usuario.setFechaCreacion(rs.getObject("fecha_creacion", LocalDateTime.class));
         } catch (Exception ignored) {}
 
         return usuario;
+    }
+
+    public Optional<Usuario> buscarPorReferenciaFacial(String referenciaFacial) {
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement s = c.prepareStatement(SELECT + "WHERE u.referencia_facial = ?")) {
+            s.setString(1, referenciaFacial);
+            try (ResultSet rs = s.executeQuery()) {
+                return rs.next() ? Optional.of(mapear(rs)) : Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw JdbcSupport.error("buscar usuario por referencia facial", e);
+        }
     }
 }

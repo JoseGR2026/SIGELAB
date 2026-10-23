@@ -15,21 +15,12 @@ public class Usuario {
     private Docente docente; // Agregado para que encaje con el Service
     private boolean activo;
     private LocalDateTime fechaCreacion;
+    private String referenciaFacial;
 
     public Usuario() { }
 
     // Constructor que usa UsuarioService.java (con Docente)
-    public Usuario(String usuario, String passwordHash, RolUsuario rol, Docente docente) {
-        this.idUsuario = 0;
-        this.usuario = usuario;
-        this.passwordHash = passwordHash;
-        this.rol = rol;
-        this.docente = docente;
-        this.nombres = "Admin";
-        this.apellidos = "Sistema";
-        this.correo = "admin@sigelab.com";
-        this.activo = true;
-    }
+
 
     public Usuario(String usuario, String passwordHash, RolUsuario rol, String nombres, String apellidos, String correo) {
         this(0, nombres, apellidos, usuario, passwordHash, correo, rol, null, true, null);
@@ -83,5 +74,13 @@ public class Usuario {
     public String toString() {
         return "Usuario{" + "id=" + idUsuario + ", username='" + usuario + '\'' +
                 ", rol=" + rol + ", activo=" + activo + '}';
+    }
+
+    public void setReferenciaFacial(String referenciaFacial) {
+        this.referenciaFacial = referenciaFacial;
+    }
+
+    public String getReferenciaFacial() {
+        return referenciaFacial;
     }
 }

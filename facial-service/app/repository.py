@@ -16,9 +16,13 @@ class FacialRepository:
 
     def get_user(self, user_id: int) -> dict[str, Any] | None:
         sql = """
-            SELECT id_usuario, usuario, rol, activo
-            FROM Usuario
-            WHERE id_usuario = ?
+            SELECT u.id AS id_usuario,
+                   u.username AS usuario,
+                   r.nombre AS rol,
+                   CASE WHEN u.estado = 'ACTIVO' THEN 1 ELSE 0 END AS activo
+            FROM Usuario AS u
+            LEFT JOIN Rol AS r ON u.rol_id = r.id
+            WHERE u.id = ?
         """
         with self.database.cursor() as cursor:
             row = cursor.execute(sql, user_id).fetchone()
@@ -27,7 +31,7 @@ class FacialRepository:
         return {
             "id_usuario": int(row[0]),
             "usuario": str(row[1]),
-            "rol": str(row[2]),
+            "rol": str(row[2]) if row[2] else "SIN_ROL",
             "activo": bool(row[3]),
         }
 
@@ -139,8 +143,6 @@ class FacialRepository:
                     device[:200],
                 )
         except Exception:
-            # An audit failure must never expose a DB stack trace or hide the
-            # original facial result. It is still logged for operations.
             logger.exception("No fue posible registrar auditoría facial")
 
 

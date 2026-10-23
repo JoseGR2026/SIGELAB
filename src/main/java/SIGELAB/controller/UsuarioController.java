@@ -1,7 +1,6 @@
 package SIGELAB.controller;
 
 import SIGELAB.enums.RolUsuario;
-import SIGELAB.model.Docente;
 import SIGELAB.model.Usuario;
 import SIGELAB.service.UsuarioService;
 import java.util.List;
@@ -18,8 +17,9 @@ public class UsuarioController {
         this.service = service;
     }
 
-    public Usuario crearUsuario(String usuario, String password, RolUsuario rol, Docente docente) {
-        return service.crearUsuario(usuario, password, rol, docente);
+    public Usuario crearUsuario(String nombres, String apellidos, String username, String password, RolUsuario rol, String correo, String referenciaFacial) {
+        // Llama al servicio que procesa y guarda todos los datos reales del formulario
+        return service.crearUsuario(nombres, apellidos, username, password, rol, correo, referenciaFacial);
     }
 
     public Optional<Usuario> autenticar(String usuario, String password) {
@@ -49,4 +49,8 @@ public class UsuarioController {
     public boolean desactivar(int id) {
         return service.desactivar(id);
     }
+    public boolean activar(int id) {
+        return service.activar(id);
+    }
+
 }

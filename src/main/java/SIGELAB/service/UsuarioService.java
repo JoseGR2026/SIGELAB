@@ -14,14 +14,14 @@ public class UsuarioService {
     public UsuarioService() { this(new UsuarioRepository()); }
     public UsuarioService(UsuarioRepository repository) { this.repository = repository; }
 
-    public Usuario crearUsuario(String usuario, String password, RolUsuario rol, Docente docente) {
+    public Usuario crearUsuario(String nombres, String apellidos, String usuario, String password, RolUsuario rol, String correo, String referenciaFacial) {
         if (usuario == null || usuario.isBlank()) throw new BusinessException("El usuario es obligatorio.");
         if (password == null || password.isBlank()) throw new BusinessException("La contraseña es obligatoria.");
         if (rol == null) throw new BusinessException("El rol es obligatorio.");
         if (repository.existeUsuario(usuario)) throw new BusinessException("El nombre de usuario ya está registrado.");
 
-        // Guarda la contraseña en texto plano
-        Usuario nuevo = new Usuario(usuario, password, rol, docente);
+        // Usamos el constructor completo con los datos reales de la vista
+        Usuario nuevo = new Usuario(0, nombres, apellidos, usuario, password, correo, rol, null, true, null);
         repository.guardar(nuevo);
         return nuevo;
     }
@@ -53,6 +53,7 @@ public class UsuarioService {
     }
 
     public boolean desactivar(int id) { return repository.desactivar(id); }
+    public boolean activar(int id) { return repository.activar(id); }
 
     // Autenticación simplificada en texto plano con equals
     public Optional<Usuario> autenticar(String usuario, String password) {

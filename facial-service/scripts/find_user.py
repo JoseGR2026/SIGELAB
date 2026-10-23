@@ -13,11 +13,13 @@ from app.db import Database
 
 def find_user(username: str) -> dict[str, Any] | None:
     query = """
-        SELECT u.id_usuario, u.usuario, u.activo,
+        SELECT u.id AS id_usuario,
+               u.username AS usuario,
+               CASE WHEN u.estado = 'ACTIVO' THEN 1 ELSE 0 END AS activo,
                CASE WHEN p.id_perfil_facial IS NULL THEN 0 ELSE 1 END
         FROM Usuario AS u
-        LEFT JOIN PerfilFacial AS p ON p.id_usuario = u.id_usuario AND p.activo = 1
-        WHERE u.usuario = ?
+        LEFT JOIN PerfilFacial AS p ON p.id_usuario = u.id AND p.activo = 1
+        WHERE u.username = ?
     """
     database = Database(settings)
     with database.connect() as connection:

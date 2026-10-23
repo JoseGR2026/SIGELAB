@@ -5,16 +5,57 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SIGELAB.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginOutcome.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/UsuarioView.form" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/UsuarioView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.env" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/Scripts/pip.exe" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/Scripts/pip.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/Scripts/pip3.12.exe" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/Scripts/pip3.12.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/Scripts/pip3.exe" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/Scripts/pip3.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/INSTALLER" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/METADATA" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/RECORD" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/REQUESTED" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/WHEEL" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/entry_points.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/AUTHORS.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/cachecontrol/LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/certifi/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/distlib/LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/distro/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/idna/LICENSE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/msgpack/COPYING" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.APACHE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.BSD" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/pkg_resources/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/platformdirs/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/pygments/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/pyproject_hooks/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/requests/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/resolvelib/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/rich/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/tomli/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/tomli_w/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/truststore/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip-26.2.1.dist-info/licenses/src/pip/_vendor/urllib3/LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/_vendor/bom.cdx.json" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/_vendor/bom.cdx.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/_vendor/certifi/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/_vendor/certifi/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/_vendor/certifi/cacert.pem" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/_vendor/certifi/cacert.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/_vendor/vendor.txt" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/lib/site-packages/pip/_vendor/vendor.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/app/repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/app/repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/scripts/find_user.py" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/scripts/find_user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/sql/001_create_facial_tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/sql/001_create_facial_tables.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/model/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/model/Usuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/UsuarioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/service/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/service/UsuarioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,68 +77,83 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;JoseGR2026&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/JoseGR2026/SIGELAB.git&quot;,
+    &quot;accountId&quot;: &quot;1cbb66e6-6659-45c6-9be4-fca5381b3831&quot;
+  }
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="8.004712116356937E-16" />
-      <entry key="MS500" value="9.564651343622328E-4" />
-      <entry key="S2" value="0.17586008789084354" />
-      <entry key="S5" value="0.49896135967146243" />
-      <entry key="S10" value="0.7063850821236635" />
-      <entry key="S30" value="0.914170976268791" />
-      <entry key="S60" value="1.0972717199117243" />
-      <entry key="M2" value="1.3633181647103705" />
-      <entry key="M5" value="1.7083843129805458" />
-      <entry key="M10" value="2.8231719313584493" />
-      <entry key="M15" value="5.1548241155696015" />
-      <entry key="M30" value="13.094154812265698" />
-      <entry key="H1" value="23.007419121766628" />
-      <entry key="H2" value="31.1622341037235" />
-      <entry key="H4" value="36.502930593894334" />
-      <entry key="D1" value="41.822883957000556" />
-      <entry key="W1" value="42.82931085988267" />
-    </decayedCancelled>
-    <decayedSelected>
       <entry key="MS100" value="1.0" />
       <entry key="MS500" value="1.0" />
       <entry key="S2" value="1.0" />
       <entry key="S5" value="1.0" />
       <entry key="S10" value="1.0" />
-      <entry key="S30" value="1.0" />
-      <entry key="S60" value="1.0000000000004023" />
-      <entry key="M2" value="1.0000012785404966" />
-      <entry key="M5" value="1.0120488273147192" />
-      <entry key="M10" value="1.2839630423990693" />
-      <entry key="M15" value="1.8527226028799553" />
-      <entry key="M30" value="3.6808077304997853" />
-      <entry key="H1" value="5.865631892514958" />
-      <entry key="H2" value="7.60082938363897" />
-      <entry key="H4" value="8.702648989521746" />
-      <entry key="D1" value="9.768714222157335" />
-      <entry key="W1" value="9.96656924246511" />
+      <entry key="S30" value="1.0000000000647318" />
+      <entry key="S60" value="1.0000080456206517" />
+      <entry key="M2" value="1.0028429244293462" />
+      <entry key="M5" value="1.1178502147421583" />
+      <entry key="M10" value="1.6931191178353857" />
+      <entry key="M15" value="2.5402547210327295" />
+      <entry key="M30" value="5.569438542349585" />
+      <entry key="H1" value="12.513198796048908" />
+      <entry key="H2" value="23.978939395857598" />
+      <entry key="H4" value="36.42294200427892" />
+      <entry key="D1" value="72.7370544899794" />
+      <entry key="W1" value="94.92826674380763" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="1.1526851625225944E-153" />
+      <entry key="S5" value="6.678582284994589E-62" />
+      <entry key="S10" value="2.5842953169083807E-31" />
+      <entry key="S30" value="6.369627670272843E-11" />
+      <entry key="S60" value="7.980994718876114E-6" />
+      <entry key="M2" value="0.0028250654362896054" />
+      <entry key="M5" value="0.095598436958397" />
+      <entry key="M10" value="0.3133570049007714" />
+      <entry key="M15" value="0.4906906482176044" />
+      <entry key="M30" value="0.9906932622436522" />
+      <entry key="H1" value="2.205687741822734" />
+      <entry key="H2" value="4.604021961497941" />
+      <entry key="H4" value="7.568647842348853" />
+      <entry key="D1" value="16.50116673480808" />
+      <entry key="W1" value="21.798251307240655" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="6.152654768838823E-11" />
-      <entry key="MS500" value="0.0091574326001668" />
-      <entry key="S2" value="0.4041310840737346" />
-      <entry key="S5" value="1.0156843264607056" />
-      <entry key="S10" value="1.4156523813972912" />
-      <entry key="S30" value="1.8023966413131158" />
-      <entry key="S60" value="2.0369810317189434" />
-      <entry key="M2" value="2.330430391762564" />
-      <entry key="M5" value="2.7059640197458927" />
-      <entry key="M10" value="4.098573544859986" />
-      <entry key="M15" value="7.000249979369483" />
-      <entry key="M30" value="16.768826253496524" />
-      <entry key="H1" value="28.868523415936078" />
-      <entry key="H2" value="38.76022283103904" />
-      <entry key="H4" value="45.20397507250607" />
-      <entry key="D1" value="51.59130075418697" />
-      <entry key="W1" value="52.79583681097034" />
+      <entry key="MS100" value="0.14458602298816092" />
+      <entry key="MS500" value="0.6792431422744724" />
+      <entry key="S2" value="0.9078337319979031" />
+      <entry key="S5" value="0.9620608153690415" />
+      <entry key="S10" value="0.9808469887648336" />
+      <entry key="S30" value="0.9935744639635663" />
+      <entry key="S60" value="0.9967978936438148" />
+      <entry key="M2" value="1.004024468401798" />
+      <entry key="M5" value="1.2123025899267408" />
+      <entry key="M10" value="2.0050045186831276" />
+      <entry key="M15" value="3.029210862107561" />
+      <entry key="M30" value="6.557884655924073" />
+      <entry key="H1" value="14.71593704024524" />
+      <entry key="H2" value="28.57983976260085" />
+      <entry key="H4" value="43.98911826048783" />
+      <entry key="D1" value="89.23746039091779" />
+      <entry key="W1" value="116.72638405200561" />
     </decayedShown>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1,
@@ -120,8 +176,11 @@
     "Repository.Attach.Sources": "false",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "UI_DESIGNER_EDITOR_MODE.PaletteManager.SHOW": "true",
+    "UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
@@ -165,6 +224,13 @@
       <recent name="SIGELAB.service" />
       <recent name="SIGELAB.enums" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="001_create_facial_tables.sql" type="DatabaseScript" editBeforeRun="true" nameIsGenerated="true">
+      <script-file value="$PROJECT_DIR$/facial-service/sql/001_create_facial_tables.sql" />
+      <script-mode>FILE</script-mode>
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>

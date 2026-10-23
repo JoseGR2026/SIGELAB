@@ -5,7 +5,7 @@ import SIGELAB.view.LoginForm;
 
 import javax.swing.*;
 
-public class Main {
+public class  Main {
 
     public static void main(String[] args) {
 
@@ -28,7 +28,7 @@ public class Main {
         try {
             UsuarioController controller = new UsuarioController();
             if (controller.buscarPorUsuario("admin").isEmpty()) {
-                controller.crearUsuario("admin", "admin", RolUsuario.ADMIN, null);
+                controller.crearUsuario("Admin", "Sistema", "admin", "1234", RolUsuario.ADMIN, "admin@sigelab.com", null);
             }
         } catch (RuntimeException e) {
             System.err.println("No fue posible verificar el usuario admin: " + e.getMessage());

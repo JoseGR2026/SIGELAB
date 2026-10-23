@@ -5,24 +5,20 @@ import SIGELAB.model.Usuario;
 import javax.swing.*;
 import java.awt.*;
 
-/** Menú principal de la aplicación. */
+/** Menú principal de la aplicación SIGELAB. */
 public class MainForm {
 
     private JPanel panelPrincipal;
     private JLabel lblTitulo;
-    private JButton btnEstudiantes;
-    private JButton btnDocentes;
-    private JButton btnCursos;
-    private JButton btnPeriodos;
-    private JButton btnSecciones;
-    private JButton btnHorarios;
-    private JButton btnInscripciones;
-    private JButton btnSesiones;
-    private JButton btnDispositivos;
-    private JButton btnAsistencia;
-    private JButton btnJustificaciones;
-    private JButton btnUsuarios;
     private JButton btnSalir;
+    private JButton btnInventario;
+    private JButton btnPrestamos;
+    private JButton btnRegistrarDevolucion;
+    private JButton btnMantenimiento;
+    private JButton btnAuditoria;
+    private JButton btnReportes;
+    private JButton btnLaboratorios;
+    private JButton btnUsuarios;
     private final Usuario usuarioAutenticado;
 
     public MainForm() {
@@ -36,86 +32,45 @@ public class MainForm {
     }
 
     private void configurarFormulario() {
-        lblTitulo.setText("SISTEMA DE ASISTENCIA UNIVERSITARIA");
+        String nombreCompleto = "Administrador";
+        if (usuarioAutenticado != null) {
+            // Ajusta getNombre() / getApellido() según los nombres de métodos en tu clase Usuario
+            nombreCompleto = usuarioAutenticado.getNombres() + " " + usuarioAutenticado.getApellidos();
+        }
+        lblTitulo.setText("Bienvenido, Administrador: " + nombreCompleto);
     }
 
     private void configurarEventos() {
-//        btnEstudiantes.addActionListener(e -> abrirEstudiantes());
-//        btnDocentes.addActionListener(e -> abrirDocentes());
-//        btnCursos.addActionListener(e -> abrirCursos());
-//        btnPeriodos.addActionListener(e -> abrirPeriodos());
-//        btnSecciones.addActionListener(e -> abrirSecciones());
-//        btnHorarios.addActionListener(e -> abrirHorarios());
-//        btnInscripciones.addActionListener(e -> abrirInscripciones());
-//        btnSesiones.addActionListener(e -> abrirSesiones());
-//        btnDispositivos.addActionListener(e -> abrirDispositivos());
-//        btnAsistencia.addActionListener(e -> abrirAsistencia());
-//        btnJustificaciones.addActionListener(e -> abrirJustificaciones());
-//        btnUsuarios.addActionListener(e -> abrirUsuarios());
-//        btnSalir.addActionListener(e -> salir());
+        btnInventario.addActionListener(e -> mostrarMensajeModulo("Inventario de Equipos"));
+        btnPrestamos.addActionListener(e -> mostrarMensajeModulo("Préstamos de Equipos"));
+        btnRegistrarDevolucion.addActionListener(e -> mostrarMensajeModulo("Registrar Devolución"));
+        btnMantenimiento.addActionListener(e -> mostrarMensajeModulo("Equipos en Mantenimiento"));
+        btnLaboratorios.addActionListener(e -> mostrarMensajeModulo("Catálogo de Laboratorios"));
+        btnUsuarios.addActionListener(e -> abrirUsuarios());
+        btnAuditoria.addActionListener(e -> mostrarMensajeModulo("Registro de Auditoría"));
+        btnReportes.addActionListener(e -> mostrarMensajeModulo("Reportes y Consultas"));
+        btnSalir.addActionListener(e -> salir());
     }
 
-//    private void abrirEstudiantes() {
-//        EstudianteView view = new EstudianteView();
-//        abrirVentana("Administración de Estudiantes", view.getPanelPrincipal(), 950, 650);
-//    }
-//
-//    private void abrirDocentes() {
-//        DocenteForm view = new DocenteForm();
-//        abrirVentana("Administración de Docentes", view.getPanelPrincipal(), 950, 650);
-//    }
-//
-//    private void abrirCursos() {
-//        CursoView view = new CursoView();
-//        abrirVentana("Administración de Cursos", view.getPanelPrincipal(), 950, 650);
-//    }
-//
-//    private void abrirPeriodos() {
-//        PeriodoAcademicoForm view = new PeriodoAcademicoForm();
-//        abrirVentana("Administración de Periodos Académicos", view.getPanelPrincipal(), 950, 650);
-//    }
-//
-//    private void abrirSecciones() {
-//        SeccionForm view = new SeccionForm();
-//        abrirVentana("Administración de Secciones", view.getPanelPrincipal(), 1050, 680);
-//    }
-//
-//    private void abrirHorarios() {
-//        HorarioSemanalForm view = new HorarioSemanalForm();
-//        abrirVentana("Administración de Horarios", view.getPanelPrincipal(), 900, 600);
-//    }
-//
-//    private void abrirInscripciones() {
-//        InscripcionForm view = new InscripcionForm();
-//        abrirVentana("Administración de Inscripciones", view.getPanelPrincipal(), 1050, 650);
-//    }
-//
-//    private void abrirSesiones() {
-//        SesionClaseForm view = new SesionClaseForm();
-//        abrirVentana("Administración de Sesiones", view.getPanelPrincipal(), 1050, 680);
-//    }
-//
-//    private void abrirDispositivos() {
-//        DispositivoForm view = new DispositivoForm();
-//        abrirVentana("Administración de Dispositivos", view.getPanelPrincipal(), 950, 650);
-//    }
-//
-//    private void abrirAsistencia() {
-//        AsistenciaForm view = new AsistenciaForm();
-//        abrirVentana("Control de Asistencia y Marcajes", view.getPanelPrincipal(), 1100, 700);
-//    }
-//
-//    private void abrirJustificaciones() {
-//        JustificacionForm view = new JustificacionForm();
-//        abrirVentana("Administración de Justificaciones", view.getPanelPrincipal(), 1100, 700);
-//    }
-//
-//    private void abrirUsuarios() {
-//        UsuarioForm view = new UsuarioForm(usuarioAutenticado);
-//        abrirVentana("Administración de Usuarios", view.getPanelPrincipal(), 1050, 650);
-//    }
+    private void abrirUsuarios() {
+        // Instancia la vista pasando el usuario autenticado que ya tienes en MainForm
+        UsuarioView view = new UsuarioView(usuarioAutenticado);
 
-    /** Abre cualquier catálogo dentro de una ventana secundaria. */
+        // Abre la ventana usando el método auxiliar que ya tienes en MainForm
+        abrirVentana("Administración de Usuarios", view.getPanelPrincipal(), 1050, 650);
+    }
+
+    /** Método temporal para avisar que el módulo está en construcción hasta que enlacemos su vista respectiva. */
+    private void mostrarMensajeModulo(String modulo) {
+        JOptionPane.showMessageDialog(
+                panelPrincipal,
+                "Abriendo el módulo de: " + modulo,
+                "SIGELAB",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    /** Abre cualquier catálogo dentro de una ventana secundaria de forma segura. */
     private void abrirVentana(String titulo, JPanel panel, int ancho, int alto) {
         JFrame ventana = new JFrame(titulo);
         ventana.setContentPane(panel);
