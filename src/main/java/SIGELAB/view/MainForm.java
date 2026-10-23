@@ -1,6 +1,7 @@
 package SIGELAB.view;
 
 import SIGELAB.model.Usuario;
+import SIGELAB.model.Laboratorio;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +46,7 @@ public class MainForm {
         btnPrestamos.addActionListener(e -> mostrarMensajeModulo("Préstamos de Equipos"));
         btnRegistrarDevolucion.addActionListener(e -> mostrarMensajeModulo("Registrar Devolución"));
         btnMantenimiento.addActionListener(e -> mostrarMensajeModulo("Equipos en Mantenimiento"));
-        btnLaboratorios.addActionListener(e -> mostrarMensajeModulo("Catálogo de Laboratorios"));
+        btnLaboratorios.addActionListener(e -> abrirCatlogoLaboratorios());
         btnUsuarios.addActionListener(e -> abrirUsuarios());
         btnAuditoria.addActionListener(e -> mostrarMensajeModulo("Registro de Auditoría"));
         btnReportes.addActionListener(e -> mostrarMensajeModulo("Reportes y Consultas"));
@@ -56,10 +57,13 @@ public class MainForm {
         // Instancia la vista pasando el usuario autenticado que ya tienes en MainForm
         UsuarioView view = new UsuarioView(usuarioAutenticado);
 
-        // Abre la ventana usando el método auxiliar que ya tienes en MainForm
         abrirVentana("Administración de Usuarios", view.getPanelPrincipal(), 1050, 650);
     }
 
+    private void abrirCatlogoLaboratorios() {
+        CatalogoLaboratorios ventana = new CatalogoLaboratorios();
+        ventana.setVisible(true);
+    }
     /** Método temporal para avisar que el módulo está en construcción hasta que enlacemos su vista respectiva. */
     private void mostrarMensajeModulo(String modulo) {
         JOptionPane.showMessageDialog(

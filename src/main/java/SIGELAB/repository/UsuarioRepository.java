@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class UsuarioRepository {
-    private static final String SELECT = "SELECT u.id, u.nombre, u.apellido, u.username, u.password_hash, u.correo, r.nombre AS rol_nombre, u.estado, u.fecha_creacion, u.referencia_facial " +
+    private static final String SELECT = "SELECT u.id, u.nombre, u.apellido, u.username, u.password_hash, u.correo, r.nombre AS rol_nombre, u.estado, u.fecha_creacion " +
             "FROM Usuario u LEFT JOIN Rol r ON r.id = u.rol_id ";
 
     public boolean guardar(Usuario usuario) {
-        String sql = "INSERT INTO Usuario (nombre, apellido, username, password_hash, correo, rol_id, estado, referencia_facial) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Usuario (nombre, apellido, username, password_hash, correo, rol_id, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection c = DatabaseConnection.getConnection(); PreparedStatement s = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             s.setString(1, usuario.getNombres());
             s.setString(2, usuario.getApellidos());
@@ -25,7 +25,6 @@ public class UsuarioRepository {
             s.setString(5, usuario.getCorreo());
             s.setInt(6, usuario.getRol() == RolUsuario.ADMIN ? 1 : 2); // 1 = ADMIN, 2 = ENCARGADO
             s.setString(7, usuario.isActivo() ? "ACTIVO" : "INACTIVO");
-            s.setString(8, usuario.getReferenciaFacial());
 
             if (s.executeUpdate() == 0) return false;
             try (ResultSet keys = s.getGeneratedKeys()) {
@@ -47,10 +46,9 @@ public class UsuarioRepository {
             s.setString(1, nombre);
             try (ResultSet rs = s.executeQuery()) {
                 return rs.next() ? Optional.of(mapear(rs)) : Optional.empty();
-
             }
-
         } catch (SQLException e) {
+            e.printStackTrace();
             throw JdbcSupport.error("buscar el usuario", e);
         }
     }
@@ -78,7 +76,7 @@ public class UsuarioRepository {
     }
 
     public boolean actualizar(Usuario u) {
-        String sql = "UPDATE Usuario SET nombre = ?, apellido = ?, username = ?, password_hash = ?, correo = ?, rol_id = ?, estado = ?, referencia_facial = ? WHERE id = ?";
+        String sql = "UPDATE Usuario SET nombre = ?, apellido = ?, username = ?, password_hash = ?, correo = ?, rol_id = ?, estado = ? WHERE id = ?";
         try (Connection c = DatabaseConnection.getConnection(); PreparedStatement s = c.prepareStatement(sql)) {
             s.setString(1, u.getNombres());
             s.setString(2, u.getApellidos());
@@ -87,8 +85,7 @@ public class UsuarioRepository {
             s.setString(5, u.getCorreo());
             s.setInt(6, u.getRol() == RolUsuario.ADMIN ? 1 : 2);
             s.setString(7, u.isActivo() ? "ACTIVO" : "INACTIVO");
-            s.setString(8, u.getReferenciaFacial());
-            s.setInt(9, u.getIdUsuario());
+            s.setInt(8, u.getIdUsuario());
             return s.executeUpdate() > 0;
         } catch (SQLException e) {
             throw JdbcSupport.error("actualizar el usuario", e);
@@ -166,25 +163,9 @@ public class UsuarioRepository {
         usuario.setActivo(activo);
 
         try {
-            usuario.setReferenciaFacial(rs.getString("referencia_facial"));
-        } catch (Exception ignored) {}
-
-        try {
             usuario.setFechaCreacion(rs.getObject("fecha_creacion", LocalDateTime.class));
         } catch (Exception ignored) {}
 
         return usuario;
-    }
-
-    public Optional<Usuario> buscarPorReferenciaFacial(String referenciaFacial) {
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement s = c.prepareStatement(SELECT + "WHERE u.referencia_facial = ?")) {
-            s.setString(1, referenciaFacial);
-            try (ResultSet rs = s.executeQuery()) {
-                return rs.next() ? Optional.of(mapear(rs)) : Optional.empty();
-            }
-        } catch (SQLException e) {
-            throw JdbcSupport.error("buscar usuario por referencia facial", e);
-        }
     }
 }

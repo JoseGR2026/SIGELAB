@@ -11,6 +11,7 @@ public class  Main {
 
         SwingUtilities.invokeLater(() -> {
             asegurarUsuarioAdministrador();
+            iniciarServicioFacialAutomatico();
 
             LoginForm loginForm = new LoginForm();
             JFrame frame = new JFrame("Sistema de Gestión y Control de Laboratorios");
@@ -22,7 +23,26 @@ public class  Main {
             frame.setVisible(true);
         });
     }
+    public static void iniciarServicioFacialAutomatico() {
+        try {
+            // Ruta donde tienes tu script de inicio
+            String rutaProyecto = "C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB\\facial-service";
 
+            // Comando para ejecutar PowerShell con el script start-facial.ps1
+            ProcessBuilder builder = new ProcessBuilder(
+                    "powershell.exe",
+                    "-ExecutionPolicy", "Bypass",
+                    "-File", ".\\start-facial.ps1"
+            );
+            builder.directory(new java.io.File(rutaProyecto));
+
+            // Inicia el proceso en segundo plano de manera independiente
+            builder.start();
+            System.out.println("Servicio facial iniciado automáticamente.");
+        } catch (Exception e) {
+            System.err.println("No se pudo iniciar el servicio facial automáticamente: " + e.getMessage());
+        }
+    }
     /** Crea las credenciales iniciales solo si todavía no existen. */
     private static void asegurarUsuarioAdministrador() {
         try {
