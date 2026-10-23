@@ -28,7 +28,7 @@ public class  Main {
         try {
             UsuarioController controller = new UsuarioController();
             if (controller.buscarPorUsuario("admin").isEmpty()) {
-                controller.crearUsuario("Admin", "Sistema", "admin", "1234", RolUsuario.ADMIN, "admin@sigelab.com", null);
+                controller.crearUsuario("Admin", "Sistema", "admin", "1234", RolUsuario.ADMIN, "admin@sigelab.com");
             }
         } catch (RuntimeException e) {
             System.err.println("No fue posible verificar el usuario admin: " + e.getMessage());

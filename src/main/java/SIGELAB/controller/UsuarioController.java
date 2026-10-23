@@ -17,9 +17,9 @@ public class UsuarioController {
         this.service = service;
     }
 
-    public Usuario crearUsuario(String nombres, String apellidos, String username, String password, RolUsuario rol, String correo, String referenciaFacial) {
+    public Usuario crearUsuario(String nombres, String apellidos, String username, String password, RolUsuario rol, String correo) {
         // Llama al servicio que procesa y guarda todos los datos reales del formulario
-        return service.crearUsuario(nombres, apellidos, username, password, rol, correo, referenciaFacial);
+        return service.crearUsuario(nombres, apellidos, username, password, rol, correo);
     }
 
     public Optional<Usuario> autenticar(String usuario, String password) {

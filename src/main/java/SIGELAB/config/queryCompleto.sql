@@ -1,8 +1,7 @@
--- =====================================================================
--- SCRIPT COMPLETO: Sistema de Gestión y Control de Laboratorios (SIGELAB)
+==========================================
+//Sistema de Gestión y Control de Laboratorios (SIGELAB)
 -- =====================================================================
 
--- Eliminar la base de datos si ya existe para evitar conflictos en pruebas
 IF EXISTS (SELECT * FROM sys.databases WHERE name = 'SIGELAB_DB')
 BEGIN
     ALTER DATABASE SIGELAB_DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
@@ -16,18 +15,14 @@ GO
 USE SIGELAB_DB;
 GO
 
--- ---------------------------------------------------------------------
--- 1. TABLA DE ROLES
--- ---------------------------------------------------------------------
+-- 1. Tabla de Roles
 CREATE TABLE Rol (
                      id INT IDENTITY(1,1) PRIMARY KEY,
                      nombre VARCHAR(50) NOT NULL UNIQUE
 );
 GO
 
--- ---------------------------------------------------------------------
--- 2. TABLA DE USUARIOS
--- ---------------------------------------------------------------------
+-- 2. Tabla de Usuarios
 CREATE TABLE Usuario (
                          id INT IDENTITY(1,1) PRIMARY KEY,
                          nombre VARCHAR(100) NOT NULL,
@@ -37,13 +32,12 @@ CREATE TABLE Usuario (
                          correo VARCHAR(100) NOT NULL,
                          rol_id INT NOT NULL,
                          estado VARCHAR(20) NOT NULL CHECK (estado IN ('ACTIVO', 'INACTIVO')),
+                         fecha_creacion DATETIME NOT NULL DEFAULT GETDATE(),
                          FOREIGN KEY (rol_id) REFERENCES Rol(id)
 );
 GO
 
--- ---------------------------------------------------------------------
--- 3. TABLA DE LABORATORIOS
--- ---------------------------------------------------------------------
+-- 3. Tabla de Laboratorios
 CREATE TABLE Laboratorio (
                              id INT IDENTITY(1,1) PRIMARY KEY,
                              codigo VARCHAR(50) NOT NULL UNIQUE,
@@ -54,18 +48,14 @@ CREATE TABLE Laboratorio (
 );
 GO
 
--- ---------------------------------------------------------------------
--- 4. TABLA DE TIPOS DE EQUIPO (Catálogo)
--- ---------------------------------------------------------------------
+-- 4. Tabla de Tipos de Equipo
 CREATE TABLE TipoEquipo (
                             id INT IDENTITY(1,1) PRIMARY KEY,
                             nombre VARCHAR(100) NOT NULL UNIQUE
 );
 GO
 
--- ---------------------------------------------------------------------
--- 5. TABLA DE EQUIPOS
--- ---------------------------------------------------------------------
+-- 5. Tabla de Equipos
 CREATE TABLE Equipo (
                         id INT IDENTITY(1,1) PRIMARY KEY,
                         codigo_inventario VARCHAR(50) NOT NULL UNIQUE,
@@ -82,9 +72,7 @@ CREATE TABLE Equipo (
 );
 GO
 
--- ---------------------------------------------------------------------
--- 6. TABLA DE PRÉSTAMOS (Encabezado)
--- ---------------------------------------------------------------------
+-- 6. Tabla de Préstamos
 CREATE TABLE Prestamo (
                           id INT IDENTITY(1,1) PRIMARY KEY,
                           solicitante VARCHAR(150) NOT NULL,
@@ -97,9 +85,7 @@ CREATE TABLE Prestamo (
 );
 GO
 
--- ---------------------------------------------------------------------
--- 7. TABLA DE DETALLE DE PRÉSTAMOS
--- ---------------------------------------------------------------------
+-- 7. Tabla de Detalle de Préstamos
 CREATE TABLE DetallePrestamo (
                                  id INT IDENTITY(1,1) PRIMARY KEY,
                                  prestamo_id INT NOT NULL,
@@ -110,9 +96,7 @@ CREATE TABLE DetallePrestamo (
 );
 GO
 
--- ---------------------------------------------------------------------
--- 8. TABLA DE MANTENIMIENTO
--- ---------------------------------------------------------------------
+-- 8. Tabla de Mantenimiento
 CREATE TABLE Mantenimiento (
                                id INT IDENTITY(1,1) PRIMARY KEY,
                                equipo_id INT NOT NULL,
@@ -128,9 +112,7 @@ CREATE TABLE Mantenimiento (
 );
 GO
 
--- ---------------------------------------------------------------------
--- 9. TABLA DE AUDITORÍA
--- ---------------------------------------------------------------------
+-- 9. Tabla de Auditoría
 CREATE TABLE Auditoria (
                            id INT IDENTITY(1,1) PRIMARY KEY,
                            usuario_id INT,
@@ -147,30 +129,43 @@ GO
 -- INSERCIÓN DE DATOS INICIALES (SEEDS)
 -- =====================================================================
 
--- 1. Roles
+-- Roles
 INSERT INTO Rol (nombre) VALUES ('ADMIN'), ('ENCARGADO');
 
--- 2. Usuarios de Prueba (Contraseña en texto plano o hash según configures tu app)
-INSERT INTO Usuario (nombre, apellido, username, password_hash, correo, rol_id, estado)
-VALUES
-    ('José', 'González', 'admin', '123456', 'admin@sigelab.com', 1, 'ACTIVO'),
-    ('Carlos', 'Pérez', 'encargado1', '123456', 'carlos@sigelab.com', 2, 'ACTIVO');
+-- Usuario Administrador por defecto (Contraseña plana '123456')
+INSERT INTO Usuario (nombre, apellido, username, password_hash, correo, rol_id, estado, referencia_facial)
+VALUES ('José', 'González', 'admin', 'admin', 'admin@sigelab.com', 1, 'ACTIVO', 'jose');
 
--- 3. Laboratorios
+-- Laboratorios de Prueba
 INSERT INTO Laboratorio (codigo, nombre, ubicacion, capacidad, estado)
-VALUES
-    ('LAB-01', 'Laboratorio de Redes', 'Edificio A - Nivel 2', 30, 'ACTIVO'),
-    ('LAB-02', 'Laboratorio de Software', 'Edificio B - Nivel 1', 25, 'ACTIVO');
-
--- 4. Tipos de Equipo
-INSERT INTO TipoEquipo (nombre)
-VALUES ('Laptop'), ('Proyector'), ('Cámara'), ('Router'), ('Tablet');
-
--- 5. Equipos (Incluyendo el CAM-001 de los casos de prueba de la guía)
-INSERT INTO Equipo (codigo_inventario, nombre, tipo_equipo_id, marca, modelo, numero_serie, laboratorio_id, estado, observaciones)
-VALUES
-    ('CAM-001', 'Cámara Sony Alpha', 3, 'Sony', 'A6400', 'SN-987654', 1, 'DISPONIBLE', 'Excelente estado general'),
-    ('LAP-001', 'Laptop Latitude 3420', 1, 'Dell', 'Latitude', 'DL-554433', 2, 'DISPONIBLE', 'Pantalla de 14 pulgadas'),
-    ('PRO-001', 'Proyector PowerLite', 2, 'Epson', 'X49', 'EP-112233', 1, 'DISPONIBLE', 'Incluye control remoto');
-
+VALUES ('LAB-01', 'Laboratorio de Redes', 'Edificio A - Nivel 2', 30, 'ACTIVO');
 GO
+
+
+ALTER TABLE Usuario ADD referencia_facial VARCHAR(255) NULL;
+
+USE SIGELAB_DB;
+GO
+
+SELECT * FROM Usuario;
+
+UPDATE Usuario
+SET password_hash = '1234',
+    estado = 'ACTIVO'
+WHERE username = 'jos';
+
+DELETE FROM Usuario ;
+
+DBCC CHECKIDENT ('Usuario', RESEED, 0);
+
+
+USE SIGELAB_DB;
+
+-- 1. Crea la tabla principal
+CREATE TABLE dbo.Usuario (
+                             id_usuario INT IDENTITY(1,1) PRIMARY KEY,
+                             username NVARCHAR(50) NOT NULL
+);
+
+-- 2. Inserta tu usuario admin de prueba
+INSERT INTO dbo.Usuario (username) VALUES ('admin');

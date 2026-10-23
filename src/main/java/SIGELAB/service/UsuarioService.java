@@ -14,7 +14,7 @@ public class UsuarioService {
     public UsuarioService() { this(new UsuarioRepository()); }
     public UsuarioService(UsuarioRepository repository) { this.repository = repository; }
 
-    public Usuario crearUsuario(String nombres, String apellidos, String usuario, String password, RolUsuario rol, String correo, String referenciaFacial) {
+    public Usuario crearUsuario(String nombres, String apellidos, String usuario, String password, RolUsuario rol, String correo) {
         if (usuario == null || usuario.isBlank()) throw new BusinessException("El usuario es obligatorio.");
         if (password == null || password.isBlank()) throw new BusinessException("La contraseña es obligatoria.");
         if (rol == null) throw new BusinessException("El rol es obligatorio.");
