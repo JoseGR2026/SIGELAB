@@ -45,8 +45,8 @@ public class MainForm {
 
         btnPrestamos.addActionListener(e -> mostrarMensajeModulo("Préstamos de Equipos"));
         btnRegistrarDevolucion.addActionListener(e -> mostrarMensajeModulo("Registrar Devolución"));
-        btnMantenimiento.addActionListener(e -> mostrarMensajeModulo("Equipos en Mantenimiento"));
         btnLaboratorios.addActionListener(e -> abrirCatlogoLaboratorios());
+        btnMantenimiento.addActionListener(e -> MantenimientoEquipos());
         btnUsuarios.addActionListener(e -> abrirUsuarios());
         btnAuditoria.addActionListener(e -> mostrarMensajeModulo("Registro de Auditoría"));
         btnReportes.addActionListener(e -> mostrarMensajeModulo("Reportes y Consultas"));
@@ -74,6 +74,11 @@ public class MainForm {
 
     private void abrirInventarioEquipos() {
         InventarioEquipo ventana = new InventarioEquipo();
+        ventana.setVisible(true);
+    }
+
+    private void MantenimientoEquipos() {
+        MantenimientoEquipos ventana = new MantenimientoEquipos();
         ventana.setVisible(true);
     }
 

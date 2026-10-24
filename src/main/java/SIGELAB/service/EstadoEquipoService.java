@@ -16,6 +16,8 @@ public class EstadoEquipoService {
         return repository.listar();
     }
 
+
+
     public boolean crearEquipo(int laboratorioId, String codigoInventario, String nombre,
                                String marca, String modelo, String numeroSerie,
                                String tipo, String estado, String observaciones) {
@@ -56,6 +58,20 @@ public class EstadoEquipoService {
         equipo.setObservaciones(observaciones != null ? observaciones.trim() : "");
 
         return repository.guardar(equipo);
+    }
+
+    public boolean enviarAMantenimiento(int equipoId, String motivo) {
+        if (motivo == null || motivo.trim().isEmpty()) {
+            throw new IllegalArgumentException("Debe especificar el motivo o la observación del mantenimiento.");
+        }
+        return repository.actualizarEstadoYObservaciones(equipoId, "MANTENIMIENTO", "Mantenimiento: " + motivo.trim());
+    }
+
+    public boolean finalizarMantenimiento(int equipoId, boolean reparadoConExito) {
+        String nuevoEstado = reparadoConExito ? "DISPONIBLE" : "DADO_DE_BAJA";
+        String observacionFinal = reparadoConExito ? "Equipo reparado y devuelto a disponibilidad." : "Equipo dado de baja tras mantenimiento.";
+
+        return repository.actualizarEstadoYObservaciones(equipoId, nuevoEstado, observacionFinal);
     }
 
     public boolean actualizar(EstadoEquipo equipo) {

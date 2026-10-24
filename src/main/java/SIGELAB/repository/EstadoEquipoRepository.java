@@ -128,4 +128,17 @@ public class EstadoEquipoRepository {
         eq.setObservaciones(rs.getString("observaciones"));
         return eq;
     }
+
+    public boolean actualizarEstadoYObservaciones(int equipoId, String nuevoEstado, String observaciones) {
+        String sql = "UPDATE Equipo SET estado = ?, observaciones = ? WHERE id = ?";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement s = c.prepareStatement(sql)) {
+            s.setString(1, nuevoEstado);
+            s.setString(2, observaciones);
+            s.setInt(3, equipoId);
+            return s.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw JdbcSupport.error("actualizar el estado de mantenimiento del equipo", e);
+        }
+    }
 }

@@ -5,14 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="Catalogo de laboratiorios completo con view y reglas">
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/EstadoEquipoController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/model/EstadoEquipo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/MantenimientoEquipoController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.form" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/facial-service/.venv/pyvenv.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.venv/pyvenv.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/EstadoEquipoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/EstadoEquipoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -24,6 +24,9 @@
     <colors>
       <entry key="8e8c47e9-98bb-40f6-91c7-3bd61bf7dd94" value="" />
     </colors>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="23350" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -54,61 +57,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0017003906388307" />
-      <entry key="MS500" value="1.3498447377148395" />
-      <entry key="S2" value="3.6343184408281926" />
-      <entry key="S5" value="7.813346413973379" />
-      <entry key="S10" value="11.631664814804013" />
-      <entry key="S30" value="15.961688481773349" />
-      <entry key="S60" value="17.39138679816249" />
-      <entry key="M2" value="18.17182464308096" />
-      <entry key="M5" value="18.66280227811405" />
-      <entry key="M10" value="18.83972468551285" />
-      <entry key="M15" value="19.005137777098174" />
-      <entry key="M30" value="20.55889709032644" />
-      <entry key="H1" value="25.41804763829717" />
-      <entry key="H2" value="33.24841884249299" />
-      <entry key="H4" value="46.835861852122044" />
-      <entry key="D1" value="136.15480492802558" />
-      <entry key="W1" value="200.46961825480838" />
+      <entry key="MS100" value="7.538858963841532E-23" />
+      <entry key="MS500" value="3.762367922711739E-5" />
+      <entry key="S2" value="0.08018376214926073" />
+      <entry key="S5" value="0.44993486770160956" />
+      <entry key="S10" value="1.0527023475215809" />
+      <entry key="S30" value="4.4916783896157355" />
+      <entry key="S60" value="9.97373985585445" />
+      <entry key="M2" value="16.077225292519785" />
+      <entry key="M5" value="21.849622951610055" />
+      <entry key="M10" value="24.28094359222774" />
+      <entry key="M15" value="25.25572467106922" />
+      <entry key="M30" value="27.609232234730165" />
+      <entry key="H1" value="32.84597827459357" />
+      <entry key="H2" value="40.88588659902089" />
+      <entry key="H4" value="54.58880003220385" />
+      <entry key="D1" value="144.04178299837375" />
+      <entry key="W1" value="208.44608218944288" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="2.3203430545137422E-175" />
-      <entry key="S30" value="7.30927298232004E-59" />
-      <entry key="S60" value="1.1264169190680082E-29" />
-      <entry key="M2" value="4.6834210652898674E-15" />
-      <entry key="M5" value="3.04238128460281E-6" />
-      <entry key="M10" value="0.0028636365618677087" />
-      <entry key="M15" value="0.028718314488610657" />
-      <entry key="M30" value="0.29877826514749156" />
-      <entry key="H1" value="1.0226086305983442" />
-      <entry key="H2" value="2.1210557792741906" />
-      <entry key="H4" value="4.586740321503434" />
-      <entry key="D1" value="23.505458068974658" />
-      <entry key="W1" value="37.574945412943855" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0000152640782722" />
+      <entry key="S5" value="1.0118431773750671" />
+      <entry key="S10" value="1.1088263634192892" />
+      <entry key="S30" value="1.4774318328454021" />
+      <entry key="S60" value="1.6909644222717999" />
+      <entry key="M2" value="1.831242697575025" />
+      <entry key="M5" value="1.9287359695460262" />
+      <entry key="M10" value="1.9662588819319846" />
+      <entry key="M15" value="2.002242403083909" />
+      <entry key="M30" value="2.2752239113272177" />
+      <entry key="H1" value="2.9969287029076064" />
+      <entry key="H2" value="4.097620013837346" />
+      <entry key="H4" value="6.5631341572773305" />
+      <entry key="D1" value="25.486315810479088" />
+      <entry key="W1" value="39.57059442899637" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9476887716228124" />
-      <entry key="MS500" value="1.336017611314665" />
-      <entry key="S2" value="3.6248420876622003" />
-      <entry key="S5" value="7.796779886223686" />
-      <entry key="S10" value="11.613897313084756" />
-      <entry key="S30" value="15.951353038160043" />
-      <entry key="S60" value="17.385421141258522" />
-      <entry key="M2" value="18.168618017935742" />
-      <entry key="M5" value="18.661465523569806" />
-      <entry key="M10" value="18.841897718764994" />
-      <entry key="M15" value="19.03332273635935" />
-      <entry key="M30" value="20.857016127019538" />
-      <entry key="H1" value="26.439789119377938" />
-      <entry key="H2" value="35.36862420054024" />
-      <entry key="H4" value="51.421668071212636" />
-      <entry key="D1" value="159.65937220892465" />
-      <entry key="W1" value="238.0443603392314" />
+      <entry key="MS100" value="5.647891522975037E-4" />
+      <entry key="MS500" value="0.22407856400217957" />
+      <entry key="S2" value="0.7479063604710323" />
+      <entry key="S5" value="1.2667325454935456" />
+      <entry key="S10" value="2.0150560168828116" />
+      <entry key="S30" value="5.882556501567412" />
+      <entry key="S60" value="11.610601173954352" />
+      <entry key="M2" value="17.8774727847217" />
+      <entry key="M5" value="23.76475476392942" />
+      <entry key="M10" value="26.240161127384344" />
+      <entry key="M15" value="27.25315364169953" />
+      <entry key="M30" value="29.881644010901294" />
+      <entry key="H1" value="35.84096291702711" />
+      <entry key="H2" value="44.98211647198913" />
+      <entry key="H4" value="61.150730353053575" />
+      <entry key="D1" value="169.5271629919396" />
+      <entry key="W1" value="248.01646677735192" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -144,7 +147,7 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Jose Gonzalez/CLionProjects/SIGELAB/src/main/java/SIGELAB/view",
+    "last_opened_file_path": "C:/Users/Jose Gonzalez/CLionProjects/SIGELAB",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.jshint": "true",
     "node.js.detected.package.tslint": "true",
@@ -165,11 +168,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Jose Gonzalez\OneDrive\Escritorio\Tareas UMG\Cuarto semestre\SIGELAB\src\main\java\SIGELAB\view" />
       <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java\SIGELAB\view" />
       <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java\SIGELAB\util" />
       <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB" />
       <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\facial-service" />
-      <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java\SIGELAB\config" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java" />
@@ -178,10 +181,10 @@
       <recent name="" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="SIGELAB.repository" />
       <recent name="SIGELAB.model" />
       <recent name="SIGELAB.controller" />
       <recent name="SIGELAB.service" />
+      <recent name="SIGELAB.repository" />
       <recent name="SIGELAB.enums" />
     </key>
   </component>

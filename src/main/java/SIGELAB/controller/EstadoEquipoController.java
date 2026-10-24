@@ -12,6 +12,8 @@ public class EstadoEquipoController {
         return service.listar();
     }
 
+
+
     public boolean crearEquipo(int laboratorioId, String codigoInventario, String nombre,
                                String marca, String modelo, String numeroSerie,
                                String tipo, String estado, String observaciones) {
