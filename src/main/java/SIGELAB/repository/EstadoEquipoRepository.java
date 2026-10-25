@@ -129,6 +129,24 @@ public class EstadoEquipoRepository {
         return eq;
     }
 
+    public EstadoEquipo buscarPorId(int id) {
+        String sql = SELECT + "WHERE id = ?";
+
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement s = c.prepareStatement(sql)) {
+            s.setInt(1, id);
+            try (ResultSet rs = s.executeQuery()) {
+                if (rs.next()) {
+                    return mapear(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error SQL al buscar ID: " + e.getMessage());
+            throw JdbcSupport.error("buscar el equipo por ID", e);
+        }
+        return null;
+    }
+
     public boolean actualizarEstadoYObservaciones(int equipoId, String nuevoEstado, String observaciones) {
         String sql = "UPDATE Equipo SET estado = ?, observaciones = ? WHERE id = ?";
         try (Connection c = DatabaseConnection.getConnection();

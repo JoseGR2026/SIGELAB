@@ -61,15 +61,32 @@ public class EstadoEquipoService {
     }
 
     public boolean enviarAMantenimiento(int equipoId, String motivo) {
+        EstadoEquipo equipoActual = repository.buscarPorId(equipoId);
+
+        if (equipoActual != null && "DADO_DE_BAJA".equalsIgnoreCase(equipoActual.getEstado())) {
+            throw new IllegalStateException("Acción denegada: El equipo ya se encuentra DADO DE BAJA y no puede ser reparado ni puesto como disponible.");
+        }
+
         if (motivo == null || motivo.trim().isEmpty()) {
             throw new IllegalArgumentException("Debe especificar el motivo o la observación del mantenimiento.");
         }
+
         return repository.actualizarEstadoYObservaciones(equipoId, "MANTENIMIENTO", "Mantenimiento: " + motivo.trim());
     }
 
     public boolean finalizarMantenimiento(int equipoId, boolean reparadoConExito) {
+        // 1. Consultar el equipo actual para verificar su estado en la base de datos
+        EstadoEquipo equipoActual = repository.buscarPorId(equipoId);
+
+        if (equipoActual != null && "DADO_DE_BAJA".equalsIgnoreCase(equipoActual.getEstado())) {
+            throw new IllegalStateException("Acción denegada: El equipo ya se encuentra DADO DE BAJA y no puede ser reparado ni puesto como disponible.");
+        }
+
+
+
+        // 2. Si pasa la validación, continúa el flujo normal
         String nuevoEstado = reparadoConExito ? "DISPONIBLE" : "DADO_DE_BAJA";
-        String observacionFinal = reparadoConExito ? "Equipo reparado y devuelto a disponibilidad." : "Equipo dado de baja tras mantenimiento.";
+        String observacionFinal = reparadoConExito ? "Reparado exitosamente - Disponible" : "Dado de baja por daños irreparables en taller";
 
         return repository.actualizarEstadoYObservaciones(equipoId, nuevoEstado, observacionFinal);
     }

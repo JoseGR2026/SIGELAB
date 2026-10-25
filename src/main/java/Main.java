@@ -25,6 +25,7 @@ public class  Main {
     }
     public static void iniciarServicioFacialAutomatico() {
         try {
+
             // Ruta donde tienes tu script de inicio
             String rutaProyecto = "C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB\\facial-service";
 

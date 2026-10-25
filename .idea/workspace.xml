@@ -4,16 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="Catalogo de laboratiorios completo con view y reglas">
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/MantenimientoEquipoController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.form" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
+    <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="Equipos en mantenimiento completos con modificaciones claras">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/EstadoEquipoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/EstadoEquipoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/.env" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,61 +54,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="7.538858963841532E-23" />
-      <entry key="MS500" value="3.762367922711739E-5" />
-      <entry key="S2" value="0.08018376214926073" />
-      <entry key="S5" value="0.44993486770160956" />
-      <entry key="S10" value="1.0527023475215809" />
-      <entry key="S30" value="4.4916783896157355" />
-      <entry key="S60" value="9.97373985585445" />
-      <entry key="M2" value="16.077225292519785" />
-      <entry key="M5" value="21.849622951610055" />
-      <entry key="M10" value="24.28094359222774" />
-      <entry key="M15" value="25.25572467106922" />
-      <entry key="M30" value="27.609232234730165" />
-      <entry key="H1" value="32.84597827459357" />
-      <entry key="H2" value="40.88588659902089" />
-      <entry key="H4" value="54.58880003220385" />
-      <entry key="D1" value="144.04178299837375" />
-      <entry key="W1" value="208.44608218944288" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.000000000031716" />
+      <entry key="S2" value="1.0023731187341895" />
+      <entry key="S5" value="1.0891513219039022" />
+      <entry key="S10" value="1.2985821983011414" />
+      <entry key="S30" value="1.6720221525281596" />
+      <entry key="S60" value="1.9038208950770898" />
+      <entry key="M2" value="2.4733649064949166" />
+      <entry key="M5" value="7.2395601721772875" />
+      <entry key="M10" value="17.59480106863734" />
+      <entry key="M15" value="25.255045828588493" />
+      <entry key="M30" value="38.062672001366614" />
+      <entry key="H1" value="50.364091886040434" />
+      <entry key="H2" value="62.8511774677199" />
+      <entry key="H4" value="79.1168661891103" />
+      <entry key="D1" value="171.32463445962583" />
+      <entry key="W1" value="237.10117676416624" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0000152640782722" />
-      <entry key="S5" value="1.0118431773750671" />
-      <entry key="S10" value="1.1088263634192892" />
-      <entry key="S30" value="1.4774318328454021" />
-      <entry key="S60" value="1.6909644222717999" />
-      <entry key="M2" value="1.831242697575025" />
-      <entry key="M5" value="1.9287359695460262" />
-      <entry key="M10" value="1.9662588819319846" />
-      <entry key="M15" value="2.002242403083909" />
-      <entry key="M30" value="2.2752239113272177" />
-      <entry key="H1" value="2.9969287029076064" />
-      <entry key="H2" value="4.097620013837346" />
-      <entry key="H4" value="6.5631341572773305" />
-      <entry key="D1" value="25.486315810479088" />
-      <entry key="W1" value="39.57059442899637" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="9.21508318050791E-202" />
+      <entry key="S5" value="3.8986141970219566E-81" />
+      <entry key="S10" value="6.88275117603511E-41" />
+      <entry key="S30" value="5.849790248201344E-14" />
+      <entry key="S60" value="3.3647351974646425E-7" />
+      <entry key="M2" value="8.168722001696626E-4" />
+      <entry key="M5" value="0.08811220388087976" />
+      <entry key="M10" value="0.42026414494127246" />
+      <entry key="M15" value="0.7157660292129189" />
+      <entry key="M30" value="1.3603521811814994" />
+      <entry key="H1" value="2.3173413876954307" />
+      <entry key="H2" value="3.6032009707903168" />
+      <entry key="H4" value="6.15445617566936" />
+      <entry key="D1" value="25.21467998325993" />
+      <entry key="W1" value="39.51006774395389" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="5.647891522975037E-4" />
-      <entry key="MS500" value="0.22407856400217957" />
-      <entry key="S2" value="0.7479063604710323" />
-      <entry key="S5" value="1.2667325454935456" />
-      <entry key="S10" value="2.0150560168828116" />
-      <entry key="S30" value="5.882556501567412" />
-      <entry key="S60" value="11.610601173954352" />
-      <entry key="M2" value="17.8774727847217" />
-      <entry key="M5" value="23.76475476392942" />
-      <entry key="M10" value="26.240161127384344" />
-      <entry key="M15" value="27.25315364169953" />
-      <entry key="M30" value="29.881644010901294" />
-      <entry key="H1" value="35.84096291702711" />
-      <entry key="H2" value="44.98211647198913" />
-      <entry key="H4" value="61.150730353053575" />
-      <entry key="D1" value="169.5271629919396" />
-      <entry key="W1" value="248.01646677735192" />
+      <entry key="MS100" value="2.7010056621928164E-7" />
+      <entry key="MS500" value="0.0485629543045479" />
+      <entry key="S2" value="0.47097039029184246" />
+      <entry key="S5" value="0.8138602314922758" />
+      <entry key="S10" value="1.1332866049430093" />
+      <entry key="S30" value="1.6036477142953123" />
+      <entry key="S60" value="1.8664050126465295" />
+      <entry key="M2" value="2.453073129418022" />
+      <entry key="M5" value="7.31522779359808" />
+      <entry key="M10" value="18.005373700567553" />
+      <entry key="M15" value="25.96273566106312" />
+      <entry key="M30" value="39.41755175855744" />
+      <entry key="H1" value="52.67784079261957" />
+      <entry key="H2" value="66.45205687103181" />
+      <entry key="H4" value="85.26962943741137" />
+      <entry key="D1" value="196.53829250628334" />
+      <entry key="W1" value="276.6110212082611" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -126,46 +123,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Application.Main.executor": "Run",
-    "Downloaded.Files.Path": "C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB",
-    "Downloaded.Files.Path.Enabled": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "UI_DESIGNER_EDITOR_MODE.PaletteManager.SHOW": "true",
-    "UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW": "true",
-    "UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH": "308",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Jose Gonzalez/CLionProjects/SIGELAB",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.jshint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.jshint": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "C:/Users/Jose Gonzalez/CLionProjects/SIGELAB/src/Main.java",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Downloaded.Files.Path&quot;: &quot;C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;UI_DESIGNER_EDITOR_MODE.PaletteManager.SHOW&quot;: &quot;true&quot;,
+    &quot;UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW&quot;: &quot;true&quot;,
+    &quot;UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH&quot;: &quot;308&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Jose Gonzalez/CLionProjects/SIGELAB&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.jshint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.jshint&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/Jose Gonzalez/CLionProjects/SIGELAB/src/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlserver.localdb"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlserver.localdb&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Jose Gonzalez\OneDrive\Escritorio\Tareas UMG\Cuarto semestre\SIGELAB\src\main\java\SIGELAB\view" />
@@ -220,6 +217,7 @@
     <MESSAGE value="Actualizacion base de datos del perfil facial y creacion de usuario view como tambien la creacion de usuaios nuevos" />
     <MESSAGE value="registro de usuarios completo" />
     <MESSAGE value="Catalogo de laboratiorios completo con view y reglas" />
-    <option name="LAST_COMMIT_MESSAGE" value="Catalogo de laboratiorios completo con view y reglas" />
+    <MESSAGE value="Equipos en mantenimiento completos con modificaciones claras" />
+    <option name="LAST_COMMIT_MESSAGE" value="Equipos en mantenimiento completos con modificaciones claras" />
   </component>
 </project>
