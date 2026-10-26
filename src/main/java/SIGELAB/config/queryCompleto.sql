@@ -1,5 +1,5 @@
-==========================================
-//Sistema de Gestión y Control de Laboratorios (SIGELAB)
+-- =====================================================================
+-- SCRIPT LIMPIO: Sistema de Gestión y Control de Laboratorios (SIGELAB)
 -- =====================================================================
 
 IF EXISTS (SELECT * FROM sys.databases WHERE name = 'SIGELAB_DB')
@@ -142,19 +142,14 @@ VALUES ('LAB-01', 'Laboratorio de Redes', 'Edificio A - Nivel 2', 30, 'ACTIVO');
 GO
 
 
-ALTER TABLE Usuario ADD referencia_facial VARCHAR(255) NULL;
-
-USE SIGELAB_DB;
-GO
-
-SELECT * FROM Usuario;
+SELECT * FROM Laboratorio;
 
 UPDATE Usuario
 SET password_hash = '1234',
     estado = 'ACTIVO'
 WHERE username = 'jos';
 
-DELETE FROM Usuario ;
+DELETE FROM Laboratorio ;
 
 DBCC CHECKIDENT ('Usuario', RESEED, 0);
 
@@ -169,3 +164,7 @@ CREATE TABLE dbo.Usuario (
 
 -- 2. Inserta tu usuario admin de prueba
 INSERT INTO dbo.Usuario (username) VALUES ('admin');
+
+INSERT INTO Equipo (codigo_inventario, nombre, tipo_equipo_id, marca, modelo, numero_serie, laboratorio_id, estado, observaciones)
+VALUES ('INV-001', 'Computadora Dell OptiPlex 7070', 1, 'Dell', 'OptiPlex', 'SN-12345', 1, 'DISPONIBLE', 'Buen estado general');
+GO
