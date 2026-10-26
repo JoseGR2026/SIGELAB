@@ -163,6 +163,7 @@ CREATE TABLE dbo.Usuario (
 );
 
 -- 2. Inserta tu usuario admin de prueba
+
 INSERT INTO dbo.Usuario (username) VALUES ('admin');
 
 INSERT INTO Equipo (codigo_inventario, nombre, tipo_equipo_id, marca, modelo, numero_serie, laboratorio_id, estado, observaciones)
