@@ -1,5 +1,5 @@
 -- =====================================================================
--- SCRIPT LIMPIO: Sistema de Gestión y Control de Laboratorios (SIGELAB)
+-- Sistema de Gestión y Control de Laboratorios (SIGELAB)
 -- =====================================================================
 
 IF EXISTS (SELECT * FROM sys.databases WHERE name = 'SIGELAB_DB')
