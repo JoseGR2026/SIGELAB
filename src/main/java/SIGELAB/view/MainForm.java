@@ -49,8 +49,16 @@ public class MainForm {
         btnMantenimiento.addActionListener(e -> MantenimientoEquipos());
         btnUsuarios.addActionListener(e -> abrirUsuarios());
         btnAuditoria.addActionListener(e -> mostrarMensajeModulo("Registro de Auditoría"));
-        btnReportes.addActionListener(e -> mostrarMensajeModulo("Reportes y Consultas"));
-        btnSalir.addActionListener(e -> salir());
+// Cambia esta línea:
+        // btnReportes.addActionListener(e -> mostrarMensajeModulo("Reportes y Consultas"));
+
+        // Por esta:
+        btnReportes.addActionListener(e -> abrirReportes());        btnSalir.addActionListener(e -> salir());
+    }
+
+    private void abrirReportes() {
+        ReportesView ventana = new ReportesView();
+        ventana.setVisible(true);
     }
 
     private void abrirUsuarios() {
