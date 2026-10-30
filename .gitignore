@@ -28,3 +28,25 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+facial-service/.venv/
+
+# Archivos temporales de Python
+facial-service/.venv/
+facial-service/**/__pycache__/
+facial-service/**/*.pyc
+
+# Copias de seguridad de variables de entorno
+facial-service/.env.backup*
+facial-service/.venv/
+facial-service/**/__pycache__/
+facial-service/**/*.pyc
+facial-service/.env
+facial-service/.env.*
+!facial-service/.env.example
+facial-service/.venv/
+facial-service/**/__pycache__/
+facial-service/**/*.pyc
+facial-service/.env
+facial-service/.env.*
+!facial-service/.env.example
+facial-service/.env.backup*
