@@ -196,7 +196,7 @@ public class MainForm extends JFrame {
     }
 
     private void abrirHistorialPrestamos() {
-        HistorialPrestamoView ventana = new HistorialPrestamoView();
+        ReportesView ventana = new ReportesView();
         ventana.setLocationRelativeTo(null);
         ventana.setVisible(true);
     }

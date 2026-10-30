@@ -4,32 +4,11 @@ import SIGELAB.repository.ReportesRepository;
 import java.util.List;
 
 public class ReportesService {
+    private final ReportesRepository repository = new ReportesRepository();
 
-    private final ReportesRepository reportesRepository;
-
-    public ReportesService() {
-        this.reportesRepository = new ReportesRepository();
-    }
-
-    public List<Object[]> obtenerEquiposPorEstado(String estado) {
-        if (estado == null || estado.trim().isEmpty()) {
-            return List.of();
-        }
-        return reportesRepository.obtenerEquiposPorEstado(estado);
-    }
-
-    // Servicio para obtener los préstamos según su estado (ej. ACTIVO, VENCIDO, etc.)
-    public List<Object[]> obtenerPrestamosPorEstado(String estadoPrestamo) {
-        return reportesRepository.obtenerPrestamosPorEstado(estadoPrestamo);
-    }
-
-    // Servicio para obtener los préstamos entre un rango de fechas
-    public List<Object[]> obtenerPrestamosPorFechas(String fechaInicio, String fechaFin) {
-        return reportesRepository.obtenerPrestamosPorFechas(fechaInicio, fechaFin);
-    }
-
-    // Servicio para el Dashboard
-    public int[] obtenerMetricasDashboard() {
-        return reportesRepository.obtenerMetricasDashboard();
-    }
+    public List<Object[]> obtenerEquiposPorEstado(String estado) { return repository.obtenerEquiposPorEstado(estado); }
+    public List<Object[]> obtenerPrestamosPorEstado(String estado) { return repository.obtenerPrestamosPorEstado(estado); }
+    public List<Object[]> obtenerPrestamosPorFechas(String ini, String fin) { return repository.obtenerPrestamosPorFechas(ini, fin); }
+    public List<Object[]> obtenerHistorialEquipo(String codigo) { return repository.obtenerHistorialEquipo(codigo); }
+    public List<Object[]> obtenerHistorialMantenimiento() { return repository.obtenerHistorialMantenimiento(); }
 }

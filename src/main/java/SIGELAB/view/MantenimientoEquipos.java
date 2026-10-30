@@ -73,11 +73,10 @@ public class MantenimientoEquipos extends JFrame {
 
         panelPrincipal.add(panelNorte, BorderLayout.NORTH);
 
-        // --- CONTENEDOR SUPERIOR (Filtro QR y Observaciones Manuales) ---
+        // --- CONTENEDOR SUPERIOR ---
         JPanel panelNorteContenedor = new JPanel(new BorderLayout(0, 12));
         panelNorteContenedor.setOpaque(false);
 
-        // Panel Filtro / QR
         JPanel panelQR = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         panelQR.setBackground(Color.WHITE);
         panelQR.setBorder(BorderFactory.createCompoundBorder(
@@ -107,7 +106,6 @@ public class MantenimientoEquipos extends JFrame {
         panelQR.add(btnCargarQRArchivo);
         panelNorteContenedor.add(panelQR, BorderLayout.NORTH);
 
-        // Panel Observaciones / Motivo 100% manual e independiente
         JPanel panelObservaciones = new JPanel(new BorderLayout(10, 5));
         panelObservaciones.setBackground(Color.WHITE);
         panelObservaciones.setBorder(BorderFactory.createCompoundBorder(
@@ -123,8 +121,7 @@ public class MantenimientoEquipos extends JFrame {
         lblObs.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblObs.setForeground(new Color(71, 85, 105));
 
-        textObservaciones = new JTextField();
-        textObservaciones.putClientProperty("JTextField.placeholderText", "Ingrese sus observaciones de forma manual para cualquier acción...");
+        textObservaciones = new JTextField("Equipo enviado a taller para revisión y mantenimiento preventivo/correctivo.");
         panelObservaciones.add(lblObs, BorderLayout.WEST);
         panelObservaciones.add(textObservaciones, BorderLayout.CENTER);
 
@@ -140,6 +137,10 @@ public class MantenimientoEquipos extends JFrame {
         table1.getTableHeader().setBackground(new Color(241, 245, 249));
         table1.getTableHeader().setForeground(new Color(51, 65, 85));
 
+        table1.getColumnModel().getColumn(0).setMinWidth(0);
+        table1.getColumnModel().getColumn(0).setMaxWidth(0);
+        table1.getColumnModel().getColumn(0).setWidth(0);
+
         JScrollPane scrollPane = new JScrollPane(table1);
         scrollPane.getViewport().setBackground(Color.WHITE);
         scrollPane.setBorder(BorderFactory.createTitledBorder(
@@ -149,7 +150,7 @@ public class MantenimientoEquipos extends JFrame {
         ));
         panelPrincipal.add(scrollPane, BorderLayout.CENTER);
 
-        // --- PANEL INFERIOR (Botones de Acción) ---
+        // --- PANEL INFERIOR ---
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         panelSur.setOpaque(false);
 
@@ -192,74 +193,133 @@ public class MantenimientoEquipos extends JFrame {
         table1.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 int fila = table1.getSelectedRow();
-                if (fila >= 0 && fila < listaEquipos.size()) {
-                    equipoSeleccionado = listaEquipos.get(table1.convertRowIndexToModel(fila));
+                if (fila >= 0) {
+                    try {
+                        int idEquipo = (int) table1.getValueAt(fila, 0);
+                        equipoSeleccionado = listaEquipos.stream()
+                                .filter(eq -> eq.getId() == idEquipo)
+                                .findFirst()
+                                .orElse(null);
+                    } catch (Exception ex) {
+                        equipoSeleccionado = null;
+                    }
                 }
             }
         });
 
         actualizarButton.addActionListener(e -> {
             cargarDatos();
-            textObservaciones.setText("");
+            textObservaciones.setText("Equipo enviado a taller para revisión y mantenimiento preventivo/correctivo.");
             txtEscanerQR.setText("");
         });
 
+        // 1. ENVIAR A MANTENIMIENTO
         enviarAMantenimientoButton.addActionListener(e -> {
             if (verificarSeleccion()) {
-                String motivo = textObservaciones.getText().trim();
-                if (motivo.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Debe ingresar una observación o motivo en el cuadro de texto.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    return;
+                String defectoPredeterminado = "Equipo enviado a taller por fallo general o revisión preventiva.";
+                textObservaciones.setText(defectoPredeterminado);
+
+                int respuesta = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Desea usar la observación predetermina para enviar a mantenimiento?\n\n• Sí: Usar: \"" + defectoPredeterminado + "\"\n• No: Escribir mi propia observación.",
+                        "Confirmar Observación",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                String motivo;
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    motivo = defectoPredeterminado;
+                } else {
+                    motivo = textObservaciones.getText().trim();
+                    if (motivo.isEmpty() || motivo.equals(defectoPredeterminado)) {
+                        String manual = JOptionPane.showInputDialog(this, "Ingrese el motivo de mantenimiento:", "Motivo Manual", JOptionPane.PLAIN_MESSAGE);
+                        if (manual == null || manual.trim().isEmpty()) return;
+                        motivo = manual.trim();
+                        textObservaciones.setText(motivo);
+                    }
                 }
+
                 try {
                     controller.enviarAMantenimiento(equipoSeleccionado.getId(), motivo);
                     JOptionPane.showMessageDialog(this, "Equipo enviado a mantenimiento exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                     cargarDatos();
-                    textObservaciones.setText("");
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
+        // 2. FINALIZAR (REPARADO)
         reparadoButton.addActionListener(e -> {
             if (verificarSeleccion()) {
-                String motivo = textObservaciones.getText().trim();
-                if (motivo.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Debe ingresar una observación detallando la reparación realizada.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-                int confirm = JOptionPane.showConfirmDialog(this, "¿El equipo fue reparado con éxito y pasa a estar DISPONIBLE?", "Confirmar Reparación", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    try {
-                        controller.finalizarMantenimiento(equipoSeleccionado.getId(), true, motivo);
-                        JOptionPane.showMessageDialog(this, "El equipo ha regresado a disponibilidad.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                        cargarDatos();
-                        textObservaciones.setText("");
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                String defectoPredeterminado = "Equipo reparado con éxito y devuelto a disponibilidad.";
+                textObservaciones.setText(defectoPredeterminado);
+
+                int respuesta = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Desea usar la observación predeterminada para el equipo REPARADO?\n\n• Sí: Usar: \"" + defectoPredeterminado + "\"\n• No: Escribir mi propia observación.",
+                        "Confirmar Reparación",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                String motivo;
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    motivo = defectoPredeterminado;
+                } else {
+                    motivo = textObservaciones.getText().trim();
+                    if (motivo.isEmpty() || motivo.equals(defectoPredeterminado)) {
+                        String manual = JOptionPane.showInputDialog(this, "Ingrese el detalle de la reparación realizada:", "Detalle Manual", JOptionPane.PLAIN_MESSAGE);
+                        if (manual == null || manual.trim().isEmpty()) return;
+                        motivo = manual.trim();
+                        textObservaciones.setText(motivo);
                     }
+                }
+
+                try {
+                    controller.finalizarMantenimiento(equipoSeleccionado.getId(), true, motivo);
+                    JOptionPane.showMessageDialog(this, "El equipo ha regresado a disponibilidad.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    cargarDatos();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
+        // 3. DAR DE BAJA
         darDeBajaButton.addActionListener(e -> {
             if (verificarSeleccion()) {
-                String motivo = textObservaciones.getText().trim();
-                if (motivo.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Debe ingresar el motivo por el cual se da de baja el equipo.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-                int confirm = JOptionPane.showConfirmDialog(this, "¿Confirma que el equipo es irreparable y será DADO DE BAJA?", "Dar de Baja", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    try {
-                        controller.finalizarMantenimiento(equipoSeleccionado.getId(), false, motivo);
-                        JOptionPane.showMessageDialog(this, "El equipo ha sido dado de baja.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
-                        cargarDatos();
-                        textObservaciones.setText("");
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                String defectoPredeterminado = "Equipo dado de baja por daños irreparables o fin de vida útil.";
+                textObservaciones.setText(defectoPredeterminado);
+
+                int respuesta = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Desea usar la observación predeterminada para DAR DE BAJA el equipo?\n\n• Sí: Usar: \"" + defectoPredeterminado + "\"\n• No: Escribir mi propia observación.",
+                        "Confirmar Baja",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                String motivo;
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    motivo = defectoPredeterminado;
+                } else {
+                    motivo = textObservaciones.getText().trim();
+                    if (motivo.isEmpty() || motivo.equals(defectoPredeterminado)) {
+                        String manual = JOptionPane.showInputDialog(this, "Ingrese el motivo de la baja:", "Motivo de Baja", JOptionPane.PLAIN_MESSAGE);
+                        if (manual == null || manual.trim().isEmpty()) return;
+                        motivo = manual.trim();
+                        textObservaciones.setText(motivo);
                     }
+                }
+
+                try {
+                    controller.finalizarMantenimiento(equipoSeleccionado.getId(), false, motivo);
+                    JOptionPane.showMessageDialog(this, "El equipo ha sido dado de baja.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                    cargarDatos();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

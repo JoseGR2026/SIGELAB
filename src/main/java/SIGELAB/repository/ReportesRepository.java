@@ -8,141 +8,122 @@ import java.util.List;
 
 public class ReportesRepository {
 
-    // Consulta 1: Obtener equipos filtrados por su estado (DISPONIBLE, PRESTADO, DAÑADO, etc.)
     public List<Object[]> obtenerEquiposPorEstado(String estadoFiltro) {
         List<Object[]> lista = new ArrayList<>();
-
-        String sql = "SELECT e.codigo_inventario, e.nombre, l.nombre AS laboratorio, e.estado " +
-                "FROM Equipo e " +
-                "LEFT JOIN Laboratorio l ON e.laboratorio_id = l.id " +
-                "WHERE e.estado = ?";
+        String sql = "SELECT e.codigo_inventario, e.nombre, ISNULL(l.nombre, 'General') AS laboratorio, e.estado " +
+                "FROM Equipo e LEFT JOIN Laboratorio l ON e.laboratorio_id = l.id " +
+                "WHERE e.estado = ? ORDER BY e.codigo_inventario ASC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, estadoFiltro);
-
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Object[] fila = new Object[]{
-                            rs.getString("codigo_inventario"),
-                            rs.getString("nombre"),
-                            rs.getString("laboratorio"),
-                            rs.getString("estado")
-                    };
-                    lista.add(fila);
+                    lista.add(new Object[]{rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4)});
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        } catch (SQLException e) { e.printStackTrace(); }
         return lista;
     }
 
-    // Consulta 2: Obtener préstamos activos, vencidos o finalizados
     public List<Object[]> obtenerPrestamosPorEstado(String estadoPrestamo) {
         List<Object[]> lista = new ArrayList<>();
-
-        // Corregido: fecha_devolucion_esperada es el nombre real en tu BD
         String sql = "SELECT id, solicitante, fecha_prestamo, fecha_devolucion_esperada, estado " +
-                "FROM Prestamo " +
-                "WHERE estado = ?";
+                "FROM Prestamo WHERE estado = ? ORDER BY fecha_prestamo DESC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, estadoPrestamo);
-
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Object[] fila = new Object[]{
-                            rs.getInt("id"),
-                            rs.getString("solicitante"),
-                            rs.getTimestamp("fecha_prestamo"),
-                            rs.getTimestamp("fecha_devolucion_esperada"),
-                            rs.getString("estado")
-                    };
-                    lista.add(fila);
+                    lista.add(new Object[]{rs.getInt(1), rs.getString(2), rs.getTimestamp(3), rs.getTimestamp(4), rs.getString(5)});
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error al obtener reporte de préstamos: " + e.getMessage());
-            e.printStackTrace();
-        }
-
+        } catch (SQLException e) { e.printStackTrace(); }
         return lista;
     }
 
-    // Consulta 3: Obtener préstamos entre un rango de fechas
     public List<Object[]> obtenerPrestamosPorFechas(String fechaInicio, String fechaFin) {
         List<Object[]> lista = new ArrayList<>();
-
         String sql = "SELECT id, solicitante, fecha_prestamo, fecha_devolucion_esperada, estado " +
-                "FROM Prestamo " +
-                "WHERE fecha_prestamo BETWEEN ? AND ?";
+                "FROM Prestamo WHERE fecha_prestamo BETWEEN ? AND ? ORDER BY fecha_prestamo DESC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, fechaInicio);
+            pstmt.setString(2, fechaFin);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new Object[]{rs.getInt(1), rs.getString(2), rs.getTimestamp(3), rs.getTimestamp(4), rs.getString(5)});
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return lista;
+    }
+
+    public List<Object[]> obtenerHistorialEquipo(String codigoInventario) {
+        List<Object[]> lista = new ArrayList<>();
+
+        // Se usa CAST(... AS VARCHAR(MAX)) para evitar el error de tipos TEXT en el UNION de SQL Server
+        String sql = "SELECT a.fecha_hora, a.accion, CAST(a.descripcion AS VARCHAR(MAX)) AS descripcion " +
+                "FROM Auditoria a " +
+                "JOIN Equipo e ON a.registro_id = e.id AND a.entidad = 'Equipo' " +
+                "WHERE e.codigo_inventario LIKE ? " +
+                "UNION " +
+                "SELECT m.fecha_ingreso AS fecha_hora, CONCAT('MANTENIMIENTO: ', m.tipo_mantenimiento) AS accion, CAST(CONCAT('Estado: ', m.estado, ' - Observación: ', ISNULL(m.observaciones, '')) AS VARCHAR(MAX)) AS descripcion " +
+                "FROM Mantenimiento m " +
+                "JOIN Equipo e ON m.equipo_id = e.id " +
+                "WHERE e.codigo_inventario LIKE ? " +
+                "ORDER BY fecha_hora DESC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Asumimos formato de fecha "YYYY-MM-DD" que ingresen en la vista
-            pstmt.setString(1, fechaInicio);
-            pstmt.setString(2, fechaFin);
+            String filtro = "%" + (codigoInventario != null ? codigoInventario.trim() : "") + "%";
+            pstmt.setString(1, filtro);
+            pstmt.setString(2, filtro);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Object[] fila = new Object[]{
-                            rs.getInt("id"),
-                            rs.getString("solicitante"),
-                            rs.getTimestamp("fecha_prestamo"),
-                            rs.getTimestamp("fecha_devolucion_esperada"),
-                            rs.getString("estado")
-                    };
-                    lista.add(fila);
+                    lista.add(new Object[]{
+                            rs.getTimestamp("fecha_hora"),
+                            rs.getString("accion"),
+                            rs.getString("descripcion")
+                    });
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al consultar préstamos por fechas: " + e.getMessage());
             e.printStackTrace();
         }
-
         return lista;
     }
 
-    // Consulta 4: Métricas rápidas para el Dashboard
-    public int[] obtenerMetricasDashboard() {
-        int totalEquipos = 0;
-        int equiposDisponibles = 0;
-        int prestamosActivos = 0;
-        int prestamosVencidos = 0;
+    public List<Object[]> obtenerHistorialMantenimiento() {
+        List<Object[]> lista = new ArrayList<>();
+        // Consulta directa a la tabla Mantenimiento unida con Equipo para traer el código y nombre reales
+        String sql = "SELECT m.fecha_ingreso, e.codigo_inventario, e.nombre, m.tipo_mantenimiento, m.responsable, m.estado, m.resultado, m.observaciones " +
+                "FROM Mantenimiento m " +
+                "JOIN Equipo e ON m.equipo_id = e.id " +
+                "ORDER BY m.fecha_ingreso DESC";
 
-        String sqlEquipos = "SELECT COUNT(*) FROM Equipo";
-        String sqlDisponibles = "SELECT COUNT(*) FROM Equipo WHERE estado = 'DISPONIBLE'";
-        String sqlPrestamosActivos = "SELECT COUNT(*) FROM Prestamo WHERE estado = 'ACTIVO'";
-        String sqlPrestamosVencidos = "SELECT COUNT(*) FROM Prestamo WHERE estado = 'VENCIDO'";
-
-        try (Connection conn = DatabaseConnection.getConnection()) {
-
-            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sqlEquipos)) {
-                if (rs.next()) totalEquipos = rs.getInt(1);
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                lista.add(new Object[]{
+                        rs.getTimestamp("fecha_ingreso"),
+                        rs.getString("codigo_inventario"),
+                        rs.getString("nombre"),
+                        rs.getString("tipo_mantenimiento"),
+                        rs.getString("responsable"),
+                        rs.getString("estado"),
+                        rs.getString("resultado"),
+                        rs.getString("observaciones")
+                });
             }
-            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sqlDisponibles)) {
-                if (rs.next()) equiposDisponibles = rs.getInt(1);
-            }
-            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sqlPrestamosActivos)) {
-                if (rs.next()) prestamosActivos = rs.getInt(1);
-            }
-            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sqlPrestamosVencidos)) {
-                if (rs.next()) prestamosVencidos = rs.getInt(1);
-            }
-
         } catch (SQLException e) {
-            System.err.println("Error al obtener métricas del Dashboard: " + e.getMessage());
             e.printStackTrace();
         }
-
-        return new int[]{totalEquipos, equiposDisponibles, prestamosActivos, prestamosVencidos};
+        return lista;
     }
-
 }
-

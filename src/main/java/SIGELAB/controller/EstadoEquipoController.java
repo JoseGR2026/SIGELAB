@@ -12,8 +12,6 @@ public class EstadoEquipoController {
         return service.listar();
     }
 
-
-
     public boolean crearEquipo(int laboratorioId, String codigoInventario, String nombre,
                                String marca, String modelo, String numeroSerie,
                                String tipo, String estado, String observaciones) {
@@ -26,5 +24,14 @@ public class EstadoEquipoController {
 
     public String generarSiguienteCodigo() {
         return service.generarSiguienteCodigo();
+    }
+
+    // Métodos que utiliza tu ventana MantenimientoEquipos:
+    public boolean enviarAMantenimiento(int equipoId, String motivo) {
+        return service.enviarAMantenimiento(equipoId, motivo);
+    }
+
+    public boolean finalizarMantenimiento(int equipoId, boolean reparadoConExito, String motivo) {
+        return service.finalizarMantenimiento(equipoId, reparadoConExito, motivo);
     }
 }

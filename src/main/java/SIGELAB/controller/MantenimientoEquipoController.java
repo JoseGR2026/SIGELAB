@@ -1,40 +1,27 @@
 package SIGELAB.controller;
 
 import SIGELAB.model.EstadoEquipo;
-import SIGELAB.repository.EstadoEquipoRepository;
 import SIGELAB.service.EstadoEquipoService;
+import SIGELAB.service.MantenimientoService;
 
 import java.util.List;
 
 public class MantenimientoEquipoController {
-    private final EstadoEquipoService service = new EstadoEquipoService();
-    private final EstadoEquipoRepository repository = new EstadoEquipoRepository();
+    private final EstadoEquipoService estadoEquipoService = new EstadoEquipoService();
+    private final MantenimientoService mantenimientoService = new MantenimientoService();
 
+    // Método que llama tu vista MantenimientoEquipos para llenar la tabla
     public List<EstadoEquipo> listarEquipos() {
-        return service.listar();
+        return estadoEquipoService.listar();
     }
 
+    // Método para enviar a mantenimiento (registra en equipo y en la tabla Mantenimiento)
     public boolean enviarAMantenimiento(int equipoId, String motivo) {
-        return service.enviarAMantenimiento(equipoId, motivo);
+        return mantenimientoService.enviarAMantenimiento(equipoId, motivo);
     }
 
+    // Método para finalizar mantenimiento (reparado o dado de baja)
     public boolean finalizarMantenimiento(int equipoId, boolean reparadoConExito, String motivo) {
-        boolean resultado = service.finalizarMantenimiento(equipoId, reparadoConExito, motivo);
-
-        try {
-            List<EstadoEquipo> equipos = repository.listar();
-            for (EstadoEquipo eq : equipos) {
-                if (eq.getId() == equipoId) {
-                    eq.setObservaciones(motivo);
-                    eq.setEstado(reparadoConExito ? "DISPONIBLE" : "DADO_DE_BAJA");
-                    repository.actualizar(eq);
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return resultado;
+        return mantenimientoService.finalizarMantenimiento(equipoId, reparadoConExito, motivo);
     }
 }
