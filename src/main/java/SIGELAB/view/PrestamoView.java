@@ -115,7 +115,7 @@ public class PrestamoView extends JFrame {
         panelQR.add(btnCargarQRArchivo);
         panelContenedorSuperior.add(panelQR, BorderLayout.NORTH);
 
-        // Formulario de Datos del Préstamo (GridBagLayout para aspecto limpio y profesional)
+        // Formulario de Datos del Préstamo
         JPanel formulario = new JPanel(new GridBagLayout());
         formulario.setBackground(Color.WHITE);
         formulario.setBorder(BorderFactory.createCompoundBorder(
@@ -182,14 +182,14 @@ public class PrestamoView extends JFrame {
         JPanel panelTablas = new JPanel(new GridLayout(1, 2, 12, 12));
         panelTablas.setOpaque(false);
 
-        // Panel Disponibles
+        // Panel Inventario General (Muestra todos los equipos y estados sin desaparecer al agregarlos)
         JPanel panelDisponibles = new JPanel(new BorderLayout(5, 5));
         panelDisponibles.setOpaque(false);
         JScrollPane scrollDisp = new JScrollPane(tablaDisponibles);
         scrollDisp.getViewport().setBackground(Color.WHITE);
         scrollDisp.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(203, 213, 225)),
-                " Inventario de Equipos ",
+                " Inventario General de Equipos ",
                 0, 0, new Font("Segoe UI", Font.BOLD, 13), new Color(37, 99, 235)
         ));
         panelDisponibles.add(scrollDisp, BorderLayout.CENTER);
@@ -198,7 +198,7 @@ public class PrestamoView extends JFrame {
         estilizarBoton(btnAgregar, false);
         panelDisponibles.add(btnAgregar, BorderLayout.SOUTH);
 
-        // Panel Seleccionados
+        // Panel Equipos del Préstamo
         JPanel panelSeleccionados = new JPanel(new BorderLayout(5, 5));
         panelSeleccionados.setOpaque(false);
         JScrollPane scrollSelec = new JScrollPane(tablaSeleccionados);
@@ -228,7 +228,7 @@ public class PrestamoView extends JFrame {
         JButton btnCerrar = new JButton("Cerrar");
 
         estilizarBoton(btnActualizar, false);
-        estilizarBoton(btnRegistrar, true); // Botón principal en azul institucional
+        estilizarBoton(btnRegistrar, true);
         estilizarBoton(btnCerrar, false);
 
         acciones.add(btnActualizar);
@@ -332,7 +332,12 @@ public class PrestamoView extends JFrame {
                 }
 
                 if (equiposSeleccionados.contains(equipoEncontrado.getId())) {
-                    JOptionPane.showMessageDialog(this, "El equipo ya se encuentra agregado en este préstamo.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "El equipo '" + equipoEncontrado.getNombreEquipo() + "' (" + equipoEncontrado.getCodigoInventario() + ") ya se encuentra agregado en este préstamo.",
+                            "Aviso",
+                            JOptionPane.WARNING_MESSAGE
+                    );
                     return;
                 }
 
@@ -342,8 +347,6 @@ public class PrestamoView extends JFrame {
                         equipoEncontrado.getCodigoInventario(),
                         equipoEncontrado.getNombreEquipo()
                 });
-
-                cargarEquiposInventario();
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "No se pudo leer ningún código QR de la imagen:\n" + ex.getMessage(), "Error de lectura", JOptionPane.ERROR_MESSAGE);
@@ -370,20 +373,18 @@ public class PrestamoView extends JFrame {
             List<EstadoEquipo> equipos = equipoRepository.listar();
 
             for (EstadoEquipo equipo : equipos) {
-                if (!equiposSeleccionados.contains(equipo.getId())) {
+                // Muestra todos los equipos siempre (nunca desaparecen al ser agregados)
+                if (filtro.isEmpty() ||
+                        equipo.getCodigoInventario().toLowerCase().contains(filtro) ||
+                        equipo.getNombreEquipo().toLowerCase().contains(filtro) ||
+                        equipo.getEstado().toLowerCase().contains(filtro)) {
 
-                    if (filtro.isEmpty() ||
-                            equipo.getCodigoInventario().toLowerCase().contains(filtro) ||
-                            equipo.getNombreEquipo().toLowerCase().contains(filtro) ||
-                            equipo.getEstado().toLowerCase().contains(filtro)) {
-
-                        modeloDisponibles.addRow(new Object[]{
-                                equipo.getId(),
-                                equipo.getCodigoInventario(),
-                                equipo.getNombreEquipo(),
-                                equipo.getEstado()
-                        });
-                    }
+                    modeloDisponibles.addRow(new Object[]{
+                            equipo.getId(),
+                            equipo.getCodigoInventario(),
+                            equipo.getNombreEquipo(),
+                            equipo.getEstado()
+                    });
                 }
             }
         } catch (RuntimeException ex) {
@@ -424,11 +425,16 @@ public class PrestamoView extends JFrame {
                         "Equipo No Disponible",
                         JOptionPane.WARNING_MESSAGE
                 );
-                cargarEquiposInventario();
                 return;
             }
 
             if (equiposSeleccionados.contains(id)) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El equipo '" + equipoActual.getNombreEquipo() + "' (" + equipoActual.getCodigoInventario() + ") ya se encuentra agregado en este préstamo.",
+                        "Aviso",
+                        JOptionPane.WARNING_MESSAGE
+                );
                 return;
             }
 
@@ -438,8 +444,6 @@ public class PrestamoView extends JFrame {
                     equipoActual.getCodigoInventario(),
                     equipoActual.getNombreEquipo()
             });
-
-            cargarEquiposInventario();
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al verificar el estado del equipo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -457,7 +461,6 @@ public class PrestamoView extends JFrame {
 
         equiposSeleccionados.remove(Integer.valueOf(id));
         modeloSeleccionados.removeRow(filaModelo);
-        cargarEquiposInventario();
     }
 
     private void registrarPrestamo() {
