@@ -90,3 +90,4 @@ def face_verify(request: UserRequest):
 @app.delete("/face/profile/{user_id}")
 def face_delete(user_id: int, request: DeleteProfileRequest):
     return service().delete_profile(user_id, request.admin_user_id)
+from fastapi.responses import HTMLResponse

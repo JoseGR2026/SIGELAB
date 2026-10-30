@@ -1,4 +1,3 @@
-
 package SIGELAB.view;
 
 import SIGELAB.controller.AuditoriaConsultaController;
@@ -20,7 +19,6 @@ public class AuditoriaConsultaView extends JFrame {
     private JLabel lblTotal;
 
     public AuditoriaConsultaView() {
-
         controller = new AuditoriaConsultaController();
 
         configurarVentana();
@@ -30,8 +28,7 @@ public class AuditoriaConsultaView extends JFrame {
     }
 
     private void configurarVentana() {
-
-        setTitle("SIGELAB - Registro de auditoría");
+        setTitle("SIGELAB - Registro de Auditoría");
         setSize(1200, 600);
         setMinimumSize(new Dimension(900, 450));
         setLocationRelativeTo(null);
@@ -39,46 +36,25 @@ public class AuditoriaConsultaView extends JFrame {
     }
 
     private void crearComponentes() {
+        JPanel panelPrincipal = new JPanel(new BorderLayout(15, 15));
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel panelPrincipal = new JPanel(
-                new BorderLayout(10, 10)
-        );
+        // Título Principal Moderno
+        JLabel lblTitulo = new JLabel("Registro de Auditoría");
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
 
-        panelPrincipal.setBorder(
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        );
+        JPanel panelSuperior = new JPanel(new BorderLayout(10, 10));
+        panelSuperior.add(lblTitulo, BorderLayout.NORTH);
 
-        JLabel lblTitulo = new JLabel(
-                "Registro de auditoría"
-        );
-
-        lblTitulo.setFont(
-                new Font("Arial", Font.BOLD, 22)
-        );
-
-        JPanel panelSuperior = new JPanel(
-                new BorderLayout(10, 10)
-        );
-
-        panelSuperior.add(
-                lblTitulo, BorderLayout.NORTH
-        );
-
-        JPanel panelAcciones = new JPanel(
-                new FlowLayout(FlowLayout.LEFT)
-        );
-
+        JPanel panelAcciones = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         btnActualizar = new JButton("Actualizar registros");
+        btnActualizar.putClientProperty("JButton.buttonType", "roundRect");
         panelAcciones.add(btnActualizar);
 
-        panelSuperior.add(
-                panelAcciones, BorderLayout.SOUTH
-        );
+        panelSuperior.add(panelAcciones, BorderLayout.SOUTH);
+        panelPrincipal.add(panelSuperior, BorderLayout.NORTH);
 
-        panelPrincipal.add(
-                panelSuperior, BorderLayout.NORTH
-        );
-
+        // Tabla de Registros
         String[] columnas = {
                 "Auditoría ID",
                 "Fecha y hora",
@@ -89,12 +65,9 @@ public class AuditoriaConsultaView extends JFrame {
                 "Descripción"
         };
 
-        modeloTabla = new DefaultTableModel(
-                columnas, 0
-        ) {
+        modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
-            public boolean isCellEditable(
-                    int fila, int columna) {
+            public boolean isCellEditable(int fila, int columna) {
                 return false;
             }
         };
@@ -102,145 +75,82 @@ public class AuditoriaConsultaView extends JFrame {
         tablaAuditoria = new JTable(modeloTabla);
         tablaAuditoria.setRowHeight(28);
         tablaAuditoria.setAutoCreateRowSorter(true);
-        tablaAuditoria.setSelectionMode(
-                ListSelectionModel.SINGLE_SELECTION
-        );
+        tablaAuditoria.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tablaAuditoria.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        tablaAuditoria.setAutoResizeMode(
-                JTable.AUTO_RESIZE_OFF
-        );
+        // Anchos de columnas
+        tablaAuditoria.getColumnModel().getColumn(0).setPreferredWidth(100);
+        tablaAuditoria.getColumnModel().getColumn(1).setPreferredWidth(180);
+        tablaAuditoria.getColumnModel().getColumn(2).setPreferredWidth(100);
+        tablaAuditoria.getColumnModel().getColumn(3).setPreferredWidth(190);
+        tablaAuditoria.getColumnModel().getColumn(4).setPreferredWidth(120);
+        tablaAuditoria.getColumnModel().getColumn(5).setPreferredWidth(100);
+        tablaAuditoria.getColumnModel().getColumn(6).setPreferredWidth(450);
 
-        tablaAuditoria.getColumnModel()
-                .getColumn(0).setPreferredWidth(100);
+        JScrollPane scroll = new JScrollPane(tablaAuditoria);
+        panelPrincipal.add(scroll, BorderLayout.CENTER);
 
-        tablaAuditoria.getColumnModel()
-                .getColumn(1).setPreferredWidth(180);
+        // Panel Inferior (Contador y Botón Cerrar)
+        JPanel panelInferior = new JPanel(new BorderLayout());
+        panelInferior.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
-        tablaAuditoria.getColumnModel()
-                .getColumn(2).setPreferredWidth(100);
-
-        tablaAuditoria.getColumnModel()
-                .getColumn(3).setPreferredWidth(190);
-
-        tablaAuditoria.getColumnModel()
-                .getColumn(4).setPreferredWidth(120);
-
-        tablaAuditoria.getColumnModel()
-                .getColumn(5).setPreferredWidth(100);
-
-        tablaAuditoria.getColumnModel()
-                .getColumn(6).setPreferredWidth(450);
-
-        JScrollPane scroll = new JScrollPane(
-                tablaAuditoria
-        );
-
-        panelPrincipal.add(
-                scroll, BorderLayout.CENTER
-        );
-
-        JPanel panelInferior = new JPanel(
-                new BorderLayout()
-        );
-
-        lblTotal = new JLabel(
-                "Registros encontrados: 0"
-        );
-
-        panelInferior.add(
-                lblTotal, BorderLayout.WEST
-        );
+        lblTotal = new JLabel("Registros encontrados: 0");
+        lblTotal.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        panelInferior.add(lblTotal, BorderLayout.WEST);
 
         btnCerrar = new JButton("Cerrar");
+        btnCerrar.putClientProperty("JButton.buttonType", "roundRect");
+        panelInferior.add(btnCerrar, BorderLayout.EAST);
 
-        panelInferior.add(
-                btnCerrar, BorderLayout.EAST
-        );
-
-        panelPrincipal.add(
-                panelInferior, BorderLayout.SOUTH
-        );
+        panelPrincipal.add(panelInferior, BorderLayout.SOUTH);
 
         setContentPane(panelPrincipal);
     }
 
     private void configurarEventos() {
-
-        btnActualizar.addActionListener(
-                e -> cargarAuditoria()
-        );
-
-        btnCerrar.addActionListener(
-                e -> dispose()
-        );
+        btnActualizar.addActionListener(e -> cargarAuditoria());
+        btnCerrar.addActionListener(e -> dispose());
     }
 
     private void cargarAuditoria() {
-
         btnActualizar.setEnabled(false);
         lblTotal.setText("Consultando auditoría...");
 
-        SwingWorker<List<Object[]>, Void> trabajador =
-                new SwingWorker<>() {
+        SwingWorker<List<Object[]>, Void> trabajador = new SwingWorker<>() {
+            @Override
+            protected List<Object[]> doInBackground() {
+                return controller.listarAuditoria();
+            }
 
-                    @Override
-                    protected List<Object[]> doInBackground() {
+            @Override
+            protected void done() {
+                try {
+                    List<Object[]> registros = get();
+                    modeloTabla.setRowCount(0);
 
-                        return controller.listarAuditoria();
+                    for (Object[] fila : registros) {
+                        modeloTabla.addRow(fila);
                     }
 
-                    @Override
-                    protected void done() {
+                    lblTotal.setText("Registros encontrados: " + registros.size());
 
-                        try {
-
-                            List<Object[]> registros = get();
-
-                            modeloTabla.setRowCount(0);
-
-                            for (Object[] fila : registros) {
-                                modeloTabla.addRow(fila);
-                            }
-
-                            lblTotal.setText(
-                                    "Registros encontrados: "
-                                            + registros.size()
-                            );
-
-                        } catch (InterruptedException e) {
-
-                            Thread.currentThread().interrupt();
-
-                            mostrarError(
-                                    "La consulta fue interrumpida."
-                            );
-
-                        } catch (ExecutionException e) {
-
-                            Throwable causa = e.getCause();
-
-                            mostrarError(
-                                    causa != null
-                                            ? causa.getMessage()
-                                            : e.getMessage()
-                            );
-
-                        } finally {
-
-                            btnActualizar.setEnabled(true);
-                        }
-                    }
-                };
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    mostrarError("La consulta fue interrumpida.");
+                } catch (ExecutionException e) {
+                    Throwable causa = e.getCause();
+                    mostrarError(causa != null ? causa.getMessage() : e.getMessage());
+                } finally {
+                    btnActualizar.setEnabled(true);
+                }
+            }
+        };
 
         trabajador.execute();
     }
 
     private void mostrarError(String mensaje) {
-
-        lblTotal.setText(
-                "No se pudo cargar la auditoría."
-        );
-
+        lblTotal.setText("No se pudo cargar la auditoría.");
         JOptionPane.showMessageDialog(
                 this,
                 "Error al consultar la auditoría:\n" + mensaje,

@@ -1,4 +1,3 @@
-
 package SIGELAB.view;
 
 import SIGELAB.controller.PrestamoVencidoController;
@@ -7,9 +6,9 @@ import SIGELAB.model.Usuario;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainForm {
+public class MainForm extends JFrame {
 
-    private JPanel panelPrincipal;
+    private final JPanel panelPrincipal;
     private JLabel lblTitulo;
     private JButton btnSalir;
     private JButton btnInventario;
@@ -28,58 +27,169 @@ public class MainForm {
     }
 
     public MainForm(Usuario usuarioAutenticado) {
+        super("SIGELAB - Panel Principal");
         this.usuarioAutenticado = usuarioAutenticado;
-        configurarFormulario();
+
+        panelPrincipal = new JPanel(new BorderLayout());
+        setContentPane(panelPrincipal);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1050, 650);
+        setMinimumSize(new Dimension(850, 550));
+        setLocationRelativeTo(null);
+
+        construirInterfazDashboard();
         configurarEventos();
         verificarPrestamosVencidos();
     }
 
-    private void configurarFormulario() {
-        String nombreCompleto = "Administrador";
+    private void construirInterfazDashboard() {
+        // --- 1. BARRA LATERAL (SIDEBAR) ---
+        JPanel sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBackground(new Color(248, 250, 252)); // Gris muy suave claro
+        sidebar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(226, 232, 240)),
+                BorderFactory.createEmptyBorder(20, 15, 20, 15)
+        ));
+        sidebar.setPreferredSize(new Dimension(240, getHeight()));
 
+        // Título / Logo en la barra lateral
+        JLabel lblLogo = new JLabel("SIGELAB");
+        lblLogo.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblLogo.setForeground(new Color(37, 99, 235)); // Azul principal
+        lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sidebar.add(lblLogo);
+
+        JLabel lblSubLogo = new JLabel("Control de Laboratorios");
+        lblSubLogo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblSubLogo.setForeground(new Color(100, 116, 139));
+        lblSubLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sidebar.add(lblSubLogo);
+
+        sidebar.add(Box.createRigidArea(new Dimension(0, 25)));
+
+        // Creación de botones organizados verticalmente
+        btnPrestamos = crearBotonSidebar("Préstamos");
+        btnRegistrarDevolucion = crearBotonSidebar("Devoluciones");
+        btnInventario = crearBotonSidebar("Inventario");
+        btnLaboratorios = crearBotonSidebar("Laboratorios");
+        btnMantenimiento = crearBotonSidebar("Mantenimiento");
+        btnUsuarios = crearBotonSidebar("Usuarios");
+        btnReportes = crearBotonSidebar("Historial / Reportes");
+        btnAuditoria = crearBotonSidebar("Auditoría");
+
+        sidebar.add(btnPrestamos);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(btnRegistrarDevolucion);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(btnInventario);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(btnLaboratorios);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(btnMantenimiento);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(btnUsuarios);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(btnReportes);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 8)));
+        sidebar.add(btnAuditoria);
+
+        panelPrincipal.add(sidebar, BorderLayout.WEST);
+
+        // --- 2. CONTENEDOR PRINCIPAL (HEADER + CENTRO) ---
+        JPanel contenidoPanel = new JPanel(new BorderLayout());
+        contenidoPanel.setBackground(Color.WHITE);
+
+        // Cabecera superior
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(Color.WHITE);
+        header.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(226, 232, 240)),
+                BorderFactory.createEmptyBorder(15, 25, 15, 25)
+        ));
+
+        String nombreCompleto = "Administrador";
         if (usuarioAutenticado != null) {
-            nombreCompleto = usuarioAutenticado.getNombres()
-                    + " " + usuarioAutenticado.getApellidos();
+            nombreCompleto = usuarioAutenticado.getNombres() + " " + usuarioAutenticado.getApellidos();
         }
 
-        lblTitulo.setText("Bienvenido, Administrador: " + nombreCompleto);
+        lblTitulo = new JLabel("Bienvenido, " + nombreCompleto);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTitulo.setForeground(new Color(15, 23, 42));
+        header.add(lblTitulo, BorderLayout.WEST);
+
+        btnSalir = new JButton("Cerrar Sesión");
+        btnSalir.putClientProperty("JButton.buttonType", "roundRect");
+        btnSalir.putClientProperty("FlatLaf.style", "arc: 8");
+        header.add(btnSalir, BorderLayout.EAST);
+
+        contenidoPanel.add(header, BorderLayout.NORTH);
+
+        // Tarjeta central de bienvenida
+        JPanel centroDashboard = new JPanel(new GridBagLayout());
+        centroDashboard.setBackground(new Color(248, 250, 252));
+
+        JPanel tarjetaBienvenida = new JPanel(new GridLayout(2, 1, 5, 5));
+        tarjetaBienvenida.setBackground(Color.WHITE);
+        tarjetaBienvenida.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(226, 232, 240), 1, true),
+                BorderFactory.createEmptyBorder(35, 45, 35, 45)
+        ));
+
+        JLabel lblBienvenidaTitulo = new JLabel("Sistema de Gestión y Control de Laboratorios", SwingConstants.CENTER);
+        lblBienvenidaTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblBienvenidaTitulo.setForeground(new Color(30, 41, 59));
+
+        JLabel lblBienvenidaDesc = new JLabel("Seleccione una opción en el menú lateral izquierdo para operar el sistema.", SwingConstants.CENTER);
+        lblBienvenidaDesc.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblBienvenidaDesc.setForeground(new Color(100, 116, 139));
+
+        tarjetaBienvenida.add(lblBienvenidaTitulo);
+        tarjetaBienvenida.add(lblBienvenidaDesc);
+
+        centroDashboard.add(tarjetaBienvenida);
+        contenidoPanel.add(centroDashboard, BorderLayout.CENTER);
+
+        panelPrincipal.add(contenidoPanel, BorderLayout.CENTER);
+    }
+
+    private JButton crearBotonSidebar(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        boton.setMaximumSize(new Dimension(210, 38));
+        boton.setPreferredSize(new Dimension(210, 38));
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        boton.setHorizontalAlignment(SwingConstants.LEFT);
+        boton.putClientProperty("JButton.buttonType", "roundRect");
+        boton.putClientProperty("FlatLaf.style", "arc: 8");
+        return boton;
     }
 
     private void configurarEventos() {
-        // Módulos de los compañeros
-        btnInventario.addActionListener(e -> abrirInventarioEquipos());
-        btnLaboratorios.addActionListener(e -> abrirCatlogoLaboratorios());
-        btnMantenimiento.addActionListener(e -> MantenimientoEquipos());
-        btnUsuarios.addActionListener(e -> abrirUsuarios());
+        if (btnInventario != null) btnInventario.addActionListener(e -> abrirInventarioEquipos());
+        if (btnLaboratorios != null) btnLaboratorios.addActionListener(e -> abrirCatlogoLaboratorios());
+        if (btnMantenimiento != null) btnMantenimiento.addActionListener(e -> MantenimientoEquipos());
+        if (btnUsuarios != null) btnUsuarios.addActionListener(e -> abrirUsuarios());
 
-        // Módulo de préstamos y devoluciones
-        btnPrestamos.addActionListener(e -> abrirPrestamos());
-        btnRegistrarDevolucion.addActionListener(e -> abrirDevoluciones());
+        if (btnPrestamos != null) btnPrestamos.addActionListener(e -> abrirPrestamos());
+        if (btnRegistrarDevolucion != null) btnRegistrarDevolucion.addActionListener(e -> abrirDevoluciones());
 
-        // Historial y auditoría
-        btnAuditoria.addActionListener(e -> abrirRegistroAuditoria());
-        btnReportes.addActionListener(e -> abrirHistorialPrestamos());
+        if (btnAuditoria != null) btnAuditoria.addActionListener(e -> abrirRegistroAuditoria());
+        if (btnReportes != null) btnReportes.addActionListener(e -> abrirHistorialPrestamos());
 
-        btnSalir.addActionListener(e -> salir());
+        if (btnSalir != null) btnSalir.addActionListener(e -> salir());
     }
 
     private void abrirPrestamos() {
-        if (!usuarioValido()) {
-            mostrarAdvertenciaSesion();
-            return;
-        }
-
+        if (!usuarioValido()) { mostrarAdvertenciaSesion(); return; }
         PrestamoView ventana = new PrestamoView(usuarioAutenticado);
         ventana.setLocationRelativeTo(null);
         ventana.setVisible(true);
     }
 
     private void abrirDevoluciones() {
-        if (!usuarioValido()) {
-            mostrarAdvertenciaSesion();
-            return;
-        }
-
+        if (!usuarioValido()) { mostrarAdvertenciaSesion(); return; }
         DevolucionView ventana = new DevolucionView(usuarioAutenticado);
         ventana.setLocationRelativeTo(null);
         ventana.setVisible(true);
@@ -98,144 +208,58 @@ public class MainForm {
     }
 
     private boolean usuarioValido() {
-        return usuarioAutenticado != null
-                && usuarioAutenticado.getIdUsuario() > 0;
+        return usuarioAutenticado != null && usuarioAutenticado.getIdUsuario() > 0;
     }
 
     private void mostrarAdvertenciaSesion() {
-        JOptionPane.showMessageDialog(
-                panelPrincipal,
-                "Debe iniciar sesión para utilizar este módulo.",
-                "SIGELAB",
-                JOptionPane.WARNING_MESSAGE
-        );
+        JOptionPane.showMessageDialog(panelPrincipal, "Debe iniciar sesión para utilizar este módulo.", "SIGELAB", JOptionPane.WARNING_MESSAGE);
     }
 
     private void verificarPrestamosVencidos() {
-        if (!usuarioValido()) {
-            return;
-        }
-
+        if (!usuarioValido()) return;
         SwingWorker<Integer, Void> worker = new SwingWorker<>() {
             @Override
             protected Integer doInBackground() throws Exception {
-                PrestamoVencidoController controller =
-                        new PrestamoVencidoController();
-
-                return controller.actualizarVencidos(
-                        usuarioAutenticado.getIdUsuario()
-                );
+                PrestamoVencidoController controller = new PrestamoVencidoController();
+                return controller.actualizarVencidos(usuarioAutenticado.getIdUsuario());
             }
-
             @Override
             protected void done() {
                 try {
                     int actualizados = get();
-
                     if (actualizados > 0) {
-                        System.out.println(
-                                "SIGELAB: " + actualizados
-                                        + " préstamo(s) marcado(s) como vencido(s)."
-                        );
+                        System.out.println("SIGELAB: " + actualizados + " préstamo(s) marcado(s) como vencido(s).");
                     }
                 } catch (Exception ex) {
-                    System.err.println(
-                            "Error al verificar préstamos vencidos: "
-                                    + ex.getMessage()
-                    );
+                    System.err.println("Error al verificar préstamos vencidos: " + ex.getMessage());
                 }
             }
         };
-
         worker.execute();
     }
 
-    // Administración de usuarios (módulo del equipo)
     private void abrirUsuarios() {
         UsuarioView view = new UsuarioView(usuarioAutenticado);
-
-        abrirVentana(
-                "Administración de Usuarios",
-                view.getPanelPrincipal(),
-                1050,
-                650
-        );
+        view.setVisible(true);
     }
 
-    // Catálogo de laboratorios (módulo del equipo)
     private void abrirCatlogoLaboratorios() {
         CatalogoLaboratorios ventana = new CatalogoLaboratorios();
         ventana.setVisible(true);
     }
 
-    // Inventario (módulo del equipo)
     private void abrirInventarioEquipos() {
         InventarioEquipo ventana = new InventarioEquipo();
         ventana.setVisible(true);
     }
 
-    // Mantenimiento (módulo del equipo)
     private void MantenimientoEquipos() {
         MantenimientoEquipos ventana = new MantenimientoEquipos();
         ventana.setVisible(true);
     }
 
-    private void mostrarMensajeModulo(String modulo) {
-        JOptionPane.showMessageDialog(
-                panelPrincipal,
-                "Abriendo el módulo de: " + modulo,
-                "SIGELAB",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-    }
-
-    private void abrirVentana(
-            String titulo,
-            JPanel panel,
-            int ancho,
-            int alto
-    ) {
-        JFrame ventana = new JFrame(titulo);
-        ventana.setContentPane(panel);
-        ventana.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
-
-        int maxAncho = Math.max(640, pantalla.width - 40);
-        int maxAlto = Math.max(480, pantalla.height - 80);
-
-        Dimension minimo = new Dimension(
-                Math.min(ancho, maxAncho),
-                Math.min(alto, maxAlto)
-        );
-
-        ventana.setMinimumSize(minimo);
-        ventana.pack();
-
-        int anchoFinal = Math.min(
-                Math.max(ventana.getWidth(), minimo.width),
-                maxAncho
-        );
-
-        int altoFinal = Math.min(
-                Math.max(ventana.getHeight(), minimo.height),
-                maxAlto
-        );
-
-        ventana.setSize(anchoFinal, altoFinal);
-        ventana.setLocationRelativeTo(null);
-        ventana.setVisible(true);
-    }
-
     private void salir() {
-        int respuesta = JOptionPane.showConfirmDialog(
-                panelPrincipal,
-                "¿Desea salir del sistema?",
-                "Confirmar salida",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-
+        int respuesta = JOptionPane.showConfirmDialog(panelPrincipal, "¿Desea salir del sistema?", "Confirmar salida", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (respuesta == JOptionPane.YES_OPTION) {
             System.exit(0);
         }

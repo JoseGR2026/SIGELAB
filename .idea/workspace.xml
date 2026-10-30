@@ -5,12 +5,77 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="Equipos en mantenimiento completos con modificaciones claras">
+      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/util/QrUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/facial-service/.env" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-service/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/AuditoriaConsultaView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/AuditoriaConsultaView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/CatalogoLaboratorios.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/CatalogoLaboratorios.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/CatalogoLaboratorios.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginForm.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginForm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/PrestamoView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/PrestamoView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/UsuarioView.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/UsuarioView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/UsuarioView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/config/DatabaseConnection.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/EstadoEquipoController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/LaboratorioController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/UsuarioController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/enums/EstadoEquipo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/enums/RolUsuario.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialAuthClient.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialClientException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialEnrollmentResult.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialStatus.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialVerificationResult.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/EstadoEquipo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/Laboratorio.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/Usuario.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/EstadoEquipoRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/LaboratorioRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/UsuarioRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/EstadoEquipoService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/LaboratorioService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/UsuarioService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/BusinessException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/DataAccessException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/DateUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/JdbcSupport.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/CatalogoLaboratorios$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/CatalogoLaboratorios.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo$ItemLaboratorio.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm$LoginOutcome.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/MainForm.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$3.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$4.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/AbstractLayout.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/DimensionInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/GridConstraints.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/GridLayoutManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/HorizontalInfo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/LayoutState.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/Spacer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/SupportCode$TextWithMnemonic.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/SupportCode.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/Util.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/VerticalInfo.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +98,15 @@
       </list>
     </option>
   </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="origin/auditoria" />
+  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="auditoria" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -46,7 +119,8 @@
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/JoseGR2026/SIGELAB.git&quot;,
     &quot;accountId&quot;: &quot;1cbb66e6-6659-45c6-9be4-fca5381b3831&quot;
-  }
+  },
+  &quot;highlightDiffLinesInEditor&quot;: true
 }</component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -55,60 +129,60 @@
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
       <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.000000000031716" />
-      <entry key="S2" value="1.0023731187341895" />
-      <entry key="S5" value="1.0891513219039022" />
-      <entry key="S10" value="1.2985821983011414" />
-      <entry key="S30" value="1.6720221525281596" />
-      <entry key="S60" value="1.9038208950770898" />
-      <entry key="M2" value="2.4733649064949166" />
-      <entry key="M5" value="7.2395601721772875" />
-      <entry key="M10" value="17.59480106863734" />
-      <entry key="M15" value="25.255045828588493" />
-      <entry key="M30" value="38.062672001366614" />
-      <entry key="H1" value="50.364091886040434" />
-      <entry key="H2" value="62.8511774677199" />
-      <entry key="H4" value="79.1168661891103" />
-      <entry key="D1" value="171.32463445962583" />
-      <entry key="W1" value="237.10117676416624" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0000000000012739" />
+      <entry key="S30" value="1.0001344764777973" />
+      <entry key="S60" value="1.0155444928078312" />
+      <entry key="M2" value="1.1739393198921357" />
+      <entry key="M5" value="2.060226275109731" />
+      <entry key="M10" value="6.133095012261337" />
+      <entry key="M15" value="12.347816330865069" />
+      <entry key="M30" value="31.267889845114013" />
+      <entry key="H1" value="56.63765774326317" />
+      <entry key="H2" value="82.23153101007992" />
+      <entry key="H4" value="107.88785577061533" />
+      <entry key="D1" value="210.93569440044726" />
+      <entry key="W1" value="281.0635442300252" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
-      <entry key="S2" value="9.21508318050791E-202" />
-      <entry key="S5" value="3.8986141970219566E-81" />
-      <entry key="S10" value="6.88275117603511E-41" />
-      <entry key="S30" value="5.849790248201344E-14" />
-      <entry key="S60" value="3.3647351974646425E-7" />
-      <entry key="M2" value="8.168722001696626E-4" />
-      <entry key="M5" value="0.08811220388087976" />
-      <entry key="M10" value="0.42026414494127246" />
-      <entry key="M15" value="0.7157660292129189" />
-      <entry key="M30" value="1.3603521811814994" />
-      <entry key="H1" value="2.3173413876954307" />
-      <entry key="H2" value="3.6032009707903168" />
-      <entry key="H4" value="6.15445617566936" />
-      <entry key="D1" value="25.21467998325993" />
-      <entry key="W1" value="39.51006774395389" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="6.763928357948557E-141" />
+      <entry key="S10" value="8.224310523046028E-71" />
+      <entry key="S30" value="4.348770608332193E-24" />
+      <entry key="S60" value="2.0853706165426768E-12" />
+      <entry key="M2" value="1.4440831102235712E-6" />
+      <entry key="M5" value="0.0046422934748145345" />
+      <entry key="M10" value="0.07577170510225066" />
+      <entry key="M15" value="0.21689752171417948" />
+      <entry key="M30" value="0.7691357101852142" />
+      <entry key="H1" value="1.8327526047901481" />
+      <entry key="H2" value="3.3856284132457812" />
+      <entry key="H4" value="6.108272133638187" />
+      <entry key="D1" value="25.50905546227943" />
+      <entry key="W1" value="40.3517642528154" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="2.7010056621928164E-7" />
-      <entry key="MS500" value="0.0485629543045479" />
-      <entry key="S2" value="0.47097039029184246" />
-      <entry key="S5" value="0.8138602314922758" />
-      <entry key="S10" value="1.1332866049430093" />
-      <entry key="S30" value="1.6036477142953123" />
-      <entry key="S60" value="1.8664050126465295" />
-      <entry key="M2" value="2.453073129418022" />
-      <entry key="M5" value="7.31522779359808" />
-      <entry key="M10" value="18.005373700567553" />
-      <entry key="M15" value="25.96273566106312" />
-      <entry key="M30" value="39.41755175855744" />
-      <entry key="H1" value="52.67784079261957" />
-      <entry key="H2" value="66.45205687103181" />
-      <entry key="H4" value="85.26962943741137" />
-      <entry key="D1" value="196.53829250628334" />
-      <entry key="W1" value="276.6110212082611" />
+      <entry key="MS100" value="0.00579892019776972" />
+      <entry key="MS500" value="0.357000994921266" />
+      <entry key="S2" value="0.7729783971291766" />
+      <entry key="S5" value="0.9021254660004498" />
+      <entry key="S10" value="0.9498028563879063" />
+      <entry key="S30" value="0.9831099867039484" />
+      <entry key="S60" value="1.0067879342419304" />
+      <entry key="M2" value="1.1685720749154196" />
+      <entry key="M5" value="2.0613371733472947" />
+      <entry key="M10" value="6.206192315185981" />
+      <entry key="M15" value="12.562131241729018" />
+      <entry key="M30" value="32.034247506548" />
+      <entry key="H1" value="58.46776581497747" />
+      <entry key="H2" value="85.61505336620877" />
+      <entry key="H4" value="113.9944614648872" />
+      <entry key="D1" value="236.44371521939743" />
+      <entry key="W1" value="321.4150802210822" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -119,6 +193,9 @@
   &quot;fromUser&quot;: false
 }</component>
   <component name="ProjectId" id="3Kw5gqSVOr5nj51btK5G8FGfGHk" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -127,6 +204,8 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;Application.main.executor&quot;: &quot;Run&quot;,
     &quot;Downloaded.Files.Path&quot;: &quot;C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB&quot;,
     &quot;Downloaded.Files.Path.Enabled&quot;: &quot;true&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
@@ -142,7 +221,9 @@
     &quot;UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW&quot;: &quot;true&quot;,
     &quot;UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH&quot;: &quot;308&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git.auto.fetch.suggestion.counter&quot;: &quot;1&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Jose Gonzalez/CLionProjects/SIGELAB&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -175,6 +256,7 @@
       <recent name="C:\Users\Jose Gonzalez\CLionProjects\SIGELAB\src\main\java" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="SIGELAB.view" />
       <recent name="" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -186,11 +268,25 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="001_create_facial_tables.sql" type="DatabaseScript" editBeforeRun="true" nameIsGenerated="true">
-      <script-file value="$PROJECT_DIR$/facial-service/sql/001_create_facial_tables.sql" />
-      <script-mode>FILE</script-mode>
-      <method v="2" />
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="SIGELAB.Main" />
+      <module name="SIGELAB" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="SIGELAB.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
