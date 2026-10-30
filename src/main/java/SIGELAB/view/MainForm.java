@@ -44,20 +44,18 @@ public class MainForm extends JFrame {
     }
 
     private void construirInterfazDashboard() {
-        // --- 1. BARRA LATERAL (SIDEBAR) ---
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(new Color(248, 250, 252)); // Gris muy suave claro
+        sidebar.setBackground(new Color(248, 250, 252));
         sidebar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(226, 232, 240)),
                 BorderFactory.createEmptyBorder(20, 15, 20, 15)
         ));
         sidebar.setPreferredSize(new Dimension(240, getHeight()));
 
-        // Título / Logo en la barra lateral
         JLabel lblLogo = new JLabel("SIGELAB");
         lblLogo.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblLogo.setForeground(new Color(37, 99, 235)); // Azul principal
+        lblLogo.setForeground(new Color(37, 99, 235));
         lblLogo.setAlignmentX(Component.CENTER_ALIGNMENT);
         sidebar.add(lblLogo);
 
@@ -69,7 +67,6 @@ public class MainForm extends JFrame {
 
         sidebar.add(Box.createRigidArea(new Dimension(0, 25)));
 
-        // Creación de botones organizados verticalmente
         btnPrestamos = crearBotonSidebar("Préstamos");
         btnRegistrarDevolucion = crearBotonSidebar("Devoluciones");
         btnInventario = crearBotonSidebar("Inventario");
@@ -97,11 +94,9 @@ public class MainForm extends JFrame {
 
         panelPrincipal.add(sidebar, BorderLayout.WEST);
 
-        // --- 2. CONTENEDOR PRINCIPAL (HEADER + CENTRO) ---
         JPanel contenidoPanel = new JPanel(new BorderLayout());
         contenidoPanel.setBackground(Color.WHITE);
 
-        // Cabecera superior
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(Color.WHITE);
         header.setBorder(BorderFactory.createCompoundBorder(
@@ -110,11 +105,15 @@ public class MainForm extends JFrame {
         ));
 
         String nombreCompleto = "Administrador";
+        String rolTexto = "Administrador";
         if (usuarioAutenticado != null) {
             nombreCompleto = usuarioAutenticado.getNombres() + " " + usuarioAutenticado.getApellidos();
+            if (usuarioAutenticado.getRol() != null) {
+                rolTexto = usuarioAutenticado.getRol().name();
+            }
         }
 
-        lblTitulo = new JLabel("Bienvenido, " + nombreCompleto);
+        lblTitulo = new JLabel("Bienvenido, " + nombreCompleto + " (" + rolTexto + ")");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitulo.setForeground(new Color(15, 23, 42));
         header.add(lblTitulo, BorderLayout.WEST);
@@ -126,7 +125,6 @@ public class MainForm extends JFrame {
 
         contenidoPanel.add(header, BorderLayout.NORTH);
 
-        // Tarjeta central de bienvenida
         JPanel centroDashboard = new JPanel(new GridBagLayout());
         centroDashboard.setBackground(new Color(248, 250, 252));
 
@@ -170,15 +168,48 @@ public class MainForm extends JFrame {
         if (btnInventario != null) btnInventario.addActionListener(e -> abrirInventarioEquipos());
         if (btnLaboratorios != null) btnLaboratorios.addActionListener(e -> abrirCatlogoLaboratorios());
         if (btnMantenimiento != null) btnMantenimiento.addActionListener(e -> MantenimientoEquipos());
-        if (btnUsuarios != null) btnUsuarios.addActionListener(e -> abrirUsuarios());
-
         if (btnPrestamos != null) btnPrestamos.addActionListener(e -> abrirPrestamos());
         if (btnRegistrarDevolucion != null) btnRegistrarDevolucion.addActionListener(e -> abrirDevoluciones());
-
-        if (btnAuditoria != null) btnAuditoria.addActionListener(e -> abrirRegistroAuditoria());
         if (btnReportes != null) btnReportes.addActionListener(e -> abrirHistorialPrestamos());
 
+        if (btnUsuarios != null) {
+            btnUsuarios.addActionListener(e -> {
+                if (esEncargado()) {
+                    mostrarAvisoAdminRestriccion("Gestión de Usuarios");
+                    return;
+                }
+                abrirUsuarios();
+            });
+        }
+
+        if (btnAuditoria != null) {
+            btnAuditoria.addActionListener(e -> {
+                if (esEncargado()) {
+                    mostrarAvisoAdminRestriccion("Módulo de Auditoría");
+                    return;
+                }
+                abrirRegistroAuditoria();
+            });
+        }
+
         if (btnSalir != null) btnSalir.addActionListener(e -> salir());
+    }
+
+    private boolean esEncargado() {
+        if (usuarioAutenticado == null || usuarioAutenticado.getRol() == null) {
+            return false;
+        }
+        String rol = usuarioAutenticado.getRol().name().trim().toLowerCase();
+        return rol.contains("encargado") || rol.equals("user") || rol.equals("empleado");
+    }
+
+    private void mostrarAvisoAdminRestriccion(String modulo) {
+        JOptionPane.showMessageDialog(
+                panelPrincipal,
+                "Acceso restringido.\nEl módulo de \"" + modulo + "\" es una opción exclusiva del Administrador.\nPor favor, comunícate con él para realizar esta acción.",
+                "SIGELAB - Restricción de Rol",
+                JOptionPane.WARNING_MESSAGE
+        );
     }
 
     private void abrirPrestamos() {

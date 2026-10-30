@@ -29,7 +29,7 @@ public class LoginForm {
     private boolean autenticando;
 
     // 🛠️ Cambia a 'false' cuando quieras activar la verificación facial real con Python.
-    private static final boolean OMITIR_FACIAL_EN_PRUEBAS = true;
+    private static final boolean OMITIR_FACIAL_EN_PRUEBAS = false;
 
     public LoginForm() {
         this(new UsuarioController(), new FacialAuthClient());
