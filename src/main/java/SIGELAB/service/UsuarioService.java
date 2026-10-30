@@ -1,10 +1,14 @@
 package SIGELAB.service;
 
+import SIGELAB.config.DatabaseConnection;
 import SIGELAB.enums.RolUsuario;
 import SIGELAB.model.Usuario;
 import SIGELAB.repository.UsuarioRepository;
 import SIGELAB.util.BusinessException;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,8 +80,11 @@ public class UsuarioService {
         return repository.actualizar(usuario);
     }
 
-    public boolean desactivar(int id) {
-        return repository.desactivar(id);
+    public boolean desactivar(int id, int usuarioLogueadoId) {
+        if (id <= 0) {
+            throw new BusinessException("ID de usuario inválido para desactivar.");
+        }
+        return repository.desactivar(id, usuarioLogueadoId);
     }
 
     public boolean activar(int id) {
@@ -85,12 +92,55 @@ public class UsuarioService {
     }
 
     public Optional<Usuario> autenticar(String usuario, String password) {
-        if (usuario == null || password == null) return Optional.empty();
-        Optional<Usuario> encontrado = repository.buscarPorUsuario(usuario);
-        if (encontrado.isEmpty() || !encontrado.get().isActivo()) return Optional.empty();
+        if (usuario == null || password == null) {
+            registrarAuditoria(1, "LOGIN_FALLIDO", "Usuario", 1, "Intento de inicio de sesión con credenciales nulas.");
+            return Optional.empty();
+        }
 
-        boolean passwordValida = password.equals(encontrado.get().getPasswordHash());
-        return passwordValida ? encontrado : Optional.empty();
+        Optional<Usuario> encontrado = repository.buscarPorUsuario(usuario);
+
+        if (encontrado.isEmpty()) {
+            registrarAuditoria(1, "LOGIN_FALLIDO", "Usuario", 1, "Intento fallido. Usuario no encontrado: " + usuario);
+            return Optional.empty();
+        }
+
+        Usuario usr = encontrado.get();
+
+        if (!usr.isActivo()) {
+            registrarAuditoria(usr.getIdUsuario(), "LOGIN_FALLIDO", "Usuario", usr.getIdUsuario(), "Intento de inicio de sesión en cuenta inactiva: " + usuario);
+            return Optional.empty();
+        }
+
+        boolean passwordValida = password.equals(usr.getPasswordHash());
+
+        if (!passwordValida) {
+            registrarAuditoria(usr.getIdUsuario(), "LOGIN_FALLIDO", "Usuario", usr.getIdUsuario(), "Contraseña incorrecta para el usuario: " + usuario);
+            return Optional.empty();
+        }
+
+        // Registro exitoso en la tabla Auditoria
+        registrarAuditoria(usr.getIdUsuario(), "LOGIN_EXITOSO", "Usuario", usr.getIdUsuario(), "Inicio de sesión exitoso para: " + usuario);
+        return Optional.of(usr);
+    }
+
+    private void registrarAuditoria(int usuarioId, String accion, String entidad, int registroId, String descripcion) {
+        String sql = "INSERT INTO Auditoria (usuario_id, accion, entidad, registro_id, descripcion, fecha_hora) VALUES (?, ?, ?, ?, ?, GETDATE())";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, usuarioId > 0 ? usuarioId : 1);
+            ps.setString(2, accion);
+            ps.setString(3, entidad);
+            ps.setInt(4, registroId > 0 ? registroId : 1);
+            ps.setString(5, descripcion);
+
+            ps.executeUpdate();
+            System.out.println("DEBUG AUDITORIA -> " + accion + " guardado correctamente en SQL Server.");
+
+        } catch (SQLException e) {
+            System.err.println("ERROR SQL AL GUARDAR AUDITORIA (" + accion + "): " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void validarUsuario(Usuario u) {

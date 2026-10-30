@@ -1,8 +1,12 @@
 package SIGELAB.service;
 
+import SIGELAB.config.DatabaseConnection;
 import SIGELAB.model.EstadoEquipo;
 import SIGELAB.repository.EstadoEquipoRepository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -16,8 +20,6 @@ public class EstadoEquipoService {
         return repository.listar();
     }
 
-
-
     public boolean crearEquipo(int laboratorioId, String codigoInventario, String nombre,
                                String marca, String modelo, String numeroSerie,
                                String tipo, String estado, String observaciones) {
@@ -30,7 +32,7 @@ public class EstadoEquipoService {
             throw new IllegalArgumentException("El código de inventario debe tener el formato correcto (Ejemplo: CM-787 o INV-001).");
         }
 
-        // 2. Validar Número de Serie (Libre de restricciones rígidas)
+        // 2. Validar Número de Serie
         if (numeroSerie == null) {
             numeroSerie = "";
         }
@@ -57,7 +59,11 @@ public class EstadoEquipoService {
         equipo.setEstado(estado);
         equipo.setObservaciones(observaciones != null ? observaciones.trim() : "");
 
-        return repository.guardar(equipo);
+        boolean guardado = repository.guardar(equipo);
+        if (guardado) {
+            registrarAuditoria(1, "CREACION", "Equipo", equipo.getId(), "Se registró el equipo " + codigoInventario + " en el inventario");
+        }
+        return guardado;
     }
 
     public boolean enviarAMantenimiento(int equipoId, String motivo) {
@@ -71,10 +77,18 @@ public class EstadoEquipoService {
             throw new IllegalArgumentException("Debe especificar el motivo o la observación del mantenimiento.");
         }
 
-        return repository.actualizarEstadoYObservaciones(equipoId, "MANTENIMIENTO", "Mantenimiento: " + motivo.trim());
+        boolean actualizado = repository.actualizarEstadoYObservaciones(equipoId, "MANTENIMIENTO", "Mantenimiento: " + motivo.trim());
+        if (actualizado) {
+            registrarAuditoria(1, "EQUIPO_ENVIADO_MANTENIMIENTO", "Equipo", equipoId, "Equipo enviado a mantenimiento. Motivo: " + motivo.trim());
+        }
+        return actualizado;
     }
 
     public boolean finalizarMantenimiento(int equipoId, boolean reparadoConExito) {
+        return finalizarMantenimiento(equipoId, reparadoConExito, reparadoConExito ? "Reparado exitosamente - Disponible" : "Dado de baja por daños irreparables en taller");
+    }
+
+    public boolean finalizarMantenimiento(int equipoId, boolean reparadoConExito, String motivo) {
         // 1. Consultar el equipo actual para verificar su estado en la base de datos
         EstadoEquipo equipoActual = repository.buscarPorId(equipoId);
 
@@ -82,13 +96,23 @@ public class EstadoEquipoService {
             throw new IllegalStateException("Acción denegada: El equipo ya se encuentra DADO DE BAJA y no puede ser reparado ni puesto como disponible.");
         }
 
-
+        if (motivo == null || motivo.trim().isEmpty()) {
+            motivo = reparadoConExito ? "Reparado exitosamente - Disponible" : "Dado de baja por daños irreparables en taller";
+        }
 
         // 2. Si pasa la validación, continúa el flujo normal
         String nuevoEstado = reparadoConExito ? "DISPONIBLE" : "DADO_DE_BAJA";
-        String observacionFinal = reparadoConExito ? "Reparado exitosamente - Disponible" : "Dado de baja por daños irreparables en taller";
+        String observacionFinal = reparadoConExito ? "Reparado: " + motivo.trim() : "Dado de baja: " + motivo.trim();
 
-        return repository.actualizarEstadoYObservaciones(equipoId, nuevoEstado, observacionFinal);
+        boolean actualizado = repository.actualizarEstadoYObservaciones(equipoId, nuevoEstado, observacionFinal);
+        if (actualizado) {
+            String descripcion = reparadoConExito ?
+                    "Mantenimiento finalizado con éxito (Reparado). Detalle: " + motivo.trim() :
+                    "Equipo dado de baja permanentemente. Motivo: " + motivo.trim();
+
+            registrarAuditoria(1, "MANTENIMIENTO_FINALIZADO", "Equipo", equipoId, descripcion);
+        }
+        return actualizado;
     }
 
     public boolean actualizar(EstadoEquipo equipo) {
@@ -116,5 +140,22 @@ public class EstadoEquipoService {
 
     public String generarSiguienteCodigo() {
         return repository.generarSiguienteCodigo();
+    }
+
+    private void registrarAuditoria(int usuarioId, String accion, String entidad, int registroId, String descripcion) {
+        String sql = "INSERT INTO Auditoria (usuario_id, accion, entidad, registro_id, descripcion, fecha_hora) VALUES (?, ?, ?, ?, ?, GETDATE())";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, usuarioId > 0 ? usuarioId : 1);
+            ps.setString(2, accion);
+            ps.setString(3, entidad);
+            ps.setInt(4, registroId > 0 ? registroId : 1);
+            ps.setString(5, descripcion);
+            ps.executeUpdate();
+            System.out.println("DEBUG AUDITORIA -> " + accion + " guardado correctamente en SQL Server.");
+        } catch (SQLException e) {
+            System.err.println("ERROR SQL AL GUARDAR AUDITORIA (" + accion + "): " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

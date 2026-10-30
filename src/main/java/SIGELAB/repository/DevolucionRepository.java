@@ -1,4 +1,3 @@
-
 package SIGELAB.repository;
 
 import SIGELAB.config.DatabaseConnection;
@@ -10,12 +9,7 @@ import java.util.List;
 
 public class DevolucionRepository {
 
-    /**
-     * Lista los equipos que todavía están pendientes
-     * de devolución.
-     */
     public List<Object[]> listarPendientes() {
-
         List<Object[]> resultados = new ArrayList<>();
 
         String sql = """
@@ -36,16 +30,11 @@ public class DevolucionRepository {
                 ORDER BY p.id, d.id
                 """;
 
-        try (Connection conexion =
-                     DatabaseConnection.getConnection();
-
-             PreparedStatement ps =
-                     conexion.prepareStatement(sql);
-
+        try (Connection conexion = DatabaseConnection.getConnection();
+             PreparedStatement ps = conexion.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-
                 resultados.add(new Object[]{
                         rs.getInt("prestamo_id"),
                         rs.getString("solicitante"),
@@ -59,51 +48,40 @@ public class DevolucionRepository {
             return resultados;
 
         } catch (SQLException e) {
-
-            throw JdbcSupport.error(
-                    "consultar devoluciones pendientes",
-                    e
-            );
+            throw JdbcSupport.error("consultar devoluciones pendientes", e);
         }
     }
 
-    /**
-     * Registra la devolución de un equipo.
-     *
-     * Todos los cambios se ejecutan dentro de
-     * una única transacción de SQL Server.
-     */
     public boolean registrarDevolucion(
             int detalleId,
             String condicion,
             int usuarioId) {
 
         if (detalleId <= 0 || usuarioId <= 0) {
-
-            throw new IllegalArgumentException(
-                    "El detalle y el usuario deben ser válidos."
-            );
+            throw new IllegalArgumentException("El detalle y el usuario deben ser válidos.");
         }
 
-        if (!"BUENO".equals(condicion)
-                && !"DANADO".equals(condicion)) {
-
-            throw new IllegalArgumentException(
-                    "La condición debe ser BUENO o DANADO."
-            );
+        String condUpper = condicion != null ? condicion.trim().toUpperCase() : "";
+        if ("DAÑADO".equals(condUpper)) {
+            condUpper = "DANADO";
         }
 
-        String consultarPrestamoId = """
-                SELECT prestamo_id
-                FROM DetallePrestamo
-                WHERE id = ?
-                """;
+        if (!"DISPONIBLE".equals(condUpper)
+                && !"BUENO".equals(condUpper)
+                && !"DANADO".equals(condUpper)) {
+            throw new IllegalArgumentException("La condición debe ser DISPONIBLE o DANADO.");
+        }
 
-        String bloquearPrestamo = """
-                SELECT estado
-                FROM Prestamo WITH (UPDLOCK, HOLDLOCK)
-                WHERE id = ?
-                """;
+        String condicionParaDetalle = ("DISPONIBLE".equals(condUpper)) ? "BUENO" : condUpper;
+
+        String nuevoEstadoEquipo = switch (condUpper) {
+            case "DISPONIBLE", "BUENO" -> "DISPONIBLE";
+            case "DANADO" -> "DANADO";
+            default -> "DISPONIBLE";
+        };
+
+        String consultarPrestamoId = "SELECT prestamo_id FROM DetallePrestamo WHERE id = ?";
+        String bloquearPrestamo = "SELECT estado, fecha_devolucion_esperada FROM Prestamo WITH (UPDLOCK, HOLDLOCK) WHERE id = ?";
 
         String consultarDetalle = """
                 SELECT
@@ -152,248 +130,134 @@ public class DevolucionRepository {
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
-        try (Connection conexion =
-                     DatabaseConnection.getConnection()) {
-
+        try (Connection conexion = DatabaseConnection.getConnection()) {
             conexion.setAutoCommit(false);
 
             try {
-
                 int prestamoId;
                 int equipoId;
+                java.sql.Timestamp fechaEsperada = null;
 
-                // 1. Identificar el préstamo.
-                try (PreparedStatement ps =
-                             conexion.prepareStatement(
-                                     consultarPrestamoId
-                             )) {
-
+                try (PreparedStatement ps = conexion.prepareStatement(consultarPrestamoId)) {
                     ps.setInt(1, detalleId);
-
                     try (ResultSet rs = ps.executeQuery()) {
-
                         if (!rs.next()) {
-
-                            throw new IllegalStateException(
-                                    "No existe el detalle seleccionado."
-                            );
+                            throw new IllegalStateException("No existe el detalle seleccionado.");
                         }
-
                         prestamoId = rs.getInt("prestamo_id");
                     }
                 }
 
-                // 2. Bloquear el préstamo durante la operación.
-                // Esto serializa las devoluciones
-                // de un mismo préstamo.
-                try (PreparedStatement ps =
-                             conexion.prepareStatement(
-                                     bloquearPrestamo
-                             )) {
-
+                try (PreparedStatement ps = conexion.prepareStatement(bloquearPrestamo)) {
                     ps.setInt(1, prestamoId);
-
                     try (ResultSet rs = ps.executeQuery()) {
-
                         if (!rs.next()) {
-
-                            throw new IllegalStateException(
-                                    "No existe el préstamo seleccionado."
-                            );
+                            throw new IllegalStateException("No existe el préstamo seleccionado.");
                         }
+                        String estado = rs.getString("estado");
+                        fechaEsperada = rs.getTimestamp("fecha_devolucion_esperada");
 
-                        String estado =
-                                rs.getString("estado");
-
-                        if (!"ACTIVO".equalsIgnoreCase(estado)
-                                && !"VENCIDO".equalsIgnoreCase(estado)) {
-
-                            throw new IllegalStateException(
-                                    "El préstamo no permite devoluciones. "
-                                            + "Estado: " + estado
-                            );
+                        if (!"ACTIVO".equalsIgnoreCase(estado) && !"VENCIDO".equalsIgnoreCase(estado)) {
+                            throw new IllegalStateException("El préstamo no permite devoluciones. Estado: " + estado);
                         }
                     }
                 }
 
-                // 3. Bloquear y validar el detalle y el equipo.
-                try (PreparedStatement ps =
-                             conexion.prepareStatement(
-                                     consultarDetalle
-                             )) {
+                boolean conMora = false;
+                if (fechaEsperada != null) {
+                    java.util.Date fechaActual = new java.util.Date();
+                    if (fechaActual.after(fechaEsperada)) {
+                        conMora = true;
+                    }
+                }
 
+                try (PreparedStatement ps = conexion.prepareStatement(consultarDetalle)) {
                     ps.setInt(1, detalleId);
                     ps.setInt(2, prestamoId);
-
                     try (ResultSet rs = ps.executeQuery()) {
-
                         if (!rs.next()) {
-
-                            throw new IllegalStateException(
-                                    "No existe el detalle del préstamo."
-                            );
+                            throw new IllegalStateException("No existe el detalle del préstamo.");
                         }
-
-                        if (!"PENDIENTE".equalsIgnoreCase(
-                                rs.getString("estado_devolucion"))) {
-
-                            throw new IllegalStateException(
-                                    "Este equipo ya fue devuelto."
-                            );
+                        if (!"PENDIENTE".equalsIgnoreCase(rs.getString("estado_devolucion"))) {
+                            throw new IllegalStateException("Este equipo ya fue devuelto.");
                         }
-
-                        if (!"PRESTADO".equalsIgnoreCase(
-                                rs.getString("estado_equipo"))) {
-
-                            throw new IllegalStateException(
-                                    "El equipo no está en estado PRESTADO."
-                            );
+                        if (!"PRESTADO".equalsIgnoreCase(rs.getString("estado_equipo"))) {
+                            throw new IllegalStateException("El equipo no está en estado PRESTADO.");
                         }
-
                         equipoId = rs.getInt("equipo_id");
                     }
                 }
 
-                String nuevoEstadoEquipo =
-                        "BUENO".equals(condicion)
-                                ? "DISPONIBLE"
-                                : "DANADO";
-
-                // 4. Registrar la condición de devolución.
-                try (PreparedStatement ps =
-                             conexion.prepareStatement(
-                                     actualizarDetalle
-                             )) {
-
-                    ps.setString(1, condicion);
+                try (PreparedStatement ps = conexion.prepareStatement(actualizarDetalle)) {
+                    ps.setString(1, condicionParaDetalle);
                     ps.setInt(2, detalleId);
                     ps.setInt(3, prestamoId);
-
                     if (ps.executeUpdate() != 1) {
-
-                        throw new SQLException(
-                                "No se pudo actualizar el detalle."
-                        );
+                        throw new SQLException("No se pudo actualizar el detalle del préstamo.");
                     }
                 }
 
-                // 5. Actualizar el estado del inventario.
-                try (PreparedStatement ps =
-                             conexion.prepareStatement(
-                                     actualizarEquipo
-                             )) {
-
+                try (PreparedStatement ps = conexion.prepareStatement(actualizarEquipo)) {
                     ps.setString(1, nuevoEstadoEquipo);
                     ps.setInt(2, equipoId);
-
                     if (ps.executeUpdate() != 1) {
-
-                        throw new SQLException(
-                                "No se pudo actualizar el equipo."
-                        );
+                        throw new SQLException("No se pudo actualizar el estado del equipo en el inventario.");
                     }
                 }
 
-                // 6. Consultar cuántos equipos
-                // siguen pendientes de devolución.
                 int pendientes;
-
-                try (PreparedStatement ps =
-                             conexion.prepareStatement(
-                                     contarPendientes
-                             )) {
-
+                try (PreparedStatement ps = conexion.prepareStatement(contarPendientes)) {
                     ps.setInt(1, prestamoId);
-
                     try (ResultSet rs = ps.executeQuery()) {
-
                         if (!rs.next()) {
-
-                            throw new SQLException(
-                                    "No se pudo consultar el préstamo."
-                            );
+                            throw new SQLException("No se pudo consultar los pendientes del préstamo.");
                         }
-
                         pendientes = rs.getInt(1);
                     }
                 }
 
-                // 7. Finalizar solamente cuando
-                // todos los equipos regresaron.
                 if (pendientes == 0) {
-
-                    try (PreparedStatement ps =
-                                 conexion.prepareStatement(
-                                         finalizarPrestamo
-                                 )) {
-
+                    try (PreparedStatement ps = conexion.prepareStatement(finalizarPrestamo)) {
                         ps.setInt(1, prestamoId);
-
                         if (ps.executeUpdate() != 1) {
-
-                            throw new SQLException(
-                                    "No se pudo finalizar el préstamo."
-                            );
+                            throw new SQLException("No se pudo finalizar el préstamo.");
                         }
                     }
                 }
 
-                // 8. Registrar auditoría
-                // dentro de la misma transacción.
-                try (PreparedStatement ps =
-                             conexion.prepareStatement(
-                                     insertarAuditoria
-                             )) {
+                String descripcionAuditoria = "Devolución del equipo #" + equipoId + " del préstamo #" + prestamoId +
+                        ". Condición: " + condUpper + ". Nuevo estado equipo: " + nuevoEstadoEquipo +
+                        ". Pendientes restantes: " + pendientes;
 
+                if (conMora) {
+                    descripcionAuditoria += " [DEVUELTO CON RETRASO / MORA]";
+                }
+
+                try (PreparedStatement ps = conexion.prepareStatement(insertarAuditoria)) {
                     ps.setInt(1, usuarioId);
                     ps.setString(2, "REGISTRAR_DEVOLUCION");
                     ps.setString(3, "DetallePrestamo");
                     ps.setInt(4, detalleId);
-
-                    ps.setString(
-                            5,
-                            "Devolución del equipo #" + equipoId
-                                    + " del préstamo #" + prestamoId
-                                    + ". Condición: " + condicion
-                                    + ". Nuevo estado: " + nuevoEstadoEquipo
-                                    + ". Pendientes restantes: " + pendientes
-                    );
-
+                    ps.setString(5, descripcionAuditoria);
                     if (ps.executeUpdate() != 1) {
-
-                        throw new SQLException(
-                                "No se pudo registrar la auditoría."
-                        );
+                        throw new SQLException("No se pudo registrar la auditoría.");
                     }
                 }
 
-                // 9. Confirmar todos los cambios.
                 conexion.commit();
-
                 return true;
 
             } catch (SQLException | RuntimeException e) {
-
-                // Revertir todos los cambios
-                // si ocurre un error.
                 try {
-
                     conexion.rollback();
-
                 } catch (SQLException rollbackError) {
-
                     e.addSuppressed(rollbackError);
                 }
-
                 throw e;
             }
 
         } catch (SQLException e) {
-
-            throw JdbcSupport.error(
-                    "registrar la devolución",
-                    e
-            );
+            throw JdbcSupport.error("registrar la devolución", e);
         }
     }
 }

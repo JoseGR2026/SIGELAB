@@ -4,78 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="Equipos en mantenimiento completos con modificaciones claras">
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/util/QrUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
+    <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="updates">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/facial-service/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/DevolucionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/DevolucionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/MantenimientoEquipoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/MantenimientoEquipoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/UsuarioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/controller/UsuarioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/DevolucionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/DevolucionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/UsuarioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/service/DevolucionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/service/DevolucionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/service/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/service/UsuarioService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/AuditoriaConsultaView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/AuditoriaConsultaView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/CatalogoLaboratorios.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/CatalogoLaboratorios.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/CatalogoLaboratorios.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/DevolucionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/DevolucionView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginForm.form" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginForm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.form" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MantenimientoEquipos.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/PrestamoView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/PrestamoView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/UsuarioView.form" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/UsuarioView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/UsuarioView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/config/DatabaseConnection.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/EstadoEquipoController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/LaboratorioController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/UsuarioController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/enums/EstadoEquipo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/enums/RolUsuario.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialAuthClient.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialClientException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialEnrollmentResult.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialStatus.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialVerificationResult.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/EstadoEquipo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/Laboratorio.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/Usuario.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/EstadoEquipoRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/LaboratorioRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/UsuarioRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/EstadoEquipoService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/LaboratorioService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/UsuarioService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/BusinessException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/DataAccessException.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/DateUtils.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/JdbcSupport.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/CatalogoLaboratorios$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/CatalogoLaboratorios.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo$ItemLaboratorio.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm$LoginOutcome.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/MainForm.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$2.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$3.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$4.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/AbstractLayout.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/DimensionInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/GridConstraints.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/GridLayoutManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/HorizontalInfo.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/LayoutState.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/Spacer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/SupportCode$TextWithMnemonic.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/SupportCode.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/Util.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/VerticalInfo.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,61 +73,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0000000000012739" />
-      <entry key="S30" value="1.0001344764777973" />
-      <entry key="S60" value="1.0155444928078312" />
-      <entry key="M2" value="1.1739393198921357" />
-      <entry key="M5" value="2.060226275109731" />
-      <entry key="M10" value="6.133095012261337" />
-      <entry key="M15" value="12.347816330865069" />
-      <entry key="M30" value="31.267889845114013" />
-      <entry key="H1" value="56.63765774326317" />
-      <entry key="H2" value="82.23153101007992" />
-      <entry key="H4" value="107.88785577061533" />
-      <entry key="D1" value="210.93569440044726" />
-      <entry key="W1" value="281.0635442300252" />
+      <entry key="MS100" value="1.0010835639375661" />
+      <entry key="MS500" value="1.2552530314267982" />
+      <entry key="S2" value="1.710792320754369" />
+      <entry key="S5" value="1.8723627057707586" />
+      <entry key="S10" value="1.9340035898061414" />
+      <entry key="S30" value="1.9774986849644958" />
+      <entry key="S60" value="1.9886853316219957" />
+      <entry key="M2" value="1.9943265720099828" />
+      <entry key="M5" value="1.9983986483258445" />
+      <entry key="M10" value="2.149654554423958" />
+      <entry key="M15" value="3.053371523045409" />
+      <entry key="M30" value="11.34599443473222" />
+      <entry key="H1" value="35.091866173082394" />
+      <entry key="H2" value="70.01625096062757" />
+      <entry key="H4" value="107.51491347998001" />
+      <entry key="D1" value="228.3494132207263" />
+      <entry key="W1" value="305.4446459601397" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
       <entry key="S2" value="0.0" />
-      <entry key="S5" value="6.763928357948557E-141" />
-      <entry key="S10" value="8.224310523046028E-71" />
-      <entry key="S30" value="4.348770608332193E-24" />
-      <entry key="S60" value="2.0853706165426768E-12" />
-      <entry key="M2" value="1.4440831102235712E-6" />
-      <entry key="M5" value="0.0046422934748145345" />
-      <entry key="M10" value="0.07577170510225066" />
-      <entry key="M15" value="0.21689752171417948" />
-      <entry key="M30" value="0.7691357101852142" />
-      <entry key="H1" value="1.8327526047901481" />
-      <entry key="H2" value="3.3856284132457812" />
-      <entry key="H4" value="6.108272133638187" />
-      <entry key="D1" value="25.50905546227943" />
-      <entry key="W1" value="40.3517642528154" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="9.483555347631267E-211" />
+      <entry key="S30" value="9.824800211803794E-71" />
+      <entry key="S60" value="9.912013020482015E-36" />
+      <entry key="M2" value="3.1483390458523975E-18" />
+      <entry key="M5" value="1.0049126537462666E-7" />
+      <entry key="M10" value="3.525371763873051E-4" />
+      <entry key="M15" value="0.006044863485023876" />
+      <entry key="M30" value="0.12840115474399103" />
+      <entry key="H1" value="0.7488361854368832" />
+      <entry key="H2" value="2.1641172123626773" />
+      <entry key="H4" value="4.8835891657251755" />
+      <entry key="D1" value="24.57524382561324" />
+      <entry key="W1" value="40.137353721779725" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.00579892019776972" />
-      <entry key="MS500" value="0.357000994921266" />
-      <entry key="S2" value="0.7729783971291766" />
-      <entry key="S5" value="0.9021254660004498" />
-      <entry key="S10" value="0.9498028563879063" />
-      <entry key="S30" value="0.9831099867039484" />
-      <entry key="S60" value="1.0067879342419304" />
-      <entry key="M2" value="1.1685720749154196" />
-      <entry key="M5" value="2.0613371733472947" />
-      <entry key="M10" value="6.206192315185981" />
-      <entry key="M15" value="12.562131241729018" />
-      <entry key="M30" value="32.034247506548" />
-      <entry key="H1" value="58.46776581497747" />
-      <entry key="H2" value="85.61505336620877" />
-      <entry key="H4" value="113.9944614648872" />
-      <entry key="D1" value="236.44371521939743" />
-      <entry key="W1" value="321.4150802210822" />
+      <entry key="MS100" value="0.03212890857617407" />
+      <entry key="MS500" value="0.5539700838154733" />
+      <entry key="S2" value="1.3177220917743155" />
+      <entry key="S5" value="1.6764299565123935" />
+      <entry key="S10" value="1.8281087216775407" />
+      <entry key="S30" value="1.9402754059231457" />
+      <entry key="S60" value="1.9698221307028243" />
+      <entry key="M2" value="1.984831231329024" />
+      <entry key="M5" value="1.9945849953056687" />
+      <entry key="M10" value="2.1480745548026463" />
+      <entry key="M15" value="3.058031779641969" />
+      <entry key="M30" value="11.473187541267139" />
+      <entry key="H1" value="35.83917764476746" />
+      <entry key="H2" value="72.17876651317526" />
+      <entry key="H4" value="112.39703118081243" />
+      <entry key="D1" value="252.92363516244717" />
+      <entry key="W1" value="345.58176899279687" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -314,6 +259,8 @@
     <MESSAGE value="registro de usuarios completo" />
     <MESSAGE value="Catalogo de laboratiorios completo con view y reglas" />
     <MESSAGE value="Equipos en mantenimiento completos con modificaciones claras" />
-    <option name="LAST_COMMIT_MESSAGE" value="Equipos en mantenimiento completos con modificaciones claras" />
+    <MESSAGE value="Fase visaul del proyecto" />
+    <MESSAGE value="updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="updates" />
   </component>
 </project>

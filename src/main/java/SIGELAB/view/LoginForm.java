@@ -1,5 +1,6 @@
 package SIGELAB.view;
 
+import SIGELAB.config.DatabaseConnection;
 import SIGELAB.controller.UsuarioController;
 import SIGELAB.integration.facial.FacialAuthClient;
 import SIGELAB.integration.facial.FacialClientException;
@@ -8,6 +9,9 @@ import SIGELAB.model.Usuario;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -50,21 +54,18 @@ public class LoginForm {
     }
 
     private void inicializarEstilosYDiseno() {
-        // Placeholders y tamaños estéticos
         txtUsuario.putClientProperty("JTextField.placeholderText", "Ingrese su usuario o carnet");
         txtPassword.putClientProperty("JTextField.placeholderText", "Ingrese su contraseña");
 
         txtUsuario.setPreferredSize(new Dimension(230, 32));
         txtPassword.setPreferredSize(new Dimension(230, 32));
 
-        // Estilos oficiales de FlatLaf para botones (Fondo azul vibrante y texto blanco)
         btnIngresar.putClientProperty("FlatLaf.style", "background: #2563eb; foreground: #ffffff; font: bold; arc: 10");
         btnSalir.putClientProperty("FlatLaf.style", "arc: 10");
 
         btnIngresar.setPreferredSize(new Dimension(115, 36));
         btnSalir.setPreferredSize(new Dimension(95, 36));
 
-        // Panel tarjeta central limpio y con sombra/borde sutil
         JPanel cardPanel = new JPanel(new GridBagLayout());
         cardPanel.setBackground(Color.WHITE);
         cardPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -76,7 +77,6 @@ public class LoginForm {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Título del Sistema
         JLabel lblTitulo = new JLabel("SIGELAB", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 26));
         lblTitulo.setForeground(new Color(15, 23, 42));
@@ -89,10 +89,7 @@ public class LoginForm {
         gbc.gridy = 1;
         cardPanel.add(lblSub, gbc);
 
-        // Espaciador
         gbc.insets = new Insets(20, 8, 8, 8);
-
-        // Usuario
         gbc.gridwidth = 1;
         gbc.gridy = 2; gbc.gridx = 0;
         JLabel lblUsr = new JLabel("Usuario:");
@@ -104,7 +101,6 @@ public class LoginForm {
         cardPanel.add(txtUsuario, gbc);
         gbc.weightx = 0.0;
 
-        // Contraseña
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.gridy = 3; gbc.gridx = 0;
         JLabel lblPwd = new JLabel("Contraseña:");
@@ -116,7 +112,6 @@ public class LoginForm {
         cardPanel.add(txtPassword, gbc);
         gbc.weightx = 0.0;
 
-        // Panel de Botones inferior
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         panelBotones.setOpaque(false);
         panelBotones.add(btnIngresar);
@@ -126,7 +121,6 @@ public class LoginForm {
         gbc.insets = new Insets(22, 8, 5, 8);
         cardPanel.add(panelBotones, gbc);
 
-        // Fondo general gris claro muy suave
         panelPrincipal.setBackground(new Color(241, 245, 249));
         panelPrincipal.add(cardPanel, new GridBagConstraints());
     }
@@ -169,6 +163,10 @@ public class LoginForm {
                     facial = new FacialVerificationResult(true, true, 0, null, 0.0, true, 0, "Omitido por modo de pruebas locales.");
                 } else {
                     facial = facialAuthClient.verify(autenticado.get().getIdUsuario());
+                    // Si el reconocimiento facial no coincide, registramos el LOGIN_FALLIDO por biometría
+                    if (!facial.matched()) {
+                        registrarAuditoriaFallida(autenticado.get().getIdUsuario(), "Fallo en verificación biométrica facial para el usuario: " + usuario);
+                    }
                 }
                 return new LoginOutcome(autenticado.get(), facial);
             }
@@ -207,6 +205,19 @@ public class LoginForm {
                 }
             }
         }.execute();
+    }
+
+    private void registrarAuditoriaFallida(int usuarioId, String descripcion) {
+        String sql = "INSERT INTO Auditoria (usuario_id, accion, entidad, registro_id, descripcion) VALUES (?, 'LOGIN_FALLIDO', 'Usuario', ?, ?)";
+        try (Connection c = DatabaseConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, usuarioId);
+            ps.setInt(2, usuarioId);
+            ps.setString(3, descripcion);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void abrirMenu(Usuario usuario) {

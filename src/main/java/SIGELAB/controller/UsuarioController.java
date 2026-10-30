@@ -18,7 +18,6 @@ public class UsuarioController {
     }
 
     public Usuario crearUsuario(String nombres, String apellidos, String username, String password, RolUsuario rol, String correo) {
-        // Llama al servicio que procesa y guarda todos los datos reales del formulario
         return service.crearUsuario(nombres, apellidos, username, password, rol, correo);
     }
 
@@ -46,11 +45,11 @@ public class UsuarioController {
         return service.actualizarConPassword(usuario, password);
     }
 
-    public boolean desactivar(int id) {
-        return service.desactivar(id);
+    public boolean desactivar(int id, int usuarioLogueadoId) {
+        return service.desactivar(id, usuarioLogueadoId);
     }
+
     public boolean activar(int id) {
         return service.activar(id);
     }
-
 }

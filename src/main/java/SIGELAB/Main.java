@@ -31,7 +31,7 @@ public class Main {
             frame.setContentPane(loginForm.getPanelPrincipal());
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            // 📌 Aumentado el tamaño de la ventana para que la tarjeta respire perfectamente
+            // Aumentado el tamaño de la ventana para que la tarjeta respire perfectamente
             frame.setSize(540, 410);
 
             frame.setLocationRelativeTo(null);

@@ -92,11 +92,35 @@ public class UsuarioRepository {
         }
     }
 
-    public boolean desactivar(int id) {
-        try (Connection c = DatabaseConnection.getConnection();
-             PreparedStatement s = c.prepareStatement("UPDATE Usuario SET estado = 'INACTIVO' WHERE id = ?")) {
-            s.setInt(1, id);
-            return s.executeUpdate() > 0;
+    public boolean desactivar(int id, int usuarioLogueadoId) {
+        String sqlUpdate = "UPDATE Usuario SET estado = 'INACTIVO' WHERE id = ?";
+        String sqlAuditoria = "INSERT INTO Auditoria (usuario_id, accion, entidad, registro_id, descripcion) VALUES (?, 'USUARIO_DESACTIVADO', 'Usuario', ?, ?)";
+
+        try (Connection c = DatabaseConnection.getConnection()) {
+            c.setAutoCommit(false);
+            try {
+                // 1. Desactivar usuario
+                try (PreparedStatement s = c.prepareStatement(sqlUpdate)) {
+                    s.setInt(1, id);
+                    if (s.executeUpdate() == 0) {
+                        throw new SQLException("No se pudo desactivar el usuario.");
+                    }
+                }
+
+                // 2. Registrar auditoría institucional
+                try (PreparedStatement s = c.prepareStatement(sqlAuditoria)) {
+                    s.setInt(1, usuarioLogueadoId > 0 ? usuarioLogueadoId : id);
+                    s.setInt(2, id);
+                    s.setString(3, "Se desactivó la cuenta de usuario con ID #" + id);
+                    s.executeUpdate();
+                }
+
+                c.commit();
+                return true;
+            } catch (SQLException | RuntimeException e) {
+                c.rollback();
+                throw e;
+            }
         } catch (SQLException e) {
             throw JdbcSupport.error("desactivar el usuario", e);
         }
