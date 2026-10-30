@@ -1,0 +1,1575 @@
+Index: src/main/java/SIGELAB/util/QrUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/SIGELAB/util/QrUtil.java b/src/main/java/SIGELAB/util/QrUtil.java
+new file mode 100644
+--- /dev/null	(date 1793331281750)
++++ b/src/main/java/SIGELAB/util/QrUtil.java	(date 1793331281750)
+@@ -0,0 +1,35 @@
++package SIGELAB.util;
++
++import com.google.zxing.BarcodeFormat;
++import com.google.zxing.EncodeHintType;
++import com.google.zxing.MultiFormatWriter;
++import com.google.zxing.common.BitMatrix;
++
++import java.awt.image.BufferedImage;
++import java.util.HashMap;
++import java.util.Map;
++
++public class QrUtil {
++
++    public static BufferedImage generarQR(String texto, int ancho, int alto) {
++        try {
++            Map<EncodeHintType, Object> hints = new HashMap<>();
++            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
++
++            BitMatrix bitMatrix = new MultiFormatWriter().encode(
++                    texto, BarcodeFormat.QR_CODE, ancho, alto, hints
++            );
++
++            BufferedImage imagen = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_RGB);
++            for (int x = 0; x < ancho; x++) {
++                for (int y = 0; y < alto; y++) {
++                    imagen.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
++                }
++            }
++            return imagen;
++        } catch (Exception e) {
++            e.printStackTrace();
++            return null;
++        }
++    }
++}
+\ No newline at end of file
+Index: src/main/java/SIGELAB/view/MantenimientoEquipos.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package SIGELAB.view;\r\n\r\nimport SIGELAB.controller.MantenimientoEquipoController;\r\nimport SIGELAB.model.EstadoEquipo;\r\n\r\nimport javax.swing.*;\r\nimport javax.swing.table.DefaultTableModel;\r\nimport java.awt.*;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\npublic class MantenimientoEquipos extends JFrame {\r\n    private JTable table1;\r\n    private JButton enviarAMantenimientoButton;\r\n    private JButton actualizarButton;\r\n    private JButton reparadoButton;\r\n    private JButton darDeBajaButton;\r\n    private JTextField textObservaciones;\r\n    private JButton salirButton;\r\n\r\n    private final MantenimientoEquipoController controller;\r\n    private List<EstadoEquipo> listaEquipos = new ArrayList<>();\r\n    private EstadoEquipo equipoSeleccionado;\r\n\r\n    private static final String[] COLUMNAS = {\"ID\", \"Cód. Inventario\", \"Equipo\", \"Marca\", \"Modelo\", \"Nº Serie\", \"Estado\", \"Observaciones\"};\r\n    private final DefaultTableModel modeloTabla = new DefaultTableModel(COLUMNAS, 0) {\r\n        @Override\r\n        public boolean isCellEditable(int fila, int columna) { return false; }\r\n    };\r\n\r\n    public MantenimientoEquipos() {\r\n        super(\"SIGELAB - Gestión de Mantenimiento y Taller\");\r\n        this.controller = new MantenimientoEquipoController();\r\n\r\n        setSize(1050, 600);\r\n        setLocationRelativeTo(null);\r\n        setDefaultCloseOperation(DISPOSE_ON_CLOSE);\r\n\r\n        inicializarComponentesPorCodigo();\r\n        configurarEventos();\r\n        cargarDatos();\r\n    }\r\n\r\n    private void inicializarComponentesPorCodigo() {\r\n        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));\r\n        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));\r\n\r\n        // 1. Panel Superior (Observaciones)\r\n        JPanel panelNorte = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));\r\n        panelNorte.setBorder(BorderFactory.createTitledBorder(\"Detalle / Motivo de Mantenimiento\"));\r\n        panelNorte.add(new JLabel(\"Observaciones / Falla:\"));\r\n        textObservaciones = new JTextField(35);\r\n        panelNorte.add(textObservaciones);\r\n\r\n        // 2. Tabla Central\r\n        table1 = new JTable(modeloTabla);\r\n        table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);\r\n        JScrollPane scrollPane = new JScrollPane(table1);\r\n\r\n        // 3. Panel Inferior (Botones)\r\n        JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));\r\n        enviarAMantenimientoButton = new JButton(\"Enviar a Mantenimiento\");\r\n        reparadoButton = new JButton(\"Finalizar (Reparado)\");\r\n        darDeBajaButton = new JButton(\"Dar de Baja\");\r\n        actualizarButton = new JButton(\"Actualizar\");\r\n        salirButton = new JButton(\"Salir\");\r\n\r\n        panelSur.add(enviarAMantenimientoButton);\r\n        panelSur.add(reparadoButton);\r\n        panelSur.add(darDeBajaButton);\r\n        panelSur.add(actualizarButton);\r\n        panelSur.add(salirButton);\r\n\r\n        // Agregar al JFrame\r\n        panelPrincipal.add(panelNorte, BorderLayout.NORTH);\r\n        panelPrincipal.add(scrollPane, BorderLayout.CENTER);\r\n        panelPrincipal.add(panelSur, BorderLayout.SOUTH);\r\n\r\n        setContentPane(panelPrincipal);\r\n    }\r\n\r\n    private void configurarEventos() {\r\n        table1.getSelectionModel().addListSelectionListener(e -> {\r\n            if (!e.getValueIsAdjusting()) {\r\n                int fila = table1.getSelectedRow();\r\n                if (fila >= 0 && fila < listaEquipos.size()) {\r\n                    equipoSeleccionado = listaEquipos.get(table1.convertRowIndexToModel(fila));\r\n                    if (textObservaciones != null && equipoSeleccionado.getObservaciones() != null) {\r\n                        textObservaciones.setText(equipoSeleccionado.getObservaciones());\r\n                    }\r\n                }\r\n            }\r\n        });\r\n\r\n        actualizarButton.addActionListener(e -> {\r\n            cargarDatos();\r\n            textObservaciones.setText(\"\");\r\n        });\r\n\r\n        enviarAMantenimientoButton.addActionListener(e -> {\r\n            if (verificarSeleccion()) {\r\n                String motivo = textObservaciones.getText().trim();\r\n                if (motivo.isEmpty()) {\r\n                    JOptionPane.showMessageDialog(this, \"Debe ingresar una observación o motivo en el cuadro de texto.\", \"Aviso\", JOptionPane.WARNING_MESSAGE);\r\n                    return;\r\n                }\r\n                try {\r\n                    controller.enviarAMantenimiento(equipoSeleccionado.getId(), motivo);\r\n                    JOptionPane.showMessageDialog(this, \"Equipo enviado a mantenimiento exitosamente.\", \"Éxito\", JOptionPane.INFORMATION_MESSAGE);\r\n                    cargarDatos();\r\n                    textObservaciones.setText(\"\");\r\n                } catch (Exception ex) {\r\n                    JOptionPane.showMessageDialog(this, ex.getMessage(), \"Error\", JOptionPane.ERROR_MESSAGE);\r\n                }\r\n            }\r\n        });\r\n\r\n        reparadoButton.addActionListener(e -> {\r\n            if (verificarSeleccion()) {\r\n                int confirm = JOptionPane.showConfirmDialog(this, \"¿El equipo fue reparado con éxito y pasa a estar DISPONIBLE?\", \"Confirmar Reparación\", JOptionPane.YES_NO_OPTION);\r\n                if (confirm == JOptionPane.YES_OPTION) {\r\n                    try {\r\n                        controller.finalizarMantenimiento(equipoSeleccionado.getId(), true);\r\n                        JOptionPane.showMessageDialog(this, \"El equipo ha regresado a disponibilidad.\", \"Éxito\", JOptionPane.INFORMATION_MESSAGE);\r\n                        cargarDatos();\r\n                        textObservaciones.setText(\"\");\r\n                    } catch (Exception ex) {\r\n                        JOptionPane.showMessageDialog(this, ex.getMessage(), \"Error\", JOptionPane.ERROR_MESSAGE);\r\n                    }\r\n                }\r\n            }\r\n        });\r\n\r\n        darDeBajaButton.addActionListener(e -> {\r\n            if (verificarSeleccion()) {\r\n                int confirm = JOptionPane.showConfirmDialog(this, \"¿Confirma que el equipo es irreparable y será DADO DE BAJA?\", \"Dar de Baja\", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);\r\n                if (confirm == JOptionPane.YES_OPTION) {\r\n                    try {\r\n                        controller.finalizarMantenimiento(equipoSeleccionado.getId(), false);\r\n                        JOptionPane.showMessageDialog(this, \"El equipo ha sido dado de baja.\", \"Aviso\", JOptionPane.INFORMATION_MESSAGE);\r\n                        cargarDatos();\r\n                        textObservaciones.setText(\"\");\r\n                    } catch (Exception ex) {\r\n                        JOptionPane.showMessageDialog(this, ex.getMessage(), \"Error\", JOptionPane.ERROR_MESSAGE);\r\n                    }\r\n                }\r\n            }\r\n        });\r\n\r\n        salirButton.addActionListener(e -> dispose());\r\n    }\r\n\r\n    private boolean verificarSeleccion() {\r\n        if (equipoSeleccionado == null) {\r\n            JOptionPane.showMessageDialog(this, \"Por favor, seleccione un equipo de la tabla.\", \"Aviso\", JOptionPane.WARNING_MESSAGE);\r\n            return false;\r\n        }\r\n        return true;\r\n    }\r\n\r\n    private void cargarDatos() {\r\n        try {\r\n            listaEquipos = controller.listarEquipos();\r\n            modeloTabla.setRowCount(0);\r\n            for (EstadoEquipo eq : listaEquipos) {\r\n                modeloTabla.addRow(new Object[]{\r\n                        eq.getId(),\r\n                        eq.getCodigoInventario(),\r\n                        eq.getNombreEquipo(),\r\n                        eq.getMarca(),\r\n                        eq.getModelo(),\r\n                        eq.getNumeroSerie(),\r\n                        eq.getEstado(),\r\n                        eq.getObservaciones()\r\n                });\r\n            }\r\n            equipoSeleccionado = null;\r\n        } catch (Exception e) {\r\n            JOptionPane.showMessageDialog(this, \"Error al cargar datos: \" + e.getMessage(), \"Error\", JOptionPane.ERROR_MESSAGE);\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/SIGELAB/view/MantenimientoEquipos.java b/src/main/java/SIGELAB/view/MantenimientoEquipos.java
+--- a/src/main/java/SIGELAB/view/MantenimientoEquipos.java	(revision 16fce0aa3339d16e71572e8bd8af7336004316e7)
++++ b/src/main/java/SIGELAB/view/MantenimientoEquipos.java	(date 1793327944126)
+@@ -32,7 +32,8 @@
+         super("SIGELAB - Gestión de Mantenimiento y Taller");
+         this.controller = new MantenimientoEquipoController();
+ 
+-        setSize(1050, 600);
++        setSize(1100, 620);
++        setMinimumSize(new Dimension(900, 500));
+         setLocationRelativeTo(null);
+         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+ 
+@@ -42,43 +43,89 @@
+     }
+ 
+     private void inicializarComponentesPorCodigo() {
+-        JPanel panelPrincipal = new JPanel(new BorderLayout(10, 10));
+-        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
++        JPanel panelPrincipal = new JPanel(new BorderLayout(15, 15));
++        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
++
++        // Título Superior
++        JLabel lblTitulo = new JLabel("Gestión de Mantenimiento y Taller de Equipos", SwingConstants.LEFT);
++        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
++        lblTitulo.setForeground(new Color(15, 23, 42));
++
++        JPanel panelNorteContenedor = new JPanel(new BorderLayout(0, 10));
++        panelNorteContenedor.add(lblTitulo, BorderLayout.NORTH);
++
++        // 1. Panel Norte (Observaciones / Falla) estilizado
++        JPanel panelNorte = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 10));
++        panelNorte.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Detalle / Motivo de Mantenimiento ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
+ 
+-        // 1. Panel Superior (Observaciones)
+-        JPanel panelNorte = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+-        panelNorte.setBorder(BorderFactory.createTitledBorder("Detalle / Motivo de Mantenimiento"));
+-        panelNorte.add(new JLabel("Observaciones / Falla:"));
+-        textObservaciones = new JTextField(35);
++        JLabel lblObs = new JLabel("Observaciones / Falla:");
++        lblObs.setFont(new Font("Segoe UI", Font.BOLD, 12));
++        panelNorte.add(lblObs);
++
++        textObservaciones = new JTextField(40);
++        textObservaciones.setPreferredSize(new Dimension(300, 32));
+         panelNorte.add(textObservaciones);
+ 
++        panelNorteContenedor.add(panelNorte, BorderLayout.SOUTH);
++        panelPrincipal.add(panelNorteContenedor, BorderLayout.NORTH);
++
+         // 2. Tabla Central
+         table1 = new JTable(modeloTabla);
++        table1.setRowHeight(28);
++        table1.setAutoCreateRowSorter(true);
+         table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+         JScrollPane scrollPane = new JScrollPane(table1);
+ 
+-        // 3. Panel Inferior (Botones)
+-        JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
++        JPanel panelCentro = new JPanel(new BorderLayout());
++        panelCentro.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Equipos Registrados en el Sistema ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++        panelCentro.add(scrollPane, BorderLayout.CENTER);
++        panelPrincipal.add(panelCentro, BorderLayout.CENTER);
++
++        // 3. Panel Inferior (Botones) estilizados con FlatLaf
++        JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
++
+         enviarAMantenimientoButton = new JButton("Enviar a Mantenimiento");
+         reparadoButton = new JButton("Finalizar (Reparado)");
+         darDeBajaButton = new JButton("Dar de Baja");
+         actualizarButton = new JButton("Actualizar");
+         salirButton = new JButton("Salir");
+ 
++        // Estilos redondos y acento azul para botones clave
++        estilizarBoton(enviarAMantenimientoButton, false);
++        estilizarBoton(reparadoButton, true); // Principal con azul sólido
++        estilizarBoton(darDeBajaButton, false);
++        estilizarBoton(actualizarButton, false);
++        estilizarBoton(salirButton, false);
++
+         panelSur.add(enviarAMantenimientoButton);
+         panelSur.add(reparadoButton);
+         panelSur.add(darDeBajaButton);
+         panelSur.add(actualizarButton);
+         panelSur.add(salirButton);
+ 
+-        // Agregar al JFrame
+-        panelPrincipal.add(panelNorte, BorderLayout.NORTH);
+-        panelPrincipal.add(scrollPane, BorderLayout.CENTER);
+         panelPrincipal.add(panelSur, BorderLayout.SOUTH);
+ 
+         setContentPane(panelPrincipal);
+     }
+ 
++    private void estilizarBoton(JButton boton, boolean esPrincipal) {
++        if (boton == null) return;
++        boton.putClientProperty("JButton.buttonType", "roundRect");
++        if (esPrincipal) {
++            boton.putClientProperty("FlatLaf.style", "background: #2563eb; foreground: #ffffff; font: bold; arc: 10");
++        } else {
++            boton.putClientProperty("FlatLaf.style", "arc: 10");
++        }
++    }
++
+     private void configurarEventos() {
+         table1.getSelectionModel().addListSelectionListener(e -> {
+             if (!e.getValueIsAdjusting()) {
+Index: src/main/java/SIGELAB/view/PrestamoView.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\r\npackage SIGELAB.view;\r\n\r\nimport SIGELAB.controller.PrestamoController;\r\nimport SIGELAB.model.EstadoEquipo;\r\nimport SIGELAB.model.Usuario;\r\nimport SIGELAB.repository.EstadoEquipoRepository;\r\n\r\nimport javax.swing.*;\r\nimport javax.swing.table.DefaultTableModel;\r\nimport java.awt.*;\r\nimport java.time.LocalDate;\r\nimport java.time.LocalDateTime;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\npublic class PrestamoView extends JFrame {\r\n\r\n    private final Usuario usuarioAutenticado;\r\n    private final PrestamoController controller;\r\n    private final EstadoEquipoRepository equipoRepository;\r\n\r\n    private JTextField txtSolicitante;\r\n    private JSpinner fechaDevolucion;\r\n    private JTextArea txtObservaciones;\r\n\r\n    private JTable tablaDisponibles;\r\n    private JTable tablaSeleccionados;\r\n\r\n    private DefaultTableModel modeloDisponibles;\r\n    private DefaultTableModel modeloSeleccionados;\r\n\r\n    private final List<Integer> equiposSeleccionados =\r\n            new ArrayList<>();\r\n\r\n    public PrestamoView(Usuario usuarioAutenticado) {\r\n        this.usuarioAutenticado = usuarioAutenticado;\r\n        this.controller = new PrestamoController();\r\n        this.equipoRepository = new EstadoEquipoRepository();\r\n\r\n        configurarVentana();\r\n        construirInterfaz();\r\n        cargarEquiposDisponibles();\r\n    }\r\n\r\n    private void configurarVentana() {\r\n        setTitle(\"SIGELAB - Registro de Préstamos\");\r\n        setSize(1050, 700);\r\n        setMinimumSize(new Dimension(850, 600));\r\n        setLocationRelativeTo(null);\r\n        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);\r\n    }\r\n\r\n    private void construirInterfaz() {\r\n        JPanel principal = new JPanel(new BorderLayout(10, 10));\r\n        principal.setBorder(\r\n                BorderFactory.createEmptyBorder(15, 15, 15, 15));\r\n\r\n        JLabel titulo = new JLabel(\r\n                \"REGISTRO DE PRÉSTAMOS DE EQUIPOS\",\r\n                SwingConstants.CENTER);\r\n        titulo.setFont(new Font(\"Arial\", Font.BOLD, 20));\r\n        principal.add(titulo, BorderLayout.NORTH);\r\n\r\n        JPanel formulario = new JPanel(new GridLayout(3, 2, 10, 10));\r\n        formulario.setBorder(\r\n                BorderFactory.createTitledBorder(\"Datos del préstamo\"));\r\n\r\n        txtSolicitante = new JTextField();\r\n\r\n        fechaDevolucion = new JSpinner(\r\n                new SpinnerDateModel());\r\n        fechaDevolucion.setEditor(\r\n                new JSpinner.DateEditor(\r\n                        fechaDevolucion, \"dd/MM/yyyy HH:mm\"));\r\n\r\n        // Fecha inicial sugerida: mañana.\r\n        fechaDevolucion.setValue(\r\n                java.sql.Timestamp.valueOf(\r\n                        LocalDate.now()\r\n                                .plusDays(1)\r\n                                .atTime(17, 0)));\r\n\r\n        txtObservaciones = new JTextArea(3, 20);\r\n        txtObservaciones.setLineWrap(true);\r\n        txtObservaciones.setWrapStyleWord(true);\r\n\r\n        formulario.add(new JLabel(\"Solicitante:\"));\r\n        formulario.add(txtSolicitante);\r\n        formulario.add(new JLabel(\"Devolución esperada:\"));\r\n        formulario.add(fechaDevolucion);\r\n        formulario.add(new JLabel(\"Observaciones:\"));\r\n        formulario.add(new JScrollPane(txtObservaciones));\r\n\r\n        modeloDisponibles = new DefaultTableModel(\r\n                new Object[]{\"ID\", \"Código\", \"Equipo\", \"Estado\"}, 0) {\r\n            @Override\r\n            public boolean isCellEditable(int fila, int columna) {\r\n                return false;\r\n            }\r\n        };\r\n\r\n        tablaDisponibles = new JTable(modeloDisponibles);\r\n        tablaDisponibles.setSelectionMode(\r\n                ListSelectionModel.SINGLE_SELECTION);\r\n\r\n        modeloSeleccionados = new DefaultTableModel(\r\n                new Object[]{\"ID\", \"Código\", \"Equipo\"}, 0) {\r\n            @Override\r\n            public boolean isCellEditable(int fila, int columna) {\r\n                return false;\r\n            }\r\n        };\r\n\r\n        tablaSeleccionados = new JTable(modeloSeleccionados);\r\n        tablaSeleccionados.setSelectionMode(\r\n                ListSelectionModel.SINGLE_SELECTION);\r\n\r\n        JPanel panelTablas = new JPanel(new GridLayout(1, 2, 10, 10));\r\n\r\n        JPanel panelDisponibles = new JPanel(new BorderLayout(5, 5));\r\n        panelDisponibles.setBorder(\r\n                BorderFactory.createTitledBorder(\"Equipos disponibles\"));\r\n        panelDisponibles.add(\r\n                new JScrollPane(tablaDisponibles), BorderLayout.CENTER);\r\n\r\n        JButton btnAgregar = new JButton(\"Agregar equipo\");\r\n        panelDisponibles.add(btnAgregar, BorderLayout.SOUTH);\r\n\r\n        JPanel panelSeleccionados = new JPanel(new BorderLayout(5, 5));\r\n        panelSeleccionados.setBorder(\r\n                BorderFactory.createTitledBorder(\"Equipos del préstamo\"));\r\n        panelSeleccionados.add(\r\n                new JScrollPane(tablaSeleccionados), BorderLayout.CENTER);\r\n\r\n        JButton btnQuitar = new JButton(\"Quitar equipo\");\r\n        panelSeleccionados.add(btnQuitar, BorderLayout.SOUTH);\r\n\r\n        panelTablas.add(panelDisponibles);\r\n        panelTablas.add(panelSeleccionados);\r\n\r\n        JPanel contenido = new JPanel(new BorderLayout(10, 10));\r\n        contenido.add(formulario, BorderLayout.NORTH);\r\n        contenido.add(panelTablas, BorderLayout.CENTER);\r\n\r\n        principal.add(contenido, BorderLayout.CENTER);\r\n\r\n        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT));\r\n\r\n        JButton btnActualizar = new JButton(\"Actualizar equipos\");\r\n        JButton btnRegistrar = new JButton(\"Registrar préstamo\");\r\n        JButton btnCerrar = new JButton(\"Cerrar\");\r\n\r\n        acciones.add(btnActualizar);\r\n        acciones.add(btnRegistrar);\r\n        acciones.add(btnCerrar);\r\n\r\n        principal.add(acciones, BorderLayout.SOUTH);\r\n\r\n        setContentPane(principal);\r\n\r\n        btnAgregar.addActionListener(e -> agregarEquipo());\r\n        btnQuitar.addActionListener(e -> quitarEquipo());\r\n        btnActualizar.addActionListener(\r\n                e -> cargarEquiposDisponibles());\r\n        btnRegistrar.addActionListener(\r\n                e -> registrarPrestamo());\r\n        btnCerrar.addActionListener(e -> dispose());\r\n    }\r\n\r\n    private void cargarEquiposDisponibles() {\r\n        try {\r\n            modeloDisponibles.setRowCount(0);\r\n\r\n            List<EstadoEquipo> equipos = equipoRepository.listar();\r\n\r\n            for (EstadoEquipo equipo : equipos) {\r\n                if (\"DISPONIBLE\".equalsIgnoreCase(equipo.getEstado())\r\n                        && !equiposSeleccionados.contains(equipo.getId())) {\r\n\r\n                    modeloDisponibles.addRow(new Object[]{\r\n                            equipo.getId(),\r\n                            equipo.getCodigoInventario(),\r\n                            equipo.getNombreEquipo(),\r\n                            equipo.getEstado()\r\n                    });\r\n                }\r\n            }\r\n\r\n        } catch (RuntimeException ex) {\r\n            JOptionPane.showMessageDialog(\r\n                    this,\r\n                    \"Error al cargar equipos:\\n\" + ex.getMessage(),\r\n                    \"Error\",\r\n                    JOptionPane.ERROR_MESSAGE);\r\n        }\r\n    }\r\n\r\n    private void agregarEquipo() {\r\n        int fila = tablaDisponibles.getSelectedRow();\r\n\r\n        if (fila < 0) {\r\n            JOptionPane.showMessageDialog(\r\n                    this, \"Selecciona un equipo disponible.\");\r\n            return;\r\n        }\r\n\r\n        int filaModelo = tablaDisponibles.convertRowIndexToModel(fila);\r\n\r\n        int id = (Integer) modeloDisponibles.getValueAt(filaModelo, 0);\r\n\r\n        if (equiposSeleccionados.contains(id)) {\r\n            JOptionPane.showMessageDialog(\r\n                    this, \"Este equipo ya fue agregado.\");\r\n            return;\r\n        }\r\n\r\n        equiposSeleccionados.add(id);\r\n\r\n        modeloSeleccionados.addRow(new Object[]{\r\n                id,\r\n                modeloDisponibles.getValueAt(filaModelo, 1),\r\n                modeloDisponibles.getValueAt(filaModelo, 2)\r\n        });\r\n\r\n        modeloDisponibles.removeRow(filaModelo);\r\n    }\r\n\r\n    private void quitarEquipo() {\r\n        int fila = tablaSeleccionados.getSelectedRow();\r\n\r\n        if (fila < 0) {\r\n            JOptionPane.showMessageDialog(\r\n                    this, \"Selecciona un equipo para quitar.\");\r\n            return;\r\n        }\r\n\r\n        int filaModelo = tablaSeleccionados.convertRowIndexToModel(fila);\r\n\r\n        int id = (Integer) modeloSeleccionados.getValueAt(filaModelo, 0);\r\n\r\n        equiposSeleccionados.remove(Integer.valueOf(id));\r\n        modeloSeleccionados.removeRow(filaModelo);\r\n\r\n        cargarEquiposDisponibles();\r\n    }\r\n\r\n    private void registrarPrestamo() {\r\n        if (usuarioAutenticado == null\r\n                || usuarioAutenticado.getIdUsuario() <= 0) {\r\n            JOptionPane.showMessageDialog(\r\n                    this,\r\n                    \"No se encontró un usuario autenticado válido.\",\r\n                    \"Error\",\r\n                    JOptionPane.ERROR_MESSAGE);\r\n            return;\r\n        }\r\n\r\n        try {\r\n            java.util.Date fecha =\r\n                    (java.util.Date) fechaDevolucion.getValue();\r\n\r\n            LocalDateTime fechaEsperada =\r\n                    new java.sql.Timestamp(\r\n                            fecha.getTime()).toLocalDateTime();\r\n\r\n            boolean registrado = controller.registrarPrestamo(\r\n                    txtSolicitante.getText(),\r\n                    fechaEsperada,\r\n                    usuarioAutenticado.getIdUsuario(),\r\n                    txtObservaciones.getText(),\r\n                    new ArrayList<>(equiposSeleccionados)\r\n            );\r\n\r\n            if (registrado) {\r\n                JOptionPane.showMessageDialog(\r\n                        this,\r\n                        \"Préstamo registrado correctamente.\",\r\n                        \"SIGELAB\",\r\n                        JOptionPane.INFORMATION_MESSAGE);\r\n\r\n                txtSolicitante.setText(\"\");\r\n                txtObservaciones.setText(\"\");\r\n                equiposSeleccionados.clear();\r\n                modeloSeleccionados.setRowCount(0);\r\n\r\n                cargarEquiposDisponibles();\r\n            }\r\n\r\n        } catch (RuntimeException ex) {\r\n            JOptionPane.showMessageDialog(\r\n                    this,\r\n                    \"No se pudo registrar el préstamo:\\n\"\r\n                            + ex.getMessage(),\r\n                    \"Error\",\r\n                    JOptionPane.ERROR_MESSAGE);\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/SIGELAB/view/PrestamoView.java b/src/main/java/SIGELAB/view/PrestamoView.java
+--- a/src/main/java/SIGELAB/view/PrestamoView.java	(revision 16fce0aa3339d16e71572e8bd8af7336004316e7)
++++ b/src/main/java/SIGELAB/view/PrestamoView.java	(date 1793336202144)
+@@ -1,4 +1,3 @@
+-
+ package SIGELAB.view;
+ 
+ import SIGELAB.controller.PrestamoController;
+@@ -9,6 +8,8 @@
+ import javax.swing.*;
+ import javax.swing.table.DefaultTableModel;
+ import java.awt.*;
++import java.awt.image.BufferedImage;
++import java.io.File;
+ import java.time.LocalDate;
+ import java.time.LocalDateTime;
+ import java.util.ArrayList;
+@@ -21,17 +22,18 @@
+     private final EstadoEquipoRepository equipoRepository;
+ 
+     private JTextField txtSolicitante;
++    private JTextField txtEscanerQR;
++    private JButton btnEscanearAccion;
++    private JButton btnCargarQRArchivo;
+     private JSpinner fechaDevolucion;
+     private JTextArea txtObservaciones;
+ 
+     private JTable tablaDisponibles;
+     private JTable tablaSeleccionados;
+-
+     private DefaultTableModel modeloDisponibles;
+     private DefaultTableModel modeloSeleccionados;
+ 
+-    private final List<Integer> equiposSeleccionados =
+-            new ArrayList<>();
++    private final List<Integer> equiposSeleccionados = new ArrayList<>();
+ 
+     public PrestamoView(Usuario usuarioAutenticado) {
+         this.usuarioAutenticado = usuarioAutenticado;
+@@ -40,229 +42,371 @@
+ 
+         configurarVentana();
+         construirInterfaz();
+-        cargarEquiposDisponibles();
++        cargarEquiposInventario();
+     }
+ 
+     private void configurarVentana() {
+         setTitle("SIGELAB - Registro de Préstamos");
+-        setSize(1050, 700);
+-        setMinimumSize(new Dimension(850, 600));
++        setSize(1200, 780);
++        setMinimumSize(new Dimension(950, 650));
+         setLocationRelativeTo(null);
+         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+     }
+ 
+     private void construirInterfaz() {
+-        JPanel principal = new JPanel(new BorderLayout(10, 10));
+-        principal.setBorder(
+-                BorderFactory.createEmptyBorder(15, 15, 15, 15));
++        JPanel principal = new JPanel(new BorderLayout(15, 15));
++        principal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
++        setContentPane(principal);
+ 
+-        JLabel titulo = new JLabel(
+-                "REGISTRO DE PRÉSTAMOS DE EQUIPOS",
+-                SwingConstants.CENTER);
+-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
++        // Título Principal
++        JLabel titulo = new JLabel("REGISTRO DE PRÉSTAMOS DE EQUIPOS", SwingConstants.CENTER);
++        titulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
++        titulo.setForeground(new Color(15, 23, 42));
+         principal.add(titulo, BorderLayout.NORTH);
+ 
+-        JPanel formulario = new JPanel(new GridLayout(3, 2, 10, 10));
+-        formulario.setBorder(
+-                BorderFactory.createTitledBorder("Datos del préstamo"));
++        // Panel Superior (Entrada QR / Filtro + Formulario)
++        JPanel panelNorteContenedor = new JPanel(new BorderLayout(0, 15));
++
++        // Panel de Lectura / Filtro QR
++        JPanel panelQR = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
++        panelQR.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(37, 99, 235)),
++                " Filtrar o Cargar QR / Archivo ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(37, 99, 235)
++        ));
++
++        JLabel lblQR = new JLabel("Buscar:");
++        lblQR.setFont(new Font("Segoe UI", Font.BOLD, 12));
++
++        txtEscanerQR = new JTextField(25);
++        txtEscanerQR.putClientProperty("JTextField.placeholderText", "Filtrar por código, nombre o estado...");
++        txtEscanerQR.setPreferredSize(new Dimension(250, 32));
++
++        btnEscanearAccion = new JButton("Filtrar");
++        btnEscanearAccion.setPreferredSize(new Dimension(100, 32));
++        estilizarBoton(btnEscanearAccion, false);
++
++        btnCargarQRArchivo = new JButton("📁 Cargar QR");
++        btnCargarQRArchivo.setPreferredSize(new Dimension(130, 32));
++        estilizarBoton(btnCargarQRArchivo, false);
++
++        panelQR.add(lblQR);
++        panelQR.add(txtEscanerQR);
++        panelQR.add(btnEscanearAccion);
++        panelQR.add(btnCargarQRArchivo);
++        panelNorteContenedor.add(panelQR, BorderLayout.NORTH);
++
++        // Formulario de Datos del Préstamo
++        JPanel formulario = new JPanel(new GridBagLayout());
++        formulario.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Datos del Préstamo ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++
++        GridBagConstraints gbc = new GridBagConstraints();
++        gbc.insets = new Insets(6, 12, 6, 12);
++        gbc.fill = GridBagConstraints.HORIZONTAL;
++        gbc.anchor = GridBagConstraints.WEST;
+ 
+         txtSolicitante = new JTextField();
++        txtSolicitante.setPreferredSize(new Dimension(300, 30));
+ 
+-        fechaDevolucion = new JSpinner(
+-                new SpinnerDateModel());
+-        fechaDevolucion.setEditor(
+-                new JSpinner.DateEditor(
+-                        fechaDevolucion, "dd/MM/yyyy HH:mm"));
+-
+-        // Fecha inicial sugerida: mañana.
+-        fechaDevolucion.setValue(
+-                java.sql.Timestamp.valueOf(
+-                        LocalDate.now()
+-                                .plusDays(1)
+-                                .atTime(17, 0)));
++        // JSpinner de Fecha bloqueado a escritura manual
++        fechaDevolucion = new JSpinner(new SpinnerDateModel());
++        JSpinner.DateEditor editorFecha = new JSpinner.DateEditor(fechaDevolucion, "dd/MM/yyyy HH:mm");
++        editorFecha.getTextField().setEditable(false);
++        fechaDevolucion.setEditor(editorFecha);
++        fechaDevolucion.setValue(java.sql.Timestamp.valueOf(LocalDate.now().plusDays(1).atTime(17, 0)));
++        fechaDevolucion.setPreferredSize(new Dimension(300, 30));
+ 
+         txtObservaciones = new JTextArea(3, 20);
+         txtObservaciones.setLineWrap(true);
+         txtObservaciones.setWrapStyleWord(true);
++        JScrollPane scrollObs = new JScrollPane(txtObservaciones);
++        scrollObs.setPreferredSize(new Dimension(300, 60));
++
++        int fila = 0;
++        agregarCampoFormulario(formulario, gbc, fila++, new JLabel("Solicitante:"), txtSolicitante);
++        agregarCampoFormulario(formulario, gbc, fila++, new JLabel("Devolución esperada:"), fechaDevolucion);
++
++        gbc.gridx = 0; gbc.gridy = fila; gbc.weightx = 0.0;
++        formulario.add(new JLabel("Observaciones:"), gbc);
++        gbc.gridx = 1; gbc.weightx = 1.0;
++        formulario.add(scrollObs, gbc);
++
++        panelNorteContenedor.add(formulario, BorderLayout.CENTER);
++        principal.add(panelNorteContenedor, BorderLayout.NORTH);
+ 
+-        formulario.add(new JLabel("Solicitante:"));
+-        formulario.add(txtSolicitante);
+-        formulario.add(new JLabel("Devolución esperada:"));
+-        formulario.add(fechaDevolucion);
+-        formulario.add(new JLabel("Observaciones:"));
+-        formulario.add(new JScrollPane(txtObservaciones));
++        // Panel Central: Tablas (Inventario vs Seleccionados)
++        JPanel panelTablas = new JPanel(new GridLayout(1, 2, 15, 0));
+ 
+-        modeloDisponibles = new DefaultTableModel(
+-                new Object[]{"ID", "Código", "Equipo", "Estado"}, 0) {
++        // Tabla Izquierda: Inventario General
++        JPanel panelDisponibles = new JPanel(new BorderLayout(0, 8));
++        panelDisponibles.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Inventario General de Equipos ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++
++        modeloDisponibles = new DefaultTableModel(new Object[]{"ID", "Código", "Equipo", "Estado"}, 0) {
+             @Override
+-            public boolean isCellEditable(int fila, int columna) {
+-                return false;
+-            }
++            public boolean isCellEditable(int fila, int columna) { return false; }
+         };
+-
+         tablaDisponibles = new JTable(modeloDisponibles);
+-        tablaDisponibles.setSelectionMode(
+-                ListSelectionModel.SINGLE_SELECTION);
++        tablaDisponibles.setRowHeight(28);
++        tablaDisponibles.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
++        panelDisponibles.add(new JScrollPane(tablaDisponibles), BorderLayout.CENTER);
++
++        JButton btnAgregar = new JButton("Agregar equipo ➔");
++        estilizarBoton(btnAgregar, false);
++        panelDisponibles.add(btnAgregar, BorderLayout.SOUTH);
+ 
+-        modeloSeleccionados = new DefaultTableModel(
+-                new Object[]{"ID", "Código", "Equipo"}, 0) {
++        // Tabla Derecha: Equipos Seleccionados para el Préstamo
++        JPanel panelSeleccionados = new JPanel(new BorderLayout(0, 8));
++        panelSeleccionados.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Equipos en el Préstamo ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++
++        modeloSeleccionados = new DefaultTableModel(new Object[]{"ID", "Código", "Equipo"}, 0) {
+             @Override
+-            public boolean isCellEditable(int fila, int columna) {
+-                return false;
+-            }
++            public boolean isCellEditable(int fila, int columna) { return false; }
+         };
+-
+         tablaSeleccionados = new JTable(modeloSeleccionados);
+-        tablaSeleccionados.setSelectionMode(
+-                ListSelectionModel.SINGLE_SELECTION);
+-
+-        JPanel panelTablas = new JPanel(new GridLayout(1, 2, 10, 10));
+-
+-        JPanel panelDisponibles = new JPanel(new BorderLayout(5, 5));
+-        panelDisponibles.setBorder(
+-                BorderFactory.createTitledBorder("Equipos disponibles"));
+-        panelDisponibles.add(
+-                new JScrollPane(tablaDisponibles), BorderLayout.CENTER);
+-
+-        JButton btnAgregar = new JButton("Agregar equipo");
+-        panelDisponibles.add(btnAgregar, BorderLayout.SOUTH);
++        tablaSeleccionados.setRowHeight(28);
++        tablaSeleccionados.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
++        panelSeleccionados.add(new JScrollPane(tablaSeleccionados), BorderLayout.CENTER);
+ 
+-        JPanel panelSeleccionados = new JPanel(new BorderLayout(5, 5));
+-        panelSeleccionados.setBorder(
+-                BorderFactory.createTitledBorder("Equipos del préstamo"));
+-        panelSeleccionados.add(
+-                new JScrollPane(tablaSeleccionados), BorderLayout.CENTER);
+-
+-        JButton btnQuitar = new JButton("Quitar equipo");
++        JButton btnQuitar = new JButton("<html>&#10005; Quitar equipo</html>");
++        estilizarBoton(btnQuitar, false);
+         panelSeleccionados.add(btnQuitar, BorderLayout.SOUTH);
+ 
+         panelTablas.add(panelDisponibles);
+         panelTablas.add(panelSeleccionados);
+-
+-        JPanel contenido = new JPanel(new BorderLayout(10, 10));
+-        contenido.add(formulario, BorderLayout.NORTH);
+-        contenido.add(panelTablas, BorderLayout.CENTER);
++        principal.add(panelTablas, BorderLayout.CENTER);
+ 
+-        principal.add(contenido, BorderLayout.CENTER);
+-
+-        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+-
+-        JButton btnActualizar = new JButton("Actualizar equipos");
++        // Panel Inferior: Botones de Acción Final
++        JPanel acciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
++        JButton btnActualizar = new JButton("Actualizar listado");
+         JButton btnRegistrar = new JButton("Registrar préstamo");
+         JButton btnCerrar = new JButton("Cerrar");
+ 
++        estilizarBoton(btnActualizar, false);
++        estilizarBoton(btnRegistrar, true);
++        estilizarBoton(btnCerrar, false);
++
+         acciones.add(btnActualizar);
+         acciones.add(btnRegistrar);
+         acciones.add(btnCerrar);
+ 
+         principal.add(acciones, BorderLayout.SOUTH);
+ 
+-        setContentPane(principal);
+-
++        // --- REGISTRO DE EVENTOS ---
+         btnAgregar.addActionListener(e -> agregarEquipo());
+         btnQuitar.addActionListener(e -> quitarEquipo());
+-        btnActualizar.addActionListener(
+-                e -> cargarEquiposDisponibles());
+-        btnRegistrar.addActionListener(
+-                e -> registrarPrestamo());
++        btnActualizar.addActionListener(e -> cargarEquiposInventario());
++        btnRegistrar.addActionListener(e -> registrarPrestamo());
+         btnCerrar.addActionListener(e -> dispose());
++
++        txtEscanerQR.addActionListener(e -> filtrarTabla());
++        btnEscanearAccion.addActionListener(e -> filtrarTabla());
++        btnCargarQRArchivo.addActionListener(e -> leerQrDesdeArchivo());
++    }
++
++    private void agregarCampoFormulario(JPanel panel, GridBagConstraints gbc, int fila, JLabel label, JComponent componente) {
++        gbc.gridx = 0; gbc.gridy = fila; gbc.weightx = 0.0;
++        panel.add(label, gbc);
++        gbc.gridx = 1; gbc.weightx = 1.0;
++        panel.add(componente, gbc);
++    }
++
++    private void estilizarBoton(JButton boton, boolean esPrincipal) {
++        if (boton == null) return;
++        boton.putClientProperty("JButton.buttonType", "roundRect");
++        if (esPrincipal) {
++            boton.putClientProperty("FlatLaf.style", "background: #2563eb; foreground: #ffffff; font: bold; arc: 10");
++        } else {
++            boton.putClientProperty("FlatLaf.style", "arc: 10");
++        }
++    }
++
++    // 📌 Lógica estricta al cargar QR desde archivo de imagen
++    private void leerQrDesdeArchivo() {
++        JFileChooser fileChooser = new JFileChooser();
++        File carpetaQrs = new File("qrs_inventario");
++        if (carpetaQrs.exists()) {
++            fileChooser.setCurrentDirectory(carpetaQrs);
++        }
++        fileChooser.setDialogTitle("Seleccionar imagen de Código QR");
++
++        int resultado = fileChooser.showOpenDialog(this);
++        if (resultado == JFileChooser.APPROVE_OPTION) {
++            File archivoSeleccionado = fileChooser.getSelectedFile();
++            try {
++                BufferedImage imagen = javax.imageio.ImageIO.read(archivoSeleccionado);
++                if (imagen == null) {
++                    JOptionPane.showMessageDialog(this, "El archivo seleccionado no es una imagen válida.", "Error", JOptionPane.ERROR_MESSAGE);
++                    return;
++                }
++
++                int ancho = imagen.getWidth();
++                int alto = imagen.getHeight();
++                int[] pixels = imagen.getRGB(0, 0, ancho, alto, null, 0, ancho);
++
++                com.google.zxing.LuminanceSource source = new com.google.zxing.RGBLuminanceSource(ancho, alto, pixels);
++                com.google.zxing.BinaryBitmap bitmap = new com.google.zxing.BinaryBitmap(new com.google.zxing.common.HybridBinarizer(source));
++
++                com.google.zxing.Result resultadoQR = new com.google.zxing.MultiFormatReader().decode(bitmap);
++                String codigoLeido = resultadoQR.getText();
++
++                String codigoBuscado = extraerCodigoInventario(codigoLeido);
++                procesarEquipoPorCodigo(codigoBuscado);
++
++            } catch (Exception ex) {
++                JOptionPane.showMessageDialog(this, "No se pudo leer ningún código QR de la imagen:\n" + ex.getMessage(), "Error de lectura", JOptionPane.ERROR_MESSAGE);
++            }
++        }
+     }
+ 
+-    private void cargarEquiposDisponibles() {
++    private String extraerCodigoInventario(String textoQR) {
++        if (textoQR.contains("SIGELAB-EQ:")) {
++            try {
++                String parte = textoQR.split("\\|")[0];
++                return parte.replace("SIGELAB-EQ:", "").trim();
++            } catch (Exception e) {
++                return textoQR;
++            }
++        }
++        return textoQR;
++    }
++
++    // 📌 Muestra TODOS los equipos en la tabla general con su estado actual
++    private void filtrarTabla() {
++        String filtro = txtEscanerQR.getText().trim().toLowerCase();
+         try {
+             modeloDisponibles.setRowCount(0);
+-
+             List<EstadoEquipo> equipos = equipoRepository.listar();
+ 
+             for (EstadoEquipo equipo : equipos) {
+-                if ("DISPONIBLE".equalsIgnoreCase(equipo.getEstado())
+-                        && !equiposSeleccionados.contains(equipo.getId())) {
++                if (!equiposSeleccionados.contains(equipo.getId())) {
++                    if (filtro.isEmpty() ||
++                            equipo.getCodigoInventario().toLowerCase().contains(filtro) ||
++                            equipo.getNombreEquipo().toLowerCase().contains(filtro) ||
++                            equipo.getEstado().toLowerCase().contains(filtro)) {
+ 
+-                    modeloDisponibles.addRow(new Object[]{
+-                            equipo.getId(),
+-                            equipo.getCodigoInventario(),
+-                            equipo.getNombreEquipo(),
+-                            equipo.getEstado()
+-                    });
++                        modeloDisponibles.addRow(new Object[]{
++                                equipo.getId(),
++                                equipo.getCodigoInventario(),
++                                equipo.getNombreEquipo(),
++                                equipo.getEstado()
++                        });
++                    }
+                 }
+             }
+-
+         } catch (RuntimeException ex) {
+-            JOptionPane.showMessageDialog(
+-                    this,
+-                    "Error al cargar equipos:\n" + ex.getMessage(),
+-                    "Error",
+-                    JOptionPane.ERROR_MESSAGE);
++            JOptionPane.showMessageDialog(this, "Error al filtrar equipos:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
++        }
++    }
++
++    private void cargarEquiposInventario() {
++        txtEscanerQR.setText("");
++        filtrarTabla();
++    }
++
++    private void procesarEquipoPorCodigo(String codigoBuscado) {
++        try {
++            List<EstadoEquipo> equipos = equipoRepository.listar();
++            EstadoEquipo equipoEncontrado = null;
++            for (EstadoEquipo eq : equipos) {
++                if (eq.getCodigoInventario().equalsIgnoreCase(codigoBuscado)) {
++                    equipoEncontrado = eq;
++                    break;
++                }
++            }
++
++            if (equipoEncontrado == null) {
++                JOptionPane.showMessageDialog(
++                        this,
++                        "El equipo con código '" + codigoBuscado + "' no existe en el inventario.",
++                        "SIGELAB - Error",
++                        JOptionPane.ERROR_MESSAGE
++                );
++                return;
++            }
++
++            // 📌 Validación estricta: Si no está DISPONIBLE, bloquea y advierte
++            if (!"DISPONIBLE".equalsIgnoreCase(equipoEncontrado.getEstado())) {
++                JOptionPane.showMessageDialog(
++                        this,
++                        "⚠️ ADVERTENCIA: El equipo '" + equipoEncontrado.getNombreEquipo() + "' (" + codigoBuscado + ") NO se puede prestar.\nEstado actual en el sistema: " + equipoEncontrado.getEstado(),
++                        "Equipo No Disponible",
++                        JOptionPane.WARNING_MESSAGE
++                );
++                return;
++            }
++
++            if (equiposSeleccionados.contains(equipoEncontrado.getId())) {
++                JOptionPane.showMessageDialog(this, "El equipo ya se encuentra agregado en este préstamo.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
++                return;
++            }
++
++            equiposSeleccionados.add(equipoEncontrado.getId());
++            modeloSeleccionados.addRow(new Object[]{
++                    equipoEncontrado.getId(),
++                    equipoEncontrado.getCodigoInventario(),
++                    equipoEncontrado.getNombreEquipo()
++            });
++
++            cargarEquiposInventario();
++
++        } catch (Exception ex) {
++            JOptionPane.showMessageDialog(this, "Error al validar el equipo: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+         }
+     }
+ 
++    // Validación estricta al hacer clic en "Agregar equipo"
+     private void agregarEquipo() {
+         int fila = tablaDisponibles.getSelectedRow();
+-
+         if (fila < 0) {
+-            JOptionPane.showMessageDialog(
+-                    this, "Selecciona un equipo disponible.");
++            JOptionPane.showMessageDialog(this, "Selecciona un equipo de la tabla general.", "Aviso", JOptionPane.WARNING_MESSAGE);
+             return;
+         }
+ 
+         int filaModelo = tablaDisponibles.convertRowIndexToModel(fila);
+-
+-        int id = (Integer) modeloDisponibles.getValueAt(filaModelo, 0);
+-
+-        if (equiposSeleccionados.contains(id)) {
+-            JOptionPane.showMessageDialog(
+-                    this, "Este equipo ya fue agregado.");
+-            return;
+-        }
+-
+-        equiposSeleccionados.add(id);
+-
+-        modeloSeleccionados.addRow(new Object[]{
+-                id,
+-                modeloDisponibles.getValueAt(filaModelo, 1),
+-                modeloDisponibles.getValueAt(filaModelo, 2)
+-        });
+-
+-        modeloDisponibles.removeRow(filaModelo);
++        String codigo = (String) modeloDisponibles.getValueAt(filaModelo, 1);
++        procesarEquipoPorCodigo(codigo);
+     }
+ 
+     private void quitarEquipo() {
+         int fila = tablaSeleccionados.getSelectedRow();
+-
+         if (fila < 0) {
+-            JOptionPane.showMessageDialog(
+-                    this, "Selecciona un equipo para quitar.");
++            JOptionPane.showMessageDialog(this, "Selecciona un equipo de la lista del préstamo para quitar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+             return;
+         }
+-
+         int filaModelo = tablaSeleccionados.convertRowIndexToModel(fila);
+-
+         int id = (Integer) modeloSeleccionados.getValueAt(filaModelo, 0);
+ 
+         equiposSeleccionados.remove(Integer.valueOf(id));
+         modeloSeleccionados.removeRow(filaModelo);
+-
+-        cargarEquiposDisponibles();
++        cargarEquiposInventario();
+     }
+ 
+     private void registrarPrestamo() {
+-        if (usuarioAutenticado == null
+-                || usuarioAutenticado.getIdUsuario() <= 0) {
+-            JOptionPane.showMessageDialog(
+-                    this,
+-                    "No se encontró un usuario autenticado válido.",
+-                    "Error",
+-                    JOptionPane.ERROR_MESSAGE);
++        if (usuarioAutenticado == null || usuarioAutenticado.getIdUsuario() <= 0) {
++            JOptionPane.showMessageDialog(this, "No se encontró un usuario autenticado válido.", "Error", JOptionPane.ERROR_MESSAGE);
++            return;
++        }
++
++        if (equiposSeleccionados.isEmpty()) {
++            JOptionPane.showMessageDialog(this, "Debe seleccionar al menos un equipo disponible para el préstamo.", "Aviso", JOptionPane.WARNING_MESSAGE);
+             return;
+         }
+ 
+         try {
+-            java.util.Date fecha =
+-                    (java.util.Date) fechaDevolucion.getValue();
+-
+-            LocalDateTime fechaEsperada =
+-                    new java.sql.Timestamp(
+-                            fecha.getTime()).toLocalDateTime();
++            java.util.Date fecha = (java.util.Date) fechaDevolucion.getValue();
++            LocalDateTime fechaEsperada = new java.sql.Timestamp(fecha.getTime()).toLocalDateTime();
+ 
+             boolean registrado = controller.registrarPrestamo(
+                     txtSolicitante.getText(),
+@@ -273,27 +417,19 @@
+             );
+ 
+             if (registrado) {
+-                JOptionPane.showMessageDialog(
+-                        this,
+-                        "Préstamo registrado correctamente.",
+-                        "SIGELAB",
+-                        JOptionPane.INFORMATION_MESSAGE);
++                JOptionPane.showMessageDialog(this, "Préstamo registrado correctamente.", "SIGELAB", JOptionPane.INFORMATION_MESSAGE);
+ 
+                 txtSolicitante.setText("");
+                 txtObservaciones.setText("");
+                 equiposSeleccionados.clear();
+                 modeloSeleccionados.setRowCount(0);
+ 
+-                cargarEquiposDisponibles();
++                cargarEquiposInventario();
++                txtEscanerQR.requestFocusInWindow();
+             }
+ 
+         } catch (RuntimeException ex) {
+-            JOptionPane.showMessageDialog(
+-                    this,
+-                    "No se pudo registrar el préstamo:\n"
+-                            + ex.getMessage(),
+-                    "Error",
+-                    JOptionPane.ERROR_MESSAGE);
++            JOptionPane.showMessageDialog(this, "No se pudo registrar el préstamo:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+         }
+     }
+-}
++}
+\ No newline at end of file
+Index: src/main/java/SIGELAB/view/UsuarioView.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package SIGELAB.view;\r\n\r\nimport SIGELAB.controller.UsuarioController;\r\nimport SIGELAB.enums.RolUsuario;\r\nimport SIGELAB.integration.facial.FacialAuthClient;\r\nimport SIGELAB.integration.facial.FacialClientException;\r\nimport SIGELAB.integration.facial.FacialEnrollmentResult;\r\nimport SIGELAB.integration.facial.FacialStatus;\r\nimport SIGELAB.model.Usuario;\r\n\r\nimport javax.swing.*;\r\nimport javax.swing.table.DefaultTableModel;\r\nimport java.util.ArrayList;\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\nimport java.util.concurrent.ExecutionException;\r\n\r\n/** Pantalla de gestión de usuarios (solo ADMIN). Corregida con integración biométrica. */\r\npublic class UsuarioView extends JFrame {\r\n\r\n    private JPanel Panelprincipal;\r\n    private JTable tablaUsuarios;\r\n    private JTextField textNombre;\r\n    private JTextField textApellido;\r\n    private JTextField textNombreUsuario;\r\n    private JTextField textCorreo;\r\n    private JComboBox<RolUsuario> comboRol;\r\n    private JPasswordField textContrasena;\r\n    private JTextField textReferenciaFacial;\r\n    private JLabel labelEstado;\r\n    private JButton btNuevo;\r\n    private JButton btGuardar;\r\n    private JButton btDesactivar;\r\n    private JButton btActivar;\r\n    private JButton regresarAlMenuButton;\r\n    private JButton btnRegistrar_Rostro;\r\n    private JButton btn_EliminarRostro;\r\n\r\n    private static final String[] COLUMNAS = {\"Usuario\", \"Nombre\", \"Apellido\", \"Correo\", \"Rol\", \"Estado\"};\r\n\r\n    private final UsuarioController controladorUsuario = new UsuarioController();\r\n    private final FacialAuthClient facialAuthClient = new FacialAuthClient();\r\n    private final Usuario usuarioAutenticado;\r\n    private Usuario usuarioSeleccionado;\r\n    private boolean perfilFacialRegistrado = false;\r\n\r\n    private final DefaultTableModel modeloTabla = new DefaultTableModel(COLUMNAS, 0) {\r\n        @Override\r\n        public boolean isCellEditable(int fila, int columna) {\r\n            return false;\r\n        }\r\n    };\r\n\r\n    private List<Usuario> usuariosMostrados = new ArrayList<>();\r\n    private int idUsuarioSeleccionado = 0;\r\n\r\n    public UsuarioView(Usuario usuarioActual) {\r\n        super(\"SIGELAB - Gestión de Usuarios\");\r\n        this.usuarioAutenticado = usuarioActual;\r\n        setContentPane(Panelprincipal);\r\n        setDefaultCloseOperation(DISPOSE_ON_CLOSE);\r\n\r\n        configurarTabla();\r\n        cargarRoles();\r\n        registrarEventos();\r\n        refrescarTabla();\r\n\r\n        setSize(1000, 620);\r\n        setLocationRelativeTo(null);\r\n    }\r\n\r\n    private void configurarTabla() {\r\n        tablaUsuarios.setModel(modeloTabla);\r\n        tablaUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);\r\n        tablaUsuarios.getSelectionModel().addListSelectionListener(evento -> {\r\n            if (!evento.getValueIsAdjusting()) {\r\n                alSeleccionarFila();\r\n            }\r\n        });\r\n        btnRegistrar_Rostro.setEnabled(false);\r\n        btn_EliminarRostro.setEnabled(false);\r\n    }\r\n\r\n    private void cargarRoles() {\r\n        try {\r\n            comboRol.removeAllItems();\r\n            for (RolUsuario rol : RolUsuario.values()) {\r\n                comboRol.addItem(rol);\r\n            }\r\n            comboRol.setSelectedItem(null);\r\n        } catch (Exception e) {\r\n            mostrarError(e);\r\n        }\r\n    }\r\n\r\n    private void registrarEventos() {\r\n        btNuevo.addActionListener(evento -> limpiarFormulario());\r\n        btGuardar.addActionListener(evento -> guardar());\r\n        btDesactivar.addActionListener(evento -> cambiarEstado(false));\r\n        btActivar.addActionListener(evento -> cambiarEstado(true));\r\n        regresarAlMenuButton.addActionListener(evento -> salir());\r\n\r\n        btnRegistrar_Rostro.addActionListener(evento -> registrarRostro());\r\n        btn_EliminarRostro.addActionListener(evento -> eliminarRostro());\r\n    }\r\n\r\n    private void refrescarTabla() {\r\n        try {\r\n            usuariosMostrados = new ArrayList<>(controladorUsuario.listar());\r\n            modeloTabla.setRowCount(0);\r\n            for (Usuario usuario : usuariosMostrados) {\r\n                String estadoTexto = usuario.isActivo() ? \"ACTIVO\" : \"INACTIVO\";\r\n                modeloTabla.addRow(new Object[]{\r\n                        usuario.getUsuario(),\r\n                        usuario.getNombres(),\r\n                        usuario.getApellidos(),\r\n                        usuario.getCorreo(),\r\n                        usuario.getRol(),\r\n                        estadoTexto});\r\n            }\r\n        } catch (Exception e) {\r\n            mostrarError(e);\r\n        }\r\n    }\r\n\r\n    private void alSeleccionarFila() {\r\n        int fila = tablaUsuarios.getSelectedRow();\r\n        if (fila < 0 || fila >= usuariosMostrados.size()) {\r\n            return;\r\n        }\r\n        usuarioSeleccionado = usuariosMostrados.get(tablaUsuarios.convertRowIndexToModel(fila));\r\n        idUsuarioSeleccionado = usuarioSeleccionado.getIdUsuario();\r\n        textNombre.setText(usuarioSeleccionado.getNombres());\r\n        textApellido.setText(usuarioSeleccionado.getApellidos());\r\n        textNombreUsuario.setText(usuarioSeleccionado.getUsuario());\r\n        textCorreo.setText(usuarioSeleccionado.getCorreo());\r\n        comboRol.setSelectedItem(usuarioSeleccionado.getRol());\r\n        textContrasena.setText(\"\");\r\n\r\n        labelEstado.setText(usuarioSeleccionado.isActivo() ? \"ACTIVO\" : \"INACTIVO\");\r\n\r\n        // Consultar el estado del perfil facial al seleccionar un usuario\r\n        consultarEstadoRostro(usuarioSeleccionado.getIdUsuario());\r\n    }\r\n\r\n    private void limpiarFormulario() {\r\n        idUsuarioSeleccionado = 0;\r\n        usuarioSeleccionado = null;\r\n        perfilFacialRegistrado = false;\r\n        tablaUsuarios.clearSelection();\r\n        textNombre.setText(\"\");\r\n        textApellido.setText(\"\");\r\n        textNombreUsuario.setText(\"\");\r\n        textCorreo.setText(\"\");\r\n        comboRol.setSelectedItem(null);\r\n        textContrasena.setText(\"\");\r\n        labelEstado.setText(\"-\");\r\n\r\n        btnRegistrar_Rostro.setEnabled(false);\r\n        btn_EliminarRostro.setEnabled(false);\r\n        btnRegistrar_Rostro.setText(\"Registrar Rostro\");\r\n\r\n        textNombre.requestFocusInWindow();\r\n    }\r\n\r\n    private void guardar() {\r\n        char[] caracteresContrasena = textContrasena.getPassword();\r\n        String contrasena = new String(caracteresContrasena);\r\n        Arrays.fill(caracteresContrasena, '0');\r\n\r\n        try {\r\n            RolUsuario rol = (RolUsuario) comboRol.getSelectedItem();\r\n\r\n            if (idUsuarioSeleccionado == 0) {\r\n                controladorUsuario.crearUsuario(\r\n                        textNombre.getText(),\r\n                        textApellido.getText(),\r\n                        textNombreUsuario.getText(),\r\n                        contrasena,\r\n                        rol,\r\n                        textCorreo.getText()\r\n                );\r\n            } else {\r\n                JOptionPane.showMessageDialog(this, \"Actualización pendiente de implementar en servicio.\", \"Usuarios\", JOptionPane.INFORMATION_MESSAGE);\r\n            }\r\n\r\n            JOptionPane.showMessageDialog(this,\r\n                    \"El usuario se guardó correctamente.\",\r\n                    \"Usuarios\", JOptionPane.INFORMATION_MESSAGE);\r\n            limpiarFormulario();\r\n            refrescarTabla();\r\n        } catch (Exception e) {\r\n            mostrarError(e);\r\n        }\r\n    }\r\n\r\n    private void cambiarEstado(boolean activar) {\r\n        if (idUsuarioSeleccionado == 0) {\r\n            JOptionPane.showMessageDialog(this, \"Seleccione un usuario de la tabla.\",\r\n                    \"Usuarios\", JOptionPane.INFORMATION_MESSAGE);\r\n            return;\r\n        }\r\n        String accion = activar ? \"activar\" : \"desactivar\";\r\n        int respuesta = JOptionPane.showConfirmDialog(this,\r\n                \"¿Desea \" + accion + \" al usuario \" + textNombreUsuario.getText() + \"?\",\r\n                \"Confirmar\", JOptionPane.YES_NO_OPTION);\r\n        if (respuesta != JOptionPane.YES_OPTION) {\r\n            return;\r\n        }\r\n        try {\r\n            if (activar) {\r\n                controladorUsuario.activar(idUsuarioSeleccionado);\r\n            } else {\r\n                controladorUsuario.desactivar(idUsuarioSeleccionado);\r\n            }\r\n            limpiarFormulario();\r\n            refrescarTabla();\r\n        } catch (Exception e) {\r\n            mostrarError(e);\r\n        }\r\n    }\r\n\r\n    private void registrarRostro() {\r\n        if (usuarioSeleccionado == null) {\r\n            mostrarError(\"Seleccione un usuario.\");\r\n            return;\r\n        }\r\n        int userId = usuarioSeleccionado.getIdUsuario();\r\n        boolean reemplazar = perfilFacialRegistrado;\r\n        String accion = reemplazar ? \"actualizar\" : \"registrar\";\r\n        if (!confirmar(\"¿Desea \" + accion + \" el rostro de \" + usuarioSeleccionado.getUsuario() + \"?\",\r\n                \"Registro facial\")) return;\r\n\r\n        btnRegistrar_Rostro.setEnabled(false);\r\n        btn_EliminarRostro.setEnabled(false);\r\n\r\n        new SwingWorker<FacialEnrollmentResult, Void>() {\r\n            @Override\r\n            protected FacialEnrollmentResult doInBackground() {\r\n                return facialAuthClient.enroll(userId, reemplazar);\r\n            }\r\n\r\n            @Override\r\n            protected void done() {\r\n                try {\r\n                    FacialEnrollmentResult result = get();\r\n                    JOptionPane.showMessageDialog(Panelprincipal,\r\n                            result.message(), \"Registro facial\", JOptionPane.INFORMATION_MESSAGE);\r\n                    consultarEstadoRostro(userId);\r\n                } catch (InterruptedException e) {\r\n                    Thread.currentThread().interrupt();\r\n                    mostrarError(\"El registro facial fue interrumpido.\");\r\n                } catch (ExecutionException e) {\r\n                    mostrarError(mensajeError(e.getCause(), \"No fue posible registrar el rostro.\"));\r\n                    consultarEstadoRostro(userId);\r\n                }\r\n            }\r\n        }.execute();\r\n    }\r\n\r\n    private void eliminarRostro() {\r\n        if (usuarioSeleccionado == null) {\r\n            mostrarError(\"Seleccione un usuario.\");\r\n            return;\r\n        }\r\n        if (usuarioAutenticado == null || usuarioAutenticado.getRol() != RolUsuario.ADMIN) {\r\n            mostrarError(\"Solo un administrador puede eliminar perfiles faciales.\");\r\n            return;\r\n        }\r\n        int userId = usuarioSeleccionado.getIdUsuario();\r\n        if (!confirmar(\"¿Desea eliminar el perfil facial de \" + usuarioSeleccionado.getUsuario() + \"?\",\r\n                \"Eliminar perfil facial\")) return;\r\n\r\n        btnRegistrar_Rostro.setEnabled(false);\r\n        btn_EliminarRostro.setEnabled(false);\r\n\r\n        new SwingWorker<Void, Void>() {\r\n            @Override\r\n            protected Void doInBackground() {\r\n                facialAuthClient.deleteProfile(userId, usuarioAutenticado.getIdUsuario());\r\n                return null;\r\n            }\r\n\r\n            @Override\r\n            protected void done() {\r\n                try {\r\n                    get();\r\n                    JOptionPane.showMessageDialog(Panelprincipal,\r\n                            \"Perfil facial eliminado correctamente.\", \"Perfil facial\",\r\n                            JOptionPane.INFORMATION_MESSAGE);\r\n                    consultarEstadoRostro(userId);\r\n                } catch (InterruptedException e) {\r\n                    Thread.currentThread().interrupt();\r\n                    mostrarError(\"La eliminación del perfil fue interrumpida.\");\r\n                } catch (ExecutionException e) {\r\n                    mostrarError(mensajeError(e.getCause(), \"No fue posible eliminar el perfil facial.\"));\r\n                    consultarEstadoRostro(userId);\r\n                }\r\n            }\r\n        }.execute();\r\n    }\r\n\r\n    private void consultarEstadoRostro(int userId) {\r\n        btnRegistrar_Rostro.setEnabled(false);\r\n        btn_EliminarRostro.setEnabled(false);\r\n\r\n        new SwingWorker<FacialStatus, Void>() {\r\n            @Override\r\n            protected FacialStatus doInBackground() {\r\n                return facialAuthClient.status(userId);\r\n            }\r\n\r\n            @Override\r\n            protected void done() {\r\n                if (usuarioSeleccionado == null || usuarioSeleccionado.getIdUsuario() != userId) return;\r\n                try {\r\n                    FacialStatus status = get();\r\n                    perfilFacialRegistrado = status.enrolled();\r\n                    btnRegistrar_Rostro.setText(status.enrolled() ? \"Actualizar Rostro\" : \"Registrar Rostro\");\r\n                    btnRegistrar_Rostro.setEnabled(true);\r\n                    btn_EliminarRostro.setEnabled(status.enrolled()\r\n                            && usuarioAutenticado != null\r\n                            && usuarioAutenticado.getRol() == RolUsuario.ADMIN);\r\n                } catch (InterruptedException e) {\r\n                    Thread.currentThread().interrupt();\r\n                } catch (ExecutionException e) {\r\n                    perfilFacialRegistrado = false;\r\n                    btnRegistrar_Rostro.setEnabled(true);\r\n                    btnRegistrar_Rostro.setText(\"Registrar Rostro\");\r\n                }\r\n            }\r\n        }.execute();\r\n    }\r\n\r\n    private String mensajeError(Throwable error, String defecto) {\r\n        if (error instanceof FacialClientException facial && facial.getMessage() != null) {\r\n            return facial.getMessage();\r\n        }\r\n        return defecto;\r\n    }\r\n\r\n    private boolean confirmar(String mensaje, String titulo) {\r\n        return JOptionPane.showConfirmDialog(Panelprincipal, mensaje, titulo,\r\n                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;\r\n    }\r\n\r\n    private void mostrarError(Exception e) {\r\n        String mensaje = e.getMessage() != null ? e.getMessage() : \"Error desconocido\";\r\n        JOptionPane.showMessageDialog(this, mensaje,\r\n                \"No se pudo completar la operación\", JOptionPane.WARNING_MESSAGE);\r\n    }\r\n\r\n    private void mostrarError(String mensaje) {\r\n        if (mensaje == null || mensaje.isBlank()) mensaje = \"Ocurrió un error inesperado.\";\r\n        JOptionPane.showMessageDialog(Panelprincipal, mensaje, \"Usuarios\", JOptionPane.ERROR_MESSAGE);\r\n    }\r\n\r\n    private void salir() {\r\n        int respuesta = JOptionPane.showConfirmDialog(Panelprincipal,\r\n                \"¿Desea regresar al menú principal?\", \"Regresar\",\r\n                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);\r\n        if (respuesta == JOptionPane.YES_OPTION) {\r\n            java.awt.Window ventana = SwingUtilities.getWindowAncestor(Panelprincipal);\r\n            if (ventana != null) ventana.dispose();\r\n        }\r\n    }\r\n\r\n    public JPanel getPanelPrincipal() {\r\n        return Panelprincipal;\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/SIGELAB/view/UsuarioView.java b/src/main/java/SIGELAB/view/UsuarioView.java
+--- a/src/main/java/SIGELAB/view/UsuarioView.java	(revision 16fce0aa3339d16e71572e8bd8af7336004316e7)
++++ b/src/main/java/SIGELAB/view/UsuarioView.java	(date 1793327514613)
+@@ -10,15 +10,16 @@
+ 
+ import javax.swing.*;
+ import javax.swing.table.DefaultTableModel;
++import java.awt.*;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.List;
+ import java.util.concurrent.ExecutionException;
+ 
+-/** Pantalla de gestión de usuarios (solo ADMIN). Corregida con integración biométrica. */
++/** Pantalla de gestión de usuarios (solo ADMIN) diseñada en código puro. */
+ public class UsuarioView extends JFrame {
+ 
+-    private JPanel Panelprincipal;
++    private final JPanel panelPrincipal;
+     private JTable tablaUsuarios;
+     private JTextField textNombre;
+     private JTextField textApellido;
+@@ -26,8 +27,8 @@
+     private JTextField textCorreo;
+     private JComboBox<RolUsuario> comboRol;
+     private JPasswordField textContrasena;
+-    private JTextField textReferenciaFacial;
+     private JLabel labelEstado;
++
+     private JButton btNuevo;
+     private JButton btGuardar;
+     private JButton btDesactivar;
+@@ -57,21 +58,153 @@
+     public UsuarioView(Usuario usuarioActual) {
+         super("SIGELAB - Gestión de Usuarios");
+         this.usuarioAutenticado = usuarioActual;
+-        setContentPane(Panelprincipal);
++
++        panelPrincipal = new JPanel(new BorderLayout(15, 15));
++        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
++        setContentPane(panelPrincipal);
++
+         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
++        setSize(1100, 680);
++        setMinimumSize(new Dimension(950, 600));
++        setLocationRelativeTo(null);
+ 
++        construirInterfaz();
+         configurarTabla();
+         cargarRoles();
+         registrarEventos();
+         refrescarTabla();
++    }
++
++    private void construirInterfaz() {
++        // Título Superior
++        JLabel lblTitulo = new JLabel("Gestión de Usuarios y Biometría", SwingConstants.LEFT);
++        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
++        lblTitulo.setForeground(new Color(15, 23, 42));
++        panelPrincipal.add(lblTitulo, BorderLayout.NORTH);
++
++        // Panel Central (Dividido en 2 columnas: Izquierda Formulario, Derecha Tabla)
++        JPanel panelCentro = new JPanel(new GridLayout(1, 2, 20, 0));
++
++        // --- IZQUIERDA: Formulario y Biometría ---
++        JPanel panelIzquierdo = new JPanel(new BorderLayout(0, 15));
++
++        JPanel panelFormulario = new JPanel(new GridBagLayout());
++        panelFormulario.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Información del Usuario ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++
++        GridBagConstraints gbc = new GridBagConstraints();
++        gbc.insets = new Insets(8, 10, 8, 10);
++        gbc.fill = GridBagConstraints.HORIZONTAL;
++        gbc.anchor = GridBagConstraints.WEST;
++
++        textNombre = new JTextField();
++        textApellido = new JTextField();
++        textNombreUsuario = new JTextField();
++        textCorreo = new JTextField();
++        comboRol = new JComboBox<>();
++        textContrasena = new JPasswordField();
++        labelEstado = new JLabel("-");
++        labelEstado.setFont(new Font("Segoe UI", Font.BOLD, 12));
++
++        int fila = 0;
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Nombres:"), textNombre);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Apellidos:"), textApellido);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Usuario / Carnet:"), textNombreUsuario);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Correo:"), textCorreo);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Rol:"), comboRol);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Contraseña:"), textContrasena);
++
++        // Estado
++        gbc.gridx = 0; gbc.gridy = fila; gbc.weightx = 0.0;
++        panelFormulario.add(new JLabel("Estado:"), gbc);
++        gbc.gridx = 1; gbc.weightx = 1.0;
++        panelFormulario.add(labelEstado, gbc);
++
++        panelIzquierdo.add(panelFormulario, BorderLayout.CENTER);
++
++        // Panel inferior izquierdo: Botones y Biometría
++        JPanel panelAccionesForm = new JPanel(new GridLayout(3, 2, 8, 8));
++        panelAccionesForm.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Acciones y Biometría Facial ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++
++        btNuevo = new JButton("Nuevo");
++        btGuardar = new JButton("Guardar");
++        btActivar = new JButton("Activar");
++        btDesactivar = new JButton("Desactivar");
++        btnRegistrar_Rostro = new JButton("Registrar Rostro");
++        btn_EliminarRostro = new JButton("Eliminar Rostro");
++
++        // Estilos redondos FlatLaf
++        estilizarBoton(btNuevo, false);
++        estilizarBoton(btGuardar, true); // Principal con azul sólido
++        estilizarBoton(btActivar, false);
++        estilizarBoton(btDesactivar, false);
++        estilizarBoton(btnRegistrar_Rostro, false);
++        estilizarBoton(btn_EliminarRostro, false);
++
++        panelAccionesForm.add(btNuevo);
++        panelAccionesForm.add(btGuardar);
++        panelAccionesForm.add(btActivar);
++        panelAccionesForm.add(btDesactivar);
++        panelAccionesForm.add(btnRegistrar_Rostro);
++        panelAccionesForm.add(btn_EliminarRostro);
++
++        panelIzquierdo.add(panelAccionesForm, BorderLayout.SOUTH);
++        panelCentro.add(panelIzquierdo);
++
++        // --- DERECHA: Tabla de Usuarios ---
++        JPanel panelDerecho = new JPanel(new BorderLayout(0, 10));
++        panelDerecho.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Lista de Usuarios Registrados ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
+ 
+-        setSize(1000, 620);
+-        setLocationRelativeTo(null);
++        tablaUsuarios = new JTable(modeloTabla);
++        tablaUsuarios.setRowHeight(28);
++        tablaUsuarios.setAutoCreateRowSorter(true);
++        tablaUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
++
++        JScrollPane scrollTabla = new JScrollPane(tablaUsuarios);
++        panelDerecho.add(scrollTabla, BorderLayout.CENTER);
++
++        panelCentro.add(panelDerecho);
++        panelPrincipal.add(panelCentro, BorderLayout.CENTER);
++
++        // --- INFERIOR: Botón Regresar ---
++        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
++        regresarAlMenuButton = new JButton("Regresar al Menú");
++        estilizarBoton(regresarAlMenuButton, false);
++        panelInferior.add(regresarAlMenuButton);
++
++        panelPrincipal.add(panelInferior, BorderLayout.SOUTH);
++    }
++
++    private void agregarCampoFormulario(JPanel panel, GridBagConstraints gbc, int fila, JLabel label, JComponent componente) {
++        gbc.gridx = 0; gbc.gridy = fila; gbc.weightx = 0.0;
++        panel.add(label, gbc);
++
++        gbc.gridx = 1; gbc.weightx = 1.0;
++        componente.setPreferredSize(new Dimension(220, 32));
++        panel.add(componente, gbc);
++    }
++
++    private void estilizarBoton(JButton boton, boolean esPrincipal) {
++        boton.putClientProperty("JButton.buttonType", "roundRect");
++        if (esPrincipal) {
++            boton.putClientProperty("FlatLaf.style", "background: #2563eb; foreground: #ffffff; font: bold; arc: 10");
++        } else {
++            boton.putClientProperty("FlatLaf.style", "arc: 10");
++        }
+     }
+ 
+     private void configurarTabla() {
+-        tablaUsuarios.setModel(modeloTabla);
+-        tablaUsuarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+         tablaUsuarios.getSelectionModel().addListSelectionListener(evento -> {
+             if (!evento.getValueIsAdjusting()) {
+                 alSeleccionarFila();
+@@ -138,8 +271,8 @@
+         textContrasena.setText("");
+ 
+         labelEstado.setText(usuarioSeleccionado.isActivo() ? "ACTIVO" : "INACTIVO");
++        labelEstado.setForeground(usuarioSeleccionado.isActivo() ? new Color(16, 185, 129) : new Color(239, 68, 68));
+ 
+-        // Consultar el estado del perfil facial al seleccionar un usuario
+         consultarEstadoRostro(usuarioSeleccionado.getIdUsuario());
+     }
+ 
+@@ -155,6 +288,7 @@
+         comboRol.setSelectedItem(null);
+         textContrasena.setText("");
+         labelEstado.setText("-");
++        labelEstado.setForeground(Color.BLACK);
+ 
+         btnRegistrar_Rostro.setEnabled(false);
+         btn_EliminarRostro.setEnabled(false);
+@@ -244,7 +378,7 @@
+             protected void done() {
+                 try {
+                     FacialEnrollmentResult result = get();
+-                    JOptionPane.showMessageDialog(Panelprincipal,
++                    JOptionPane.showMessageDialog(panelPrincipal,
+                             result.message(), "Registro facial", JOptionPane.INFORMATION_MESSAGE);
+                     consultarEstadoRostro(userId);
+                 } catch (InterruptedException e) {
+@@ -285,7 +419,7 @@
+             protected void done() {
+                 try {
+                     get();
+-                    JOptionPane.showMessageDialog(Panelprincipal,
++                    JOptionPane.showMessageDialog(panelPrincipal,
+                             "Perfil facial eliminado correctamente.", "Perfil facial",
+                             JOptionPane.INFORMATION_MESSAGE);
+                     consultarEstadoRostro(userId);
+@@ -340,7 +474,7 @@
+     }
+ 
+     private boolean confirmar(String mensaje, String titulo) {
+-        return JOptionPane.showConfirmDialog(Panelprincipal, mensaje, titulo,
++        return JOptionPane.showConfirmDialog(panelPrincipal, mensaje, titulo,
+                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+     }
+ 
+@@ -352,20 +486,20 @@
+ 
+     private void mostrarError(String mensaje) {
+         if (mensaje == null || mensaje.isBlank()) mensaje = "Ocurrió un error inesperado.";
+-        JOptionPane.showMessageDialog(Panelprincipal, mensaje, "Usuarios", JOptionPane.ERROR_MESSAGE);
++        JOptionPane.showMessageDialog(panelPrincipal, mensaje, "Usuarios", JOptionPane.ERROR_MESSAGE);
+     }
+ 
+     private void salir() {
+-        int respuesta = JOptionPane.showConfirmDialog(Panelprincipal,
++        int respuesta = JOptionPane.showConfirmDialog(panelPrincipal,
+                 "¿Desea regresar al menú principal?", "Regresar",
+                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+         if (respuesta == JOptionPane.YES_OPTION) {
+-            java.awt.Window ventana = SwingUtilities.getWindowAncestor(Panelprincipal);
++            Window ventana = SwingUtilities.getWindowAncestor(panelPrincipal);
+             if (ventana != null) ventana.dispose();
+         }
+     }
+ 
+     public JPanel getPanelPrincipal() {
+-        return Panelprincipal;
++        return panelPrincipal;
+     }
+ }
+\ No newline at end of file
+Index: src/main/java/SIGELAB/view/InventarioEquipo.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package SIGELAB.view;\r\n\r\nimport SIGELAB.controller.EstadoEquipoController;\r\nimport SIGELAB.model.EstadoEquipo;\r\nimport SIGELAB.model.Laboratorio;\r\nimport SIGELAB.service.LaboratorioService;\r\n\r\nimport javax.swing.*;\r\nimport javax.swing.table.DefaultTableModel;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\npublic class InventarioEquipo extends JFrame {\r\n    private JPanel PanelInventario;\r\n    private JTable table1;\r\n    private JTextField textID;\r\n    private JTextField textCodigoInventario;\r\n    private JTextField textNombreEquipo;\r\n    private JComboBox<String> comboBoxTipo;\r\n    private JComboBox<ItemLaboratorio> comboBoxLAB;\r\n    private JComboBox<String> comboBoxEstado;\r\n    private JTextField textObservaciones;\r\n    private JButton nuevoButton;\r\n    private JButton guardarButton;\r\n    private JButton actualizarButton;\r\n    private JButton limpiarButton;\r\n    private JTextField textField1; // Marca\r\n    private JTextField textField2; // Modelo\r\n    private JTextField textField3; // Número de serie\r\n\r\n    private final EstadoEquipoController controller;\r\n    private EstadoEquipo equipoSeleccionado;\r\n    private int idSeleccionado = 0;\r\n\r\n    private static final String[] COLUMNAS = {\"ID\", \"Lab ID\", \"Cód. Inventario\", \"Equipo\", \"Marca\", \"Modelo\", \"Nº Serie\", \"Tipo\", \"Estado\", \"Observaciones\"};\r\n    private final DefaultTableModel modeloTabla = new DefaultTableModel(COLUMNAS, 0) {\r\n        @Override\r\n        public boolean isCellEditable(int fila, int columna) { return false; }\r\n    };\r\n\r\n    private List<EstadoEquipo> equiposMostrados = new ArrayList<>();\r\n\r\n    public InventarioEquipo() {\r\n        super(\"SIGELAB - Inventario y Estado de Equipos\");\r\n        this.controller = new EstadoEquipoController();\r\n\r\n        setContentPane(PanelInventario);\r\n        setDefaultCloseOperation(DISPOSE_ON_CLOSE);\r\n\r\n        configurarFormulario();\r\n        configurarTabla();\r\n        cargarLaboratoriosEnCombo();\r\n        registrarEventos();\r\n        refrescarTabla();\r\n        limpiarFormulario();\r\n\r\n        setSize(1150, 650);\r\n        setLocationRelativeTo(null);\r\n    }\r\n\r\n    private void configurarFormulario() {\r\n        if (textID != null) textID.setEditable(false);\r\n        if (actualizarButton != null) actualizarButton.setEnabled(false);\r\n\r\n        if (comboBoxEstado != null) {\r\n            comboBoxEstado.removeAllItems();\r\n            comboBoxEstado.addItem(\"DISPONIBLE\");\r\n            comboBoxEstado.addItem(\"EN_USO\");\r\n            comboBoxEstado.addItem(\"MANTENIMIENTO\");\r\n            comboBoxEstado.addItem(\"DADO_DE_BAJA\");\r\n        }\r\n\r\n        if (comboBoxTipo != null) {\r\n            comboBoxTipo.removeAllItems();\r\n            comboBoxTipo.addItem(\"Hardware\");\r\n            comboBoxTipo.addItem(\"Multimedia\");\r\n            comboBoxTipo.addItem(\"Redes\");\r\n            comboBoxTipo.addItem(\"Herramienta\");\r\n        }\r\n    }\r\n\r\n    private void configurarTabla() {\r\n        if (table1 != null) {\r\n            table1.setModel(modeloTabla);\r\n            table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);\r\n            table1.getSelectionModel().addListSelectionListener(e -> {\r\n                if (!e.getValueIsAdjusting()) seleccionarFila();\r\n            });\r\n        }\r\n    }\r\n\r\n    private void cargarLaboratoriosEnCombo() {\r\n        if (comboBoxLAB == null) return;\r\n        comboBoxLAB.removeAllItems();\r\n        try {\r\n            LaboratorioService labService = new LaboratorioService();\r\n            List<Laboratorio> laboratorios = labService.obtenerLaboratorios();\r\n            for (Laboratorio lab : laboratorios) {\r\n                String etiqueta = lab.getCodigo() + \" - \" + lab.getNombre();\r\n                comboBoxLAB.addItem(new ItemLaboratorio(lab.getId(), etiqueta));\r\n            }\r\n        } catch (Exception e) {\r\n            JOptionPane.showMessageDialog(this, \"Error al cargar laboratorios: \" + e.getMessage(), \"Error\", JOptionPane.ERROR_MESSAGE);\r\n        }\r\n    }\r\n\r\n    private void registrarEventos() {\r\n        if (nuevoButton != null) nuevoButton.addActionListener(e -> limpiarFormulario());\r\n        if (guardarButton != null) guardarButton.addActionListener(e -> guardar());\r\n        if (actualizarButton != null) actualizarButton.addActionListener(e -> actualizar());\r\n        if (limpiarButton != null) limpiarButton.addActionListener(e -> limpiarFormulario());\r\n    }\r\n\r\n    private void refrescarTabla() {\r\n        try {\r\n            equiposMostrados = new ArrayList<>(controller.listar());\r\n            modeloTabla.setRowCount(0);\r\n            for (EstadoEquipo eq : equiposMostrados) {\r\n                modeloTabla.addRow(new Object[]{\r\n                        eq.getId(),\r\n                        eq.getLaboratorioId(),\r\n                        eq.getCodigoInventario(),\r\n                        eq.getNombreEquipo(),\r\n                        eq.getMarca(),\r\n                        eq.getModelo(),\r\n                        eq.getNumeroSerie(),\r\n                        eq.getTipo(),\r\n                        eq.getEstado(),\r\n                        eq.getObservaciones()\r\n                });\r\n            }\r\n        } catch (Exception e) {\r\n            JOptionPane.showMessageDialog(this, e.getMessage(), \"Error\", JOptionPane.ERROR_MESSAGE);\r\n        }\r\n    }\r\n\r\n    private void seleccionarFila() {\r\n        if (table1 == null) return;\r\n        int fila = table1.getSelectedRow();\r\n        if (fila < 0 || fila >= equiposMostrados.size()) return;\r\n\r\n        equipoSeleccionado = equiposMostrados.get(table1.convertRowIndexToModel(fila));\r\n        idSeleccionado = equipoSeleccionado.getId();\r\n\r\n        if (textID != null) textID.setText(String.valueOf(equipoSeleccionado.getId()));\r\n        if (textCodigoInventario != null) textCodigoInventario.setText(equipoSeleccionado.getCodigoInventario());\r\n        if (textNombreEquipo != null) textNombreEquipo.setText(equipoSeleccionado.getNombreEquipo());\r\n        if (textField1 != null) textField1.setText(equipoSeleccionado.getMarca());\r\n        if (textField2 != null) textField2.setText(equipoSeleccionado.getModelo());\r\n        if (textField3 != null) textField3.setText(equipoSeleccionado.getNumeroSerie());\r\n        if (textObservaciones != null) textObservaciones.setText(equipoSeleccionado.getObservaciones());\r\n        if (comboBoxEstado != null) comboBoxEstado.setSelectedItem(equipoSeleccionado.getEstado());\r\n        if (comboBoxTipo != null) comboBoxTipo.setSelectedItem(equipoSeleccionado.getTipo());\r\n\r\n        if (comboBoxLAB != null) {\r\n            int labIdEquipo = equipoSeleccionado.getLaboratorioId();\r\n            for (int i = 0; i < comboBoxLAB.getItemCount(); i++) {\r\n                ItemLaboratorio item = comboBoxLAB.getItemAt(i);\r\n                if (item.getId() == labIdEquipo) {\r\n                    comboBoxLAB.setSelectedIndex(i);\r\n                    break;\r\n                }\r\n            }\r\n        }\r\n\r\n        if (guardarButton != null) guardarButton.setEnabled(false);\r\n        if (actualizarButton != null) actualizarButton.setEnabled(true);\r\n    }\r\n\r\n    private void limpiarFormulario() {\r\n        idSeleccionado = 0;\r\n        equipoSeleccionado = null;\r\n        if (table1 != null) table1.clearSelection();\r\n\r\n        if (textID != null) textID.setText(\"\");\r\n\r\n        // Sugiere código automático pero permite edición manual\r\n        if (textCodigoInventario != null) {\r\n            try {\r\n                String siguienteCodigo = controller.generarSiguienteCodigo();\r\n                textCodigoInventario.setText(siguienteCodigo);\r\n            } catch (Exception e) {\r\n                textCodigoInventario.setText(\"INV-001\");\r\n            }\r\n        }\r\n\r\n        if (textNombreEquipo != null) textNombreEquipo.setText(\"\");\r\n        if (textField1 != null) textField1.setText(\"\");\r\n        if (textField2 != null) textField2.setText(\"\");\r\n        if (textField3 != null) textField3.setText(\"\");\r\n        if (textObservaciones != null) textObservaciones.setText(\"\");\r\n        if (comboBoxLAB != null && comboBoxLAB.getItemCount() > 0) comboBoxLAB.setSelectedIndex(0);\r\n        if (comboBoxEstado != null) comboBoxEstado.setSelectedIndex(0);\r\n        if (comboBoxTipo != null && comboBoxTipo.getItemCount() > 0) comboBoxTipo.setSelectedIndex(0);\r\n\r\n        if (guardarButton != null) guardarButton.setEnabled(true);\r\n        if (actualizarButton != null) actualizarButton.setEnabled(false);\r\n        if (textNombreEquipo != null) textNombreEquipo.requestFocusInWindow();\r\n    }\r\n\r\n    private void guardar() {\r\n        try {\r\n            ItemLaboratorio labSeleccionado = comboBoxLAB != null ? (ItemLaboratorio) comboBoxLAB.getSelectedItem() : null;\r\n            int labId = labSeleccionado != null ? labSeleccionado.getId() : 0;\r\n\r\n            String codigo = textCodigoInventario != null ? textCodigoInventario.getText().trim() : \"\";\r\n            String nombre = textNombreEquipo != null ? textNombreEquipo.getText().trim() : \"\";\r\n            String marca = textField1 != null ? textField1.getText().trim() : \"\";\r\n            String modelo = textField2 != null ? textField2.getText().trim() : \"\";\r\n            String numeroSerie = textField3 != null ? textField3.getText().trim() : \"\";\r\n            String tipo = comboBoxTipo != null ? comboBoxTipo.getSelectedItem().toString() : \"Hardware\";\r\n            String estado = comboBoxEstado != null ? comboBoxEstado.getSelectedItem().toString() : \"DISPONIBLE\";\r\n            String observaciones = textObservaciones != null ? textObservaciones.getText().trim() : \"\";\r\n\r\n            if (idSeleccionado == 0) {\r\n                controller.crearEquipo(labId, codigo, nombre, marca, modelo, numeroSerie, tipo, estado, observaciones);\r\n                JOptionPane.showMessageDialog(this, \"Equipo registrado con éxito.\", \"Inventario\", JOptionPane.INFORMATION_MESSAGE);\r\n            } else {\r\n                equipoSeleccionado.setLaboratorioId(labId);\r\n                equipoSeleccionado.setCodigoInventario(codigo);\r\n                equipoSeleccionado.setNombreEquipo(nombre);\r\n                equipoSeleccionado.setMarca(marca);\r\n                equipoSeleccionado.setModelo(modelo);\r\n                equipoSeleccionado.setNumeroSerie(numeroSerie);\r\n                equipoSeleccionado.setTipo(tipo);\r\n                equipoSeleccionado.setEstado(estado);\r\n                equipoSeleccionado.setObservaciones(observaciones);\r\n\r\n                controller.actualizar(equipoSeleccionado);\r\n                JOptionPane.showMessageDialog(this, \"Equipo actualizado con éxito.\", \"Inventario\", JOptionPane.INFORMATION_MESSAGE);\r\n            }\r\n\r\n            limpiarFormulario();\r\n            refrescarTabla();\r\n        } catch (Exception e) {\r\n            // Muestra el mensaje de validación limpio en pantalla (cumpliendo con la rúbrica)\r\n            JOptionPane.showMessageDialog(this, e.getMessage(), \"Error de Validación\", JOptionPane.ERROR_MESSAGE);\r\n        }\r\n    }\r\n\r\n    private void actualizar() {\r\n        if (idSeleccionado == 0) {\r\n            JOptionPane.showMessageDialog(this, \"Seleccione un equipo de la tabla.\", \"Aviso\", JOptionPane.WARNING_MESSAGE);\r\n            return;\r\n        }\r\n        guardar();\r\n    }\r\n\r\n    private static class ItemLaboratorio {\r\n        private final int id;\r\n        private final String nombre;\r\n\r\n        public ItemLaboratorio(int id, String nombre) {\r\n            this.id = id;\r\n            this.nombre = nombre;\r\n        }\r\n\r\n        public int getId() { return id; }\r\n\r\n        @Override\r\n        public String toString() { return nombre; }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/SIGELAB/view/InventarioEquipo.java b/src/main/java/SIGELAB/view/InventarioEquipo.java
+--- a/src/main/java/SIGELAB/view/InventarioEquipo.java	(revision 16fce0aa3339d16e71572e8bd8af7336004316e7)
++++ b/src/main/java/SIGELAB/view/InventarioEquipo.java	(date 1793335065989)
+@@ -4,14 +4,19 @@
+ import SIGELAB.model.EstadoEquipo;
+ import SIGELAB.model.Laboratorio;
+ import SIGELAB.service.LaboratorioService;
++import SIGELAB.util.QrUtil;
+ 
+ import javax.swing.*;
+ import javax.swing.table.DefaultTableModel;
++import java.awt.*;
++import java.awt.image.BufferedImage;
++import java.io.File;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+ public class InventarioEquipo extends JFrame {
+-    private JPanel PanelInventario;
++
++    private final JPanel PanelInventario;
+     private JTable table1;
+     private JTextField textID;
+     private JTextField textCodigoInventario;
+@@ -19,50 +24,195 @@
+     private JComboBox<String> comboBoxTipo;
+     private JComboBox<ItemLaboratorio> comboBoxLAB;
+     private JComboBox<String> comboBoxEstado;
+-    private JTextField textObservaciones;
++    private JTextArea textObservaciones;
++
+     private JButton nuevoButton;
+     private JButton guardarButton;
+     private JButton actualizarButton;
+     private JButton limpiarButton;
++    private JButton btnVerQR;
++
+     private JTextField textField1; // Marca
+     private JTextField textField2; // Modelo
+-    private JTextField textField3; // Número de serie
++    private JTextField textField3; // Nº Serie
+ 
+     private final EstadoEquipoController controller;
+     private EstadoEquipo equipoSeleccionado;
+     private int idSeleccionado = 0;
+ 
+-    private static final String[] COLUMNAS = {"ID", "Lab ID", "Cód. Inventario", "Equipo", "Marca", "Modelo", "Nº Serie", "Tipo", "Estado", "Observaciones"};
+-    private final DefaultTableModel modeloTabla = new DefaultTableModel(COLUMNAS, 0) {
+-        @Override
+-        public boolean isCellEditable(int fila, int columna) { return false; }
++    private static final String[] COLUMNAS = new String[]{
++            "ID", "Lab ID", "Cód. Inventario", "Equipo", "Marca", "Modelo", "Nº Serie", "Tipo", "Estado", "Observaciones"
+     };
+ 
+-    private List<EstadoEquipo> equiposMostrados = new ArrayList<>();
++    private final DefaultTableModel modeloTabla;
++    private List<EstadoEquipo> equiposMostrados;
+ 
+     public InventarioEquipo() {
+         super("SIGELAB - Inventario y Estado de Equipos");
++
++        this.modeloTabla = new DefaultTableModel(COLUMNAS, 0) {
++            @Override
++            public boolean isCellEditable(int fila, int columna) {
++                return false;
++            }
++        };
++        this.equiposMostrados = new ArrayList<>();
+         this.controller = new EstadoEquipoController();
+ 
++        PanelInventario = new JPanel(new BorderLayout(15, 15));
++        PanelInventario.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+         setContentPane(PanelInventario);
+-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+ 
++        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
++        setSize(1250, 700);
++        setMinimumSize(new Dimension(1000, 600));
++        setLocationRelativeTo(null);
++
++        construirInterfaz();
+         configurarFormulario();
+         configurarTabla();
+         cargarLaboratoriosEnCombo();
+         registrarEventos();
+         refrescarTabla();
+         limpiarFormulario();
++    }
++
++    private void construirInterfaz() {
++        JLabel lblTitulo = new JLabel("Control e Inventario de Equipos de Laboratorio", SwingConstants.LEFT);
++        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
++        lblTitulo.setForeground(new Color(15, 23, 42));
++        PanelInventario.add(lblTitulo, BorderLayout.NORTH);
++
++        JPanel panelCentro = new JPanel(new GridLayout(1, 2, 20, 0));
++
++        JPanel panelIzquierdo = new JPanel(new BorderLayout(0, 15));
++
++        JPanel panelFormulario = new JPanel(new GridBagLayout());
++        panelFormulario.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Datos del Equipo ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++
++        GridBagConstraints gbc = new GridBagConstraints();
++        gbc.insets = new Insets(6, 10, 6, 10);
++        gbc.fill = GridBagConstraints.HORIZONTAL;
++        gbc.anchor = GridBagConstraints.WEST;
++
++        textID = new JTextField();
++        textCodigoInventario = new JTextField();
++        textNombreEquipo = new JTextField();
++        textField1 = new JTextField();
++        textField2 = new JTextField();
++        textField3 = new JTextField();
++        comboBoxTipo = new JComboBox<>();
++        comboBoxLAB = new JComboBox<>();
++        comboBoxEstado = new JComboBox<>();
++
++        textObservaciones = new JTextArea(3, 20);
++        textObservaciones.setLineWrap(true);
++        textObservaciones.setWrapStyleWord(true);
++        JScrollPane scrollObs = new JScrollPane(textObservaciones);
++
++        int fila = 0;
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("ID:"), textID);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Laboratorio:"), comboBoxLAB);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Cód. Inventario:"), textCodigoInventario);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Nombre Equipo:"), textNombreEquipo);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Marca:"), textField1);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Modelo:"), textField2);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Nº Serie:"), textField3);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Tipo:"), comboBoxTipo);
++        agregarCampoFormulario(panelFormulario, gbc, fila++, new JLabel("Estado:"), comboBoxEstado);
++
++        gbc.gridx = 0; gbc.gridy = fila; gbc.weightx = 0.0;
++        panelFormulario.add(new JLabel("Observaciones:"), gbc);
++        gbc.gridx = 1; gbc.weightx = 1.0;
++        scrollObs.setPreferredSize(new Dimension(240, 60));
++        panelFormulario.add(scrollObs, gbc);
++
++        panelIzquierdo.add(panelFormulario, BorderLayout.CENTER);
+ 
+-        setSize(1150, 650);
+-        setLocationRelativeTo(null);
++        JPanel panelBotones = new JPanel(new GridLayout(3, 2, 8, 8));
++        panelBotones.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Acciones ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++
++        nuevoButton = new JButton("Nuevo");
++        guardarButton = new JButton("Guardar");
++        actualizarButton = new JButton("Actualizar");
++        limpiarButton = new JButton("Limpiar");
++        btnVerQR = new JButton("Ver Código QR");
++
++        estilizarBoton(nuevoButton, false);
++        estilizarBoton(guardarButton, true);
++        estilizarBoton(actualizarButton, false);
++        estilizarBoton(limpiarButton, false);
++        estilizarBoton(btnVerQR, false);
++
++        panelBotones.add(nuevoButton);
++        panelBotones.add(guardarButton);
++        panelBotones.add(actualizarButton);
++        panelBotones.add(limpiarButton);
++        panelBotones.add(btnVerQR);
++
++        panelIzquierdo.add(panelBotones, BorderLayout.SOUTH);
++        panelCentro.add(panelIzquierdo);
++
++        JPanel panelDerecho = new JPanel(new BorderLayout(0, 10));
++        panelDerecho.setBorder(BorderFactory.createTitledBorder(
++                BorderFactory.createLineBorder(new Color(203, 213, 225)),
++                " Equipos Registrados ",
++                0, 0, new Font("Segoe UI", Font.BOLD, 12), new Color(51, 65, 85)
++        ));
++
++        table1 = new JTable(modeloTabla);
++        table1.setRowHeight(28);
++        table1.setAutoCreateRowSorter(true);
++        table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
++        table1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
++
++        JScrollPane scrollTabla = new JScrollPane(table1);
++        panelDerecho.add(scrollTabla, BorderLayout.CENTER);
++
++        panelCentro.add(panelDerecho);
++        PanelInventario.add(panelCentro, BorderLayout.CENTER);
++
++        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
++        JButton btnCerrar = new JButton("Cerrar");
++        estilizarBoton(btnCerrar, false);
++        btnCerrar.addActionListener(e -> dispose());
++        panelInferior.add(btnCerrar);
++
++        PanelInventario.add(panelInferior, BorderLayout.SOUTH);
++    }
++
++    private void agregarCampoFormulario(JPanel panel, GridBagConstraints gbc, int fila, JLabel label, JComponent componente) {
++        gbc.gridx = 0; gbc.gridy = fila; gbc.weightx = 0.0;
++        panel.add(label, gbc);
++
++        gbc.gridx = 1; gbc.weightx = 1.0;
++        componente.setPreferredSize(new Dimension(240, 30));
++        panel.add(componente, gbc);
++    }
++
++    private void estilizarBoton(JButton boton, boolean esPrincipal) {
++        if (boton == null) return;
++        boton.putClientProperty("JButton.buttonType", "roundRect");
++        if (esPrincipal) {
++            boton.putClientProperty("FlatLaf.style", "background: #2563eb; foreground: #ffffff; font: bold; arc: 10");
++        } else {
++            boton.putClientProperty("FlatLaf.style", "arc: 10");
++        }
+     }
+ 
+     private void configurarFormulario() {
+-        if (textID != null) textID.setEditable(false);
+-        if (actualizarButton != null) actualizarButton.setEnabled(false);
++        if (this.textID != null) textID.setEditable(false);
++        if (this.actualizarButton != null) actualizarButton.setEnabled(false);
+ 
+-        if (comboBoxEstado != null) {
++        if (this.comboBoxEstado != null) {
+             comboBoxEstado.removeAllItems();
+             comboBoxEstado.addItem("DISPONIBLE");
+             comboBoxEstado.addItem("EN_USO");
+@@ -70,7 +220,7 @@
+             comboBoxEstado.addItem("DADO_DE_BAJA");
+         }
+ 
+-        if (comboBoxTipo != null) {
++        if (this.comboBoxTipo != null) {
+             comboBoxTipo.removeAllItems();
+             comboBoxTipo.addItem("Hardware");
+             comboBoxTipo.addItem("Multimedia");
+@@ -80,106 +230,161 @@
+     }
+ 
+     private void configurarTabla() {
+-        if (table1 != null) {
++        if (this.table1 != null) {
+             table1.setModel(modeloTabla);
+             table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+-            table1.getSelectionModel().addListSelectionListener(e -> {
++            table1.getSelectionModel().addListSelectionListener((e) -> {
+                 if (!e.getValueIsAdjusting()) seleccionarFila();
+             });
+         }
+     }
+ 
+     private void cargarLaboratoriosEnCombo() {
+-        if (comboBoxLAB == null) return;
+-        comboBoxLAB.removeAllItems();
+-        try {
+-            LaboratorioService labService = new LaboratorioService();
+-            List<Laboratorio> laboratorios = labService.obtenerLaboratorios();
+-            for (Laboratorio lab : laboratorios) {
+-                String etiqueta = lab.getCodigo() + " - " + lab.getNombre();
+-                comboBoxLAB.addItem(new ItemLaboratorio(lab.getId(), etiqueta));
+-            }
+-        } catch (Exception e) {
+-            JOptionPane.showMessageDialog(this, "Error al cargar laboratorios: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
++        if (this.comboBoxLAB != null) {
++            comboBoxLAB.removeAllItems();
++            try {
++                LaboratorioService labService = new LaboratorioService();
++                for (Laboratorio lab : labService.obtenerLaboratorios()) {
++                    String etiqueta = lab.getCodigo() + " - " + lab.getNombre();
++                    comboBoxLAB.addItem(new ItemLaboratorio(lab.getId(), etiqueta));
++                }
++            } catch (Exception e) {
++                JOptionPane.showMessageDialog(this, "Error al cargar laboratorios: " + e.getMessage(), "Error", 0);
++            }
+         }
+     }
+ 
+     private void registrarEventos() {
+-        if (nuevoButton != null) nuevoButton.addActionListener(e -> limpiarFormulario());
+-        if (guardarButton != null) guardarButton.addActionListener(e -> guardar());
+-        if (actualizarButton != null) actualizarButton.addActionListener(e -> actualizar());
+-        if (limpiarButton != null) limpiarButton.addActionListener(e -> limpiarFormulario());
++        if (nuevoButton != null) nuevoButton.addActionListener((e) -> limpiarFormulario());
++        if (guardarButton != null) guardarButton.addActionListener((e) -> guardar());
++        if (actualizarButton != null) actualizarButton.addActionListener((e) -> actualizar());
++        if (limpiarButton != null) limpiarButton.addActionListener((e) -> limpiarFormulario());
++        if (btnVerQR != null) btnVerQR.addActionListener(e -> mostrarCodigoQR());
++    }
++
++    // 📌 Método auxiliar para generar y guardar automáticamente el QR en la carpeta
++    private void generarYGuardarQrAutomatico(String codigoInventario) {
++        try {
++            BufferedImage imgQR = QrUtil.generarQR(codigoInventario, 220, 220);
++            if (imgQR != null) {
++                File carpeta = new File("qrs_inventario");
++                if (!carpeta.exists()) {
++                    carpeta.mkdir();
++                }
++                File archivoSalida = new File(carpeta, codigoInventario + ".png");
++                javax.imageio.ImageIO.write(imgQR, "png", archivoSalida);
++            }
++        } catch (Exception ex) {
++            ex.printStackTrace();
++        }
++    }
++
++    private void mostrarCodigoQR() {
++        if (equipoSeleccionado == null) {
++            JOptionPane.showMessageDialog(this, "Por favor, seleccione un equipo de la tabla para ver su código QR.", "SIGELAB - QR", JOptionPane.WARNING_MESSAGE);
++            return;
++        }
++
++        String textoCodigo = equipoSeleccionado.getCodigoInventario();
++        BufferedImage imgQR = QrUtil.generarQR(textoCodigo, 220, 220);
++
++        if (imgQR == null) {
++            JOptionPane.showMessageDialog(this, "No se pudo generar el código QR.", "Error", JOptionPane.ERROR_MESSAGE);
++            return;
++        }
++
++        // Asegurar que también esté guardado al visualizarlo
++        generarYGuardarQrAutomatico(textoCodigo);
++
++        JDialog dialogoQR = new JDialog(this, "Código QR - " + textoCodigo, true);
++        dialogoQR.setLayout(new BorderLayout(15, 15));
++        ((JPanel) dialogoQR.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
++
++        JLabel lblImagen = new JLabel(new ImageIcon(imgQR));
++        lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
++
++        JLabel lblInfo = new JLabel("<html><div style='text-align: center;'><b>Guardado automáticamente en 'qrs_inventario':</b><br>" +
++                equipoSeleccionado.getNombreEquipo() + "<br><span style='color: #2563eb; font-size: 14px;'><b>" + textoCodigo + "</b></span></div></html>", SwingConstants.CENTER);
++        lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
++
++        JButton btnCerrarQR = new JButton("Cerrar");
++        estilizarBoton(btnCerrarQR, false);
++        btnCerrarQR.addActionListener(e -> dialogoQR.dispose());
++
++        JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER));
++        panelSur.add(btnCerrarQR);
++
++        dialogoQR.add(lblInfo, BorderLayout.NORTH);
++        dialogoQR.add(lblImagen, BorderLayout.CENTER);
++        dialogoQR.add(panelSur, BorderLayout.SOUTH);
++
++        dialogoQR.setSize(340, 410);
++        dialogoQR.setLocationRelativeTo(this);
++        dialogoQR.setVisible(true);
+     }
+ 
+     private void refrescarTabla() {
+         try {
+             equiposMostrados = new ArrayList<>(controller.listar());
+             modeloTabla.setRowCount(0);
++
+             for (EstadoEquipo eq : equiposMostrados) {
+                 modeloTabla.addRow(new Object[]{
+-                        eq.getId(),
+-                        eq.getLaboratorioId(),
+-                        eq.getCodigoInventario(),
+-                        eq.getNombreEquipo(),
+-                        eq.getMarca(),
+-                        eq.getModelo(),
+-                        eq.getNumeroSerie(),
+-                        eq.getTipo(),
+-                        eq.getEstado(),
+-                        eq.getObservaciones()
++                        eq.getId(), eq.getLaboratorioId(), eq.getCodigoInventario(),
++                        eq.getNombreEquipo(), eq.getMarca(), eq.getModelo(),
++                        eq.getNumeroSerie(), eq.getTipo(), eq.getEstado(), eq.getObservaciones()
+                 });
+             }
+         } catch (Exception e) {
+-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
++            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", 0);
+         }
+     }
+ 
+     private void seleccionarFila() {
+-        if (table1 == null) return;
+-        int fila = table1.getSelectedRow();
+-        if (fila < 0 || fila >= equiposMostrados.size()) return;
+-
+-        equipoSeleccionado = equiposMostrados.get(table1.convertRowIndexToModel(fila));
+-        idSeleccionado = equipoSeleccionado.getId();
++        if (table1 != null) {
++            int fila = table1.getSelectedRow();
++            if (fila >= 0 && fila < equiposMostrados.size()) {
++                equipoSeleccionado = equiposMostrados.get(table1.convertRowIndexToModel(fila));
++                idSeleccionado = equipoSeleccionado.getId();
+ 
+-        if (textID != null) textID.setText(String.valueOf(equipoSeleccionado.getId()));
+-        if (textCodigoInventario != null) textCodigoInventario.setText(equipoSeleccionado.getCodigoInventario());
+-        if (textNombreEquipo != null) textNombreEquipo.setText(equipoSeleccionado.getNombreEquipo());
+-        if (textField1 != null) textField1.setText(equipoSeleccionado.getMarca());
+-        if (textField2 != null) textField2.setText(equipoSeleccionado.getModelo());
+-        if (textField3 != null) textField3.setText(equipoSeleccionado.getNumeroSerie());
+-        if (textObservaciones != null) textObservaciones.setText(equipoSeleccionado.getObservaciones());
+-        if (comboBoxEstado != null) comboBoxEstado.setSelectedItem(equipoSeleccionado.getEstado());
+-        if (comboBoxTipo != null) comboBoxTipo.setSelectedItem(equipoSeleccionado.getTipo());
++                if (textID != null) textID.setText(String.valueOf(equipoSeleccionado.getId()));
++                if (textCodigoInventario != null) textCodigoInventario.setText(equipoSeleccionado.getCodigoInventario());
++                if (textNombreEquipo != null) textNombreEquipo.setText(equipoSeleccionado.getNombreEquipo());
++                if (textField1 != null) textField1.setText(equipoSeleccionado.getMarca());
++                if (textField2 != null) textField2.setText(equipoSeleccionado.getModelo());
++                if (textField3 != null) textField3.setText(equipoSeleccionado.getNumeroSerie());
++                if (textObservaciones != null) textObservaciones.setText(equipoSeleccionado.getObservaciones());
++                if (comboBoxEstado != null) comboBoxEstado.setSelectedItem(equipoSeleccionado.getEstado());
++                if (comboBoxTipo != null) comboBoxTipo.setSelectedItem(equipoSeleccionado.getTipo());
+ 
+-        if (comboBoxLAB != null) {
+-            int labIdEquipo = equipoSeleccionado.getLaboratorioId();
+-            for (int i = 0; i < comboBoxLAB.getItemCount(); i++) {
+-                ItemLaboratorio item = comboBoxLAB.getItemAt(i);
+-                if (item.getId() == labIdEquipo) {
+-                    comboBoxLAB.setSelectedIndex(i);
+-                    break;
+-                }
+-            }
+-        }
++                if (comboBoxLAB != null) {
++                    int labIdEquipo = equipoSeleccionado.getLaboratorioId();
++                    for (int i = 0; i < comboBoxLAB.getItemCount(); ++i) {
++                        ItemLaboratorio item = comboBoxLAB.getItemAt(i);
++                        if (item.getId() == labIdEquipo) {
++                            comboBoxLAB.setSelectedIndex(i);
++                            break;
++                        }
++                    }
++                }
+ 
+-        if (guardarButton != null) guardarButton.setEnabled(false);
+-        if (actualizarButton != null) actualizarButton.setEnabled(true);
++                if (guardarButton != null) guardarButton.setEnabled(false);
++                if (actualizarButton != null) actualizarButton.setEnabled(true);
++            }
++        }
+     }
+ 
+     private void limpiarFormulario() {
+         idSeleccionado = 0;
+         equipoSeleccionado = null;
+         if (table1 != null) table1.clearSelection();
+-
+         if (textID != null) textID.setText("");
+ 
+-        // Sugiere código automático pero permite edición manual
+         if (textCodigoInventario != null) {
+             try {
+                 String siguienteCodigo = controller.generarSiguienteCodigo();
+                 textCodigoInventario.setText(siguienteCodigo);
+-            } catch (Exception e) {
++            } catch (Exception var2) {
+                 textCodigoInventario.setText("INV-001");
+             }
+         }
+@@ -189,6 +394,7 @@
+         if (textField2 != null) textField2.setText("");
+         if (textField3 != null) textField3.setText("");
+         if (textObservaciones != null) textObservaciones.setText("");
++
+         if (comboBoxLAB != null && comboBoxLAB.getItemCount() > 0) comboBoxLAB.setSelectedIndex(0);
+         if (comboBoxEstado != null) comboBoxEstado.setSelectedIndex(0);
+         if (comboBoxTipo != null && comboBoxTipo.getItemCount() > 0) comboBoxTipo.setSelectedIndex(0);
+@@ -202,7 +408,6 @@
+         try {
+             ItemLaboratorio labSeleccionado = comboBoxLAB != null ? (ItemLaboratorio) comboBoxLAB.getSelectedItem() : null;
+             int labId = labSeleccionado != null ? labSeleccionado.getId() : 0;
+-
+             String codigo = textCodigoInventario != null ? textCodigoInventario.getText().trim() : "";
+             String nombre = textNombreEquipo != null ? textNombreEquipo.getText().trim() : "";
+             String marca = textField1 != null ? textField1.getText().trim() : "";
+@@ -214,7 +419,11 @@
+ 
+             if (idSeleccionado == 0) {
+                 controller.crearEquipo(labId, codigo, nombre, marca, modelo, numeroSerie, tipo, estado, observaciones);
+-                JOptionPane.showMessageDialog(this, "Equipo registrado con éxito.", "Inventario", JOptionPane.INFORMATION_MESSAGE);
++
++                // 📌 Genera y guarda automáticamente la imagen QR en la carpeta al registrar
++                generarYGuardarQrAutomatico(codigo);
++
++                JOptionPane.showMessageDialog(this, "Equipo registrado con éxito y código QR generado en 'qrs_inventario'.", "Inventario", JOptionPane.INFORMATION_MESSAGE);
+             } else {
+                 equipoSeleccionado.setLaboratorioId(labId);
+                 equipoSeleccionado.setCodigoInventario(codigo);
+@@ -225,15 +434,17 @@
+                 equipoSeleccionado.setTipo(tipo);
+                 equipoSeleccionado.setEstado(estado);
+                 equipoSeleccionado.setObservaciones(observaciones);
+-
+                 controller.actualizar(equipoSeleccionado);
+-                JOptionPane.showMessageDialog(this, "Equipo actualizado con éxito.", "Inventario", JOptionPane.INFORMATION_MESSAGE);
++
++                // Actualizar o generar el QR por si cambió el código
++                generarYGuardarQrAutomatico(codigo);
++
++                JOptionPane.showMessageDialog(this, "Equipo actualizado con éxito y QR actualizado.", "Inventario", JOptionPane.INFORMATION_MESSAGE);
+             }
+ 
+             limpiarFormulario();
+             refrescarTabla();
+         } catch (Exception e) {
+-            // Muestra el mensaje de validación limpio en pantalla (cumpliendo con la rúbrica)
+             JOptionPane.showMessageDialog(this, e.getMessage(), "Error de Validación", JOptionPane.ERROR_MESSAGE);
+         }
+     }
+@@ -241,9 +452,9 @@
+     private void actualizar() {
+         if (idSeleccionado == 0) {
+             JOptionPane.showMessageDialog(this, "Seleccione un equipo de la tabla.", "Aviso", JOptionPane.WARNING_MESSAGE);
+-            return;
+-        }
+-        guardar();
++        } else {
++            guardar();
++        }
+     }
+ 
+     private static class ItemLaboratorio {
+@@ -255,9 +466,13 @@
+             this.nombre = nombre;
+         }
+ 
+-        public int getId() { return id; }
++        public int getId() {
++            return id;
++        }
+ 
+         @Override
+-        public String toString() { return nombre; }
++        public String toString() {
++            return nombre;
++        }
+     }
+ }
+\ No newline at end of file

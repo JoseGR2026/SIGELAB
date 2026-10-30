@@ -1,0 +1,356 @@
+Index: src/main/java/SIGELAB/view/LoginForm.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package SIGELAB.view;\r\n\r\nimport SIGELAB.controller.UsuarioController;\r\nimport SIGELAB.integration.facial.FacialAuthClient;\r\nimport SIGELAB.integration.facial.FacialClientException;\r\nimport SIGELAB.integration.facial.FacialVerificationResult;\r\nimport SIGELAB.model.Usuario;\r\n\r\nimport javax.swing.*;\r\nimport java.util.Optional;\r\nimport java.util.concurrent.ExecutionException;\r\n\r\n/** Pantalla de entrada al sistema. */\r\npublic class LoginForm {\r\n\r\n    private JPanel panelPrincipal;\r\n    private JTextField txtUsuario;\r\n    private JPasswordField txtPassword;\r\n    private JButton btnIngresar;\r\n    private JButton btnSalir;\r\n\r\n    private final UsuarioController usuarioController;\r\n    private final FacialAuthClient facialAuthClient;\r\n    private boolean autenticando;\r\n\r\n    public LoginForm() {\r\n        this(new UsuarioController(), new FacialAuthClient());\r\n    }\r\n\r\n    public LoginForm(UsuarioController usuarioController) {\r\n        this(usuarioController, new FacialAuthClient());\r\n    }\r\n\r\n    public LoginForm(UsuarioController usuarioController, FacialAuthClient facialAuthClient) {\r\n        this.usuarioController = usuarioController;\r\n        this.facialAuthClient = facialAuthClient;\r\n        configurarEventos();\r\n    }\r\n\r\n    private void configurarEventos() {\r\n        btnIngresar.addActionListener(e -> ingresar());\r\n        btnSalir.addActionListener(e -> System.exit(0));\r\n        txtPassword.addActionListener(e -> ingresar());\r\n    }\r\n\r\n    private void ingresar() {\r\n        if (autenticando) return;\r\n        String usuario = txtUsuario.getText().trim();\r\n        String password = new String(txtPassword.getPassword());\r\n\r\n        if (usuario.isBlank()) {\r\n            mostrarError(\"Ingrese el usuario.\");\r\n            txtUsuario.requestFocus();\r\n            return;\r\n        }\r\n        if (password.isBlank()) {\r\n            mostrarError(\"Ingrese la contraseña.\");\r\n            txtPassword.requestFocus();\r\n            return;\r\n        }\r\n\r\n        autenticando = true;\r\n        btnIngresar.setEnabled(false);\r\n        btnIngresar.setText(\"Verificando identidad...\");\r\n\r\n        new SwingWorker<LoginOutcome, Void>() {\r\n            @Override\r\n            protected LoginOutcome doInBackground() {\r\n                Optional<Usuario> autenticado = usuarioController.autenticar(usuario, password);\r\n                if (autenticado.isEmpty()) return LoginOutcome.sinCredenciales();\r\n                // El password nunca sale de Java. Python recibe solamente el id estable.\r\n                FacialVerificationResult facial = facialAuthClient.verify(autenticado.get().getIdUsuario());\r\n                return new LoginOutcome(autenticado.get(), facial);\r\n            }\r\n\r\n            @Override\r\n            protected void done() {\r\n                try {\r\n                    LoginOutcome outcome = get();\r\n                    if (outcome.credencialesInvalidas()) {\r\n                        mostrarError(\"Usuario o contraseña incorrectos, o usuario inactivo.\");\r\n                        txtPassword.selectAll();\r\n                        txtPassword.requestFocus();\r\n                    } else if (!outcome.facial().matched()) {\r\n                        mostrarError(outcome.facial().message());\r\n                        txtPassword.selectAll();\r\n                        txtPassword.requestFocus();\r\n                    } else {\r\n                        abrirMenu(outcome.usuario());\r\n                    }\r\n                } catch (InterruptedException e) {\r\n                    Thread.currentThread().interrupt();\r\n                    mostrarError(\"La verificación facial fue interrumpida.\");\r\n                } catch (ExecutionException e) {\r\n                    Throwable cause = e.getCause();\r\n                    if (cause instanceof FacialClientException facialError) {\r\n                        mostrarError(facialError.getMessage());\r\n                    } else if (cause instanceof RuntimeException runtimeError) {\r\n                        mostrarError(runtimeError.getMessage());\r\n                    } else {\r\n                        mostrarError(\"No fue posible completar la autenticación.\");\r\n                    }\r\n                } finally {\r\n                    autenticando = false;\r\n                    btnIngresar.setEnabled(true);\r\n                    btnIngresar.setText(\"INGRESAR\");\r\n                }\r\n            }\r\n        }.execute();\r\n    }\r\n\r\n    private void abrirMenu(Usuario usuario) {\r\n        java.awt.Window ventanaActual = SwingUtilities.getWindowAncestor(panelPrincipal);\r\n        if (ventanaActual != null) ventanaActual.dispose();\r\n\r\n        MainForm mainForm = new MainForm(usuario);\r\n        JFrame ventana = new JFrame(\"Sistema de Asistencia Universitaria\");\r\n        ventana.setContentPane(mainForm.getPanelPrincipal());\r\n        ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\r\n        ventana.setSize(750, 650);\r\n        ventana.setLocationRelativeTo(null);\r\n        ventana.setResizable(false);\r\n        ventana.setVisible(true);\r\n    }\r\n\r\n    private void mostrarError(String mensaje) {\r\n        if (mensaje == null || mensaje.isBlank()) mensaje = \"Ocurrió un error inesperado.\";\r\n        JOptionPane.showMessageDialog(panelPrincipal, mensaje, \"Inicio de sesión\", JOptionPane.ERROR_MESSAGE);\r\n    }\r\n\r\n    public JPanel getPanelPrincipal() {\r\n        return panelPrincipal;\r\n    }\r\n\r\n    private record LoginOutcome(Usuario usuario, FacialVerificationResult facial,\r\n                                boolean credencialesInvalidas) {\r\n        private LoginOutcome(Usuario usuario, FacialVerificationResult facial) {\r\n            this(usuario, facial, false);\r\n        }\r\n\r\n        private static LoginOutcome sinCredenciales() {\r\n            return new LoginOutcome(null, null, true);\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/SIGELAB/view/LoginForm.java b/src/main/java/SIGELAB/view/LoginForm.java
+--- a/src/main/java/SIGELAB/view/LoginForm.java	(revision c8696a12799f63a60a12a5cbb492915d99b26d1a)
++++ b/src/main/java/SIGELAB/view/LoginForm.java	(date 1793308249681)
+@@ -23,6 +23,10 @@
+     private final FacialAuthClient facialAuthClient;
+     private boolean autenticando;
+ 
++    // 🛠️ Cambia a 'true' para saltarte el reconocimiento facial mientras pruebas el sistema localmente.
++    // Cambia a 'false' cuando ya quieras probar el reconocimiento facial real con tus compañeros.
++    private static final boolean OMITIR_FACIAL_EN_PRUEBAS = true;
++
+     public LoginForm() {
+         this(new UsuarioController(), new FacialAuthClient());
+     }
+@@ -68,8 +72,17 @@
+             protected LoginOutcome doInBackground() {
+                 Optional<Usuario> autenticado = usuarioController.autenticar(usuario, password);
+                 if (autenticado.isEmpty()) return LoginOutcome.sinCredenciales();
+-                // El password nunca sale de Java. Python recibe solamente el id estable.
+-                FacialVerificationResult facial = facialAuthClient.verify(autenticado.get().getIdUsuario());
++
++                FacialVerificationResult facial;
++
++                if (OMITIR_FACIAL_EN_PRUEBAS) {
++                    // Pasamos los 8 argumentos que exige el record para simular un éxito completo
++                    facial = new FacialVerificationResult(true, true, 0, null, 0.0, true, 0, "Omitido por modo de pruebas locales.");
++                } else {
++                    // El password nunca sale de Java. Python recibe solamente el id estable.
++                    facial = facialAuthClient.verify(autenticado.get().getIdUsuario());
++                }
++
+                 return new LoginOutcome(autenticado.get(), facial);
+             }
+ 
+@@ -142,4 +155,4 @@
+             return new LoginOutcome(null, null, true);
+         }
+     }
+-}
++}
+\ No newline at end of file
+Index: src/main/java/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/Main.java b/src/main/java/SIGELAB/Main.java
+rename from src/main/java/Main.java
+rename to src/main/java/SIGELAB/Main.java
+--- a/src/main/java/Main.java	(revision c8696a12799f63a60a12a5cbb492915d99b26d1a)
++++ b/src/main/java/SIGELAB/Main.java	(date 1793308238762)
+@@ -1,17 +1,17 @@
+-
++package  SIGELAB;
+ import SIGELAB.controller.UsuarioController;
+ import SIGELAB.enums.RolUsuario;
+ import SIGELAB.view.LoginForm;
+ 
+ import javax.swing.*;
+ 
+-public class  Main {
++public class Main {
+ 
+     public static void main(String[] args) {
+ 
+         SwingUtilities.invokeLater(() -> {
+             asegurarUsuarioAdministrador();
+-            iniciarServicioFacialAutomatico();
++           iniciarServicioFacialAutomatico();
+ 
+             LoginForm loginForm = new LoginForm();
+             JFrame frame = new JFrame("Sistema de Gestión y Control de Laboratorios");
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"6abf13f1-1c91-4279-a683-611eab2b9601\" name=\"Changes\" comment=\"Equipos en mantenimiento completos con modificaciones claras\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/facial-service/.env\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/facial-service/.env\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/Main.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/Main.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"DatabaseLocalColorSettings\">\r\n    <colors>\r\n      <entry key=\"8e8c47e9-98bb-40f6-91c7-3bd61bf7dd94\" value=\"\" />\r\n    </colors>\r\n  </component>\r\n  <component name=\"EmbeddingIndexingInfo\">\r\n    <option name=\"cachedIndexableFilesCount\" value=\"23350\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Enum\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;JoseGR2026&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/JoseGR2026/SIGELAB.git&quot;,\r\n    &quot;accountId&quot;: &quot;1cbb66e6-6659-45c6-9be4-fca5381b3831&quot;\r\n  }\r\n}</component>\r\n  <component name=\"McpProjectServerCommands\">\r\n    <commands />\r\n    <urls />\r\n  </component>\r\n  <component name=\"NextEditCompletionFeaturesState\">\r\n    <decayedCancelled>\r\n      <entry key=\"MS100\" value=\"1.0\" />\r\n      <entry key=\"MS500\" value=\"1.000000000031716\" />\r\n      <entry key=\"S2\" value=\"1.0023731187341895\" />\r\n      <entry key=\"S5\" value=\"1.0891513219039022\" />\r\n      <entry key=\"S10\" value=\"1.2985821983011414\" />\r\n      <entry key=\"S30\" value=\"1.6720221525281596\" />\r\n      <entry key=\"S60\" value=\"1.9038208950770898\" />\r\n      <entry key=\"M2\" value=\"2.4733649064949166\" />\r\n      <entry key=\"M5\" value=\"7.2395601721772875\" />\r\n      <entry key=\"M10\" value=\"17.59480106863734\" />\r\n      <entry key=\"M15\" value=\"25.255045828588493\" />\r\n      <entry key=\"M30\" value=\"38.062672001366614\" />\r\n      <entry key=\"H1\" value=\"50.364091886040434\" />\r\n      <entry key=\"H2\" value=\"62.8511774677199\" />\r\n      <entry key=\"H4\" value=\"79.1168661891103\" />\r\n      <entry key=\"D1\" value=\"171.32463445962583\" />\r\n      <entry key=\"W1\" value=\"237.10117676416624\" />\r\n    </decayedCancelled>\r\n    <decayedSelected>\r\n      <entry key=\"MS100\" value=\"0.0\" />\r\n      <entry key=\"MS500\" value=\"0.0\" />\r\n      <entry key=\"S2\" value=\"9.21508318050791E-202\" />\r\n      <entry key=\"S5\" value=\"3.8986141970219566E-81\" />\r\n      <entry key=\"S10\" value=\"6.88275117603511E-41\" />\r\n      <entry key=\"S30\" value=\"5.849790248201344E-14\" />\r\n      <entry key=\"S60\" value=\"3.3647351974646425E-7\" />\r\n      <entry key=\"M2\" value=\"8.168722001696626E-4\" />\r\n      <entry key=\"M5\" value=\"0.08811220388087976\" />\r\n      <entry key=\"M10\" value=\"0.42026414494127246\" />\r\n      <entry key=\"M15\" value=\"0.7157660292129189\" />\r\n      <entry key=\"M30\" value=\"1.3603521811814994\" />\r\n      <entry key=\"H1\" value=\"2.3173413876954307\" />\r\n      <entry key=\"H2\" value=\"3.6032009707903168\" />\r\n      <entry key=\"H4\" value=\"6.15445617566936\" />\r\n      <entry key=\"D1\" value=\"25.21467998325993\" />\r\n      <entry key=\"W1\" value=\"39.51006774395389\" />\r\n    </decayedSelected>\r\n    <decayedShown>\r\n      <entry key=\"MS100\" value=\"2.7010056621928164E-7\" />\r\n      <entry key=\"MS500\" value=\"0.0485629543045479\" />\r\n      <entry key=\"S2\" value=\"0.47097039029184246\" />\r\n      <entry key=\"S5\" value=\"0.8138602314922758\" />\r\n      <entry key=\"S10\" value=\"1.1332866049430093\" />\r\n      <entry key=\"S30\" value=\"1.6036477142953123\" />\r\n      <entry key=\"S60\" value=\"1.8664050126465295\" />\r\n      <entry key=\"M2\" value=\"2.453073129418022\" />\r\n      <entry key=\"M5\" value=\"7.31522779359808\" />\r\n      <entry key=\"M10\" value=\"18.005373700567553\" />\r\n      <entry key=\"M15\" value=\"25.96273566106312\" />\r\n      <entry key=\"M30\" value=\"39.41755175855744\" />\r\n      <entry key=\"H1\" value=\"52.67784079261957\" />\r\n      <entry key=\"H2\" value=\"66.45205687103181\" />\r\n      <entry key=\"H4\" value=\"85.26962943741137\" />\r\n      <entry key=\"D1\" value=\"196.53829250628334\" />\r\n      <entry key=\"W1\" value=\"276.6110212082611\" />\r\n    </decayedShown>\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 1,\r\n  &quot;fromUser&quot;: false\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3Kw5gqSVOr5nj51btK5G8FGfGHk\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;Application.Main.executor&quot;: &quot;Run&quot;,\r\n    &quot;Downloaded.Files.Path&quot;: &quot;C:\\\\Users\\\\Jose Gonzalez\\\\CLionProjects\\\\SIGELAB&quot;,\r\n    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;true&quot;,\r\n    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,\r\n    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,\r\n    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,\r\n    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,\r\n    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,\r\n    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;UI_DESIGNER_EDITOR_MODE.PaletteManager.SHOW&quot;: &quot;true&quot;,\r\n    &quot;UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW&quot;: &quot;true&quot;,\r\n    &quot;UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH&quot;: &quot;308&quot;,\r\n    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;master&quot;,\r\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/Jose Gonzalez/CLionProjects/SIGELAB&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.jshint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.jshint&quot;: &quot;&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/Jose Gonzalez/CLionProjects/SIGELAB/src/Main.java&quot;,\r\n    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,\r\n    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,\r\n    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;\r\n  },\r\n  &quot;keyToStringList&quot;: {\r\n    &quot;DatabaseDriversLRU&quot;: [\r\n      &quot;sqlserver.localdb&quot;\r\n    ]\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\Jose Gonzalez\\OneDrive\\Escritorio\\Tareas UMG\\Cuarto semestre\\SIGELAB\\src\\main\\java\\SIGELAB\\view\" />\r\n      <recent name=\"C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB\\src\\main\\java\\SIGELAB\\view\" />\r\n      <recent name=\"C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB\\src\\main\\java\\SIGELAB\\util\" />\r\n      <recent name=\"C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB\" />\r\n      <recent name=\"C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB\\facial-service\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB\\src\\main\\java\" />\r\n    </key>\r\n    <key name=\"MoveClassesOrPackagesDialog.RECENTS_KEY\">\r\n      <recent name=\"\" />\r\n    </key>\r\n    <key name=\"CopyClassDialog.RECENTS_KEY\">\r\n      <recent name=\"SIGELAB.model\" />\r\n      <recent name=\"SIGELAB.controller\" />\r\n      <recent name=\"SIGELAB.service\" />\r\n      <recent name=\"SIGELAB.repository\" />\r\n      <recent name=\"SIGELAB.enums\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"001_create_facial_tables.sql\" type=\"DatabaseScript\" editBeforeRun=\"true\" nameIsGenerated=\"true\">\r\n      <script-file value=\"$PROJECT_DIR$/facial-service/sql/001_create_facial_tables.sql\" />\r\n      <script-mode>FILE</script-mode>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10968.63\" />\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10968.63\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"6abf13f1-1c91-4279-a683-611eab2b9601\" name=\"Changes\" comment=\"\" />\r\n      <created>1792455904632</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1792455904632</updated>\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"Actualizacion base de datos del perfil facial y creacion de usuario view como tambien la creacion de usuaios nuevos\" />\r\n    <MESSAGE value=\"registro de usuarios completo\" />\r\n    <MESSAGE value=\"Catalogo de laboratiorios completo con view y reglas\" />\r\n    <MESSAGE value=\"Equipos en mantenimiento completos con modificaciones claras\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Equipos en mantenimiento completos con modificaciones claras\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision c8696a12799f63a60a12a5cbb492915d99b26d1a)
++++ b/.idea/workspace.xml	(date 1793308368299)
+@@ -5,12 +5,61 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="6abf13f1-1c91-4279-a683-611eab2b9601" name="Changes" comment="Equipos en mantenimiento completos con modificaciones claras">
++      <change beforePath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/facial-service/.env" beforeDir="false" afterPath="$PROJECT_DIR$/facial-service/.env" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/repository/EstadoEquipoRepository.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/service/EstadoEquipoService.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/InventarioEquipo.form" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/Main.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/LoginForm.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/SIGELAB/view/MainForm.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/Main.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/config/DatabaseConnection.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/EstadoEquipoController.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/LaboratorioController.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/controller/UsuarioController.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/enums/EstadoEquipo.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/enums/RolUsuario.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialAuthClient.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialClientException.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialEnrollmentResult.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialStatus.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/integration/facial/FacialVerificationResult.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/EstadoEquipo.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/Laboratorio.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/model/Usuario.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/EstadoEquipoRepository.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/LaboratorioRepository.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/repository/UsuarioRepository.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/EstadoEquipoService.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/LaboratorioService.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/service/UsuarioService.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/BusinessException.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/DataAccessException.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/DateUtils.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/util/JdbcSupport.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/CatalogoLaboratorios$1.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/CatalogoLaboratorios.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo$1.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo$ItemLaboratorio.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/InventarioEquipo.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm$1.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm$LoginOutcome.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/LoginForm.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/MainForm.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$1.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$2.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$3.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView$4.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/SIGELAB/view/UsuarioView.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/AbstractLayout.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/DimensionInfo.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/GridConstraints.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/GridLayoutManager.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/HorizontalInfo.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/LayoutState.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/Spacer.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/SupportCode$TextWithMnemonic.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/SupportCode.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/Util.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/target/classes/com/intellij/uiDesigner/core/VerticalInfo.class" beforeDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -34,6 +83,11 @@
+     </option>
+   </component>
+   <component name="Git.Settings">
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="master" />
++      </map>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+   <component name="GitHubPullRequestSearchHistory">{
+@@ -42,12 +96,13 @@
+     &quot;assignee&quot;: &quot;JoseGR2026&quot;
+   }
+ }</component>
+-  <component name="GithubPullRequestsUISettings">{
+-  &quot;selectedUrlAndAccountId&quot;: {
+-    &quot;url&quot;: &quot;https://github.com/JoseGR2026/SIGELAB.git&quot;,
+-    &quot;accountId&quot;: &quot;1cbb66e6-6659-45c6-9be4-fca5381b3831&quot;
+-  }
+-}</component>
++  <component name="GithubPullRequestsUISettings"><![CDATA[{
++  "selectedUrlAndAccountId": {
++    "url": "https://github.com/JoseGR2026/SIGELAB.git",
++    "accountId": "1cbb66e6-6659-45c6-9be4-fca5381b3831"
++  },
++  "highlightDiffLinesInEditor": true
++}]]></component>
+   <component name="McpProjectServerCommands">
+     <commands />
+     <urls />
+@@ -55,60 +110,60 @@
+   <component name="NextEditCompletionFeaturesState">
+     <decayedCancelled>
+       <entry key="MS100" value="1.0" />
+-      <entry key="MS500" value="1.000000000031716" />
+-      <entry key="S2" value="1.0023731187341895" />
+-      <entry key="S5" value="1.0891513219039022" />
+-      <entry key="S10" value="1.2985821983011414" />
+-      <entry key="S30" value="1.6720221525281596" />
+-      <entry key="S60" value="1.9038208950770898" />
+-      <entry key="M2" value="2.4733649064949166" />
+-      <entry key="M5" value="7.2395601721772875" />
+-      <entry key="M10" value="17.59480106863734" />
+-      <entry key="M15" value="25.255045828588493" />
+-      <entry key="M30" value="38.062672001366614" />
+-      <entry key="H1" value="50.364091886040434" />
+-      <entry key="H2" value="62.8511774677199" />
+-      <entry key="H4" value="79.1168661891103" />
+-      <entry key="D1" value="171.32463445962583" />
+-      <entry key="W1" value="237.10117676416624" />
++      <entry key="MS500" value="1.0" />
++      <entry key="S2" value="1.0" />
++      <entry key="S5" value="1.0" />
++      <entry key="S10" value="1.0000000000012739" />
++      <entry key="S30" value="1.0001344764777973" />
++      <entry key="S60" value="1.0155444928078312" />
++      <entry key="M2" value="1.1739393198921357" />
++      <entry key="M5" value="2.060226275109731" />
++      <entry key="M10" value="6.133095012261337" />
++      <entry key="M15" value="12.347816330865069" />
++      <entry key="M30" value="31.267889845114013" />
++      <entry key="H1" value="56.63765774326317" />
++      <entry key="H2" value="82.23153101007992" />
++      <entry key="H4" value="107.88785577061533" />
++      <entry key="D1" value="210.93569440044726" />
++      <entry key="W1" value="281.0635442300252" />
+     </decayedCancelled>
+     <decayedSelected>
+       <entry key="MS100" value="0.0" />
+       <entry key="MS500" value="0.0" />
+-      <entry key="S2" value="9.21508318050791E-202" />
+-      <entry key="S5" value="3.8986141970219566E-81" />
+-      <entry key="S10" value="6.88275117603511E-41" />
+-      <entry key="S30" value="5.849790248201344E-14" />
+-      <entry key="S60" value="3.3647351974646425E-7" />
+-      <entry key="M2" value="8.168722001696626E-4" />
+-      <entry key="M5" value="0.08811220388087976" />
+-      <entry key="M10" value="0.42026414494127246" />
+-      <entry key="M15" value="0.7157660292129189" />
+-      <entry key="M30" value="1.3603521811814994" />
+-      <entry key="H1" value="2.3173413876954307" />
+-      <entry key="H2" value="3.6032009707903168" />
+-      <entry key="H4" value="6.15445617566936" />
+-      <entry key="D1" value="25.21467998325993" />
+-      <entry key="W1" value="39.51006774395389" />
++      <entry key="S2" value="0.0" />
++      <entry key="S5" value="6.763928357948557E-141" />
++      <entry key="S10" value="8.224310523046028E-71" />
++      <entry key="S30" value="4.348770608332193E-24" />
++      <entry key="S60" value="2.0853706165426768E-12" />
++      <entry key="M2" value="1.4440831102235712E-6" />
++      <entry key="M5" value="0.0046422934748145345" />
++      <entry key="M10" value="0.07577170510225066" />
++      <entry key="M15" value="0.21689752171417948" />
++      <entry key="M30" value="0.7691357101852142" />
++      <entry key="H1" value="1.8327526047901481" />
++      <entry key="H2" value="3.3856284132457812" />
++      <entry key="H4" value="6.108272133638187" />
++      <entry key="D1" value="25.50905546227943" />
++      <entry key="W1" value="40.3517642528154" />
+     </decayedSelected>
+     <decayedShown>
+-      <entry key="MS100" value="2.7010056621928164E-7" />
+-      <entry key="MS500" value="0.0485629543045479" />
+-      <entry key="S2" value="0.47097039029184246" />
+-      <entry key="S5" value="0.8138602314922758" />
+-      <entry key="S10" value="1.1332866049430093" />
+-      <entry key="S30" value="1.6036477142953123" />
+-      <entry key="S60" value="1.8664050126465295" />
+-      <entry key="M2" value="2.453073129418022" />
+-      <entry key="M5" value="7.31522779359808" />
+-      <entry key="M10" value="18.005373700567553" />
+-      <entry key="M15" value="25.96273566106312" />
+-      <entry key="M30" value="39.41755175855744" />
+-      <entry key="H1" value="52.67784079261957" />
+-      <entry key="H2" value="66.45205687103181" />
+-      <entry key="H4" value="85.26962943741137" />
+-      <entry key="D1" value="196.53829250628334" />
+-      <entry key="W1" value="276.6110212082611" />
++      <entry key="MS100" value="0.00579892019776972" />
++      <entry key="MS500" value="0.357000994921266" />
++      <entry key="S2" value="0.7729783971291766" />
++      <entry key="S5" value="0.9021254660004498" />
++      <entry key="S10" value="0.9498028563879063" />
++      <entry key="S30" value="0.9831099867039484" />
++      <entry key="S60" value="1.0067879342419304" />
++      <entry key="M2" value="1.1685720749154196" />
++      <entry key="M5" value="2.0613371733472947" />
++      <entry key="M10" value="6.206192315185981" />
++      <entry key="M15" value="12.562131241729018" />
++      <entry key="M30" value="32.034247506548" />
++      <entry key="H1" value="58.46776581497747" />
++      <entry key="H2" value="85.61505336620877" />
++      <entry key="H4" value="113.9944614648872" />
++      <entry key="D1" value="236.44371521939743" />
++      <entry key="W1" value="321.4150802210822" />
+     </decayedShown>
+   </component>
+   <component name="ProblemsViewState">
+@@ -119,6 +174,9 @@
+   &quot;fromUser&quot;: false
+ }</component>
+   <component name="ProjectId" id="3Kw5gqSVOr5nj51btK5G8FGfGHk" />
++  <component name="ProjectLevelVcsManager">
++    <ConfirmationsSetting value="2" id="Add" />
++  </component>
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+@@ -127,6 +185,8 @@
+   &quot;keyToString&quot;: {
+     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
++    &quot;Application.Unnamed.executor&quot;: &quot;Run&quot;,
++    &quot;Application.main.executor&quot;: &quot;Run&quot;,
+     &quot;Downloaded.Files.Path&quot;: &quot;C:\\Users\\Jose Gonzalez\\CLionProjects\\SIGELAB&quot;,
+     &quot;Downloaded.Files.Path.Enabled&quot;: &quot;true&quot;,
+     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+@@ -142,7 +202,9 @@
+     &quot;UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.SHOW&quot;: &quot;true&quot;,
+     &quot;UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH&quot;: &quot;308&quot;,
+     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
++    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;#1 on feature/prestamos-devoluciones&quot;,
++    &quot;git.auto.fetch.suggestion.counter&quot;: &quot;1&quot;,
+     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+     &quot;last_opened_file_path&quot;: &quot;C:/Users/Jose Gonzalez/CLionProjects/SIGELAB&quot;,
+     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+@@ -186,11 +248,24 @@
+     </key>
+   </component>
+   <component name="RunManager">
+-    <configuration name="001_create_facial_tables.sql" type="DatabaseScript" editBeforeRun="true" nameIsGenerated="true">
+-      <script-file value="$PROJECT_DIR$/facial-service/sql/001_create_facial_tables.sql" />
+-      <script-mode>FILE</script-mode>
+-      <method v="2" />
++    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
++      <option name="MAIN_CLASS_NAME" value="SIGELAB.Main" />
++      <module name="SIGELAB" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="SIGELAB.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
+     </configuration>
++    <recent_temporary>
++      <list>
++        <item itemvalue="Application.Main" />
++      </list>
++    </recent_temporary>
+   </component>
+   <component name="SharedIndexes">
+     <attachedChunks>
