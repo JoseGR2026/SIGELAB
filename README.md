@@ -1,81 +1,103 @@
 # SIGELAB - Sistema de Gestión y Control de Laboratorios Universitarios
 
 **Universidad Mariano Gálvez de Guatemala**  
+**Facultad de Ingeniería en Sistemas**  
 **Curso:** 017 - Programación II  
 **Catedrático:** Ing. Alejandro Díaz  
 **Ciclo:** Segundo Semestre 2026  
 
 ---
 
-## 📋 Descripción del Proyecto
-**SIGELAB** es una aplicación de escritorio desarrollada en **Java Swing** bajo una estricta arquitectura por capas (`View` -> `Controller` -> `Service` -> `Repository` -> `JDBC`), con persistencia en **Microsoft SQL Server**. El sistema está diseñado para administrar de forma íntegra el ciclo de vida de los activos tecnológicos en laboratorios universitarios, abarcando inventario, códigos QR, préstamos con múltiples equipos, devoluciones parciales/totales, control de taller y mantenimiento, auditoría institucional y un sistema de autenticación de doble factor mediante **reconocimiento facial (Python + OpenCV)**.
+## 👥 1. Nombre del Proyecto e Integrantes
+* **Nombre del Proyecto:** Sistema de Gestión y Control de Laboratorios Universitarios (SIGELAB)
+* Integrantes del Grupo:
+* JOSÉ ANTONIO GONZALEZ REYES -------------------------3590-25-4454
+* DERECK ABRAHAM CARRANZA ACIFUINA----------------3590-25-760
+* JEREMY ALEXANDER PAIZ CASTILLO----------------------3590-25-13128
+* EVI MERARI ELIZABETH SEQUÉN JIMÉNEZ -------------3590-25-3900
 
 ---
 
-## 🚀 Características Principales y Reglas de Negocio
-
-1. **Autenticación y Seguridad Biométrica:**
-   * Inicio de sesión validando credenciales de usuario, contraseña y estado activo (`RN-01`).
-   * Segundo factor obligatorio de **reconocimiento facial** consumiendo un script local de Python con OpenCV (`RN-02`).
-2. **Control de Accesos por Roles:**
-   * **Administrador:** Acceso completo a todo el sistema (usuarios, catálogos, equipos, préstamos, devoluciones, mantenimiento, auditoría y reportes).
-   * **Encargado:** Operación restringida a inventario, préstamos, devoluciones, mantenimiento y consultas (con avisos automáticos para funciones de nivel superior).
-3. **Gestión de Equipos y Estados:**
-   * Control estricto de 5 estados obligatorios: `DISPONIBLE`, `PRESTADO`, `DAÑADO`, `MANTENIMIENTO` y `DADO_DE_BAJA` (`RN-08`).
-   * Identificación rápida de equipos mediante códigos **QR** generados con la librería ZXing (`RN-19`).
-4. **Préstamos y Devoluciones:**
-   * Registro de préstamos de uno o varios equipos mediante encabezado y tabla de detalle (`RN-05`, `RN-06`).
-   * Cambio automático de estados: al prestar un equipo pasa a `PRESTADO` (`RN-09`); al devolverlo en buen estado regresa a `DISPONIBLE` (`RN-12`) o `DAÑADO` si presenta averías (`RN-13`).
-   * Devoluciones parciales y seguimiento de préstamos vencidos (`RN-16`, `RN-17`).
-5. **Mantenimiento y Auditoría:**
-   * Envío de equipos dañados a taller para mantenimiento preventivo o correctivo (`RN-14`).
-   * Cierre de mantenimiento con transición automática a `DISPONIBLE` (si fue reparado) o `BAJA` (si es irreparable) (`RN-15`).
-   * Registro transversal de auditoría y eventos biométricos en base de datos (`RN-18`).
+## 💻 2. Versiones Requeridas de Java y SQL Server
+* **Java:** JDK 17 o superior (Se recomienda OpenJDK 17 o Temurin).
+* **Base de Datos:** Microsoft SQL Server (Versión 2019 o superior, compatible con SQL Server Express).
 
 ---
 
-## 🛠️ Tecnologías y Arquitectura
-
-* **Lenguaje Principal:** Java (JDK 17+)
-* **Interfaz Gráfica:** Java Swing (con FlatLaf para diseño moderno)
-* **Base de Datos:** Microsoft SQL Server (JDBC)
-* **Gestión de Dependencias:** Maven (`pom.xml`)
-* **Control de Versiones:** Git / GitHub (con commits incrementales y trazables)
-* **Librerías Externas:** 
-  * `ZXing` (Google) para generación y lectura de códigos QR.
-  * `JCalendar` para control de fechas de devolución.
-  * `Python + OpenCV` para el subsistema de reconocimiento facial local.
+## 📦 3. Dependencias Externas Necesarias (`pom.xml`)
+El proyecto gestiona sus dependencias mediante **Maven**. Las librerías externas integradas obligatoriamente son:
+* **Conector JDBC para SQL Server:** `com.microsoft.sqlserver:mssql-jdbc`
+* **Librería para Códigos QR:** `com.google.zxing:core` y `com.google.zxing:javase`
+* **Control de Fechas (Calendarios):** `com.toedter:jcalendar`
+* **Interfaz Gráfica (Look and Feel Moderno):** `com.formdev:flatlaf`
+* **Visión Artificial / Biometría:** Python 3.x con OpenCV (`opencv-python`) para el componente facial.
 
 ---
 
-## 📂 Estructura del Proyecto (Arquitectura Limpia)
-
-* `SIGELAB.config`: Configuración de la conexión a SQL Server (`DatabaseConnection`).
-* `SIGELAB.controller`: Coordinación de acciones entre vistas y servicios.
-* `SIGELAB.model`: Clases de entidad (Modelos y Enums como `EstadoEquipo` y `RolUsuario`).
-* `SIGELAB.repository`: Consultas SQL directas y transaccionales.
-* `SIGELAB.service`: Lógica de negocio y validaciones estrictas independientes de la interfaz (`RN-20`).
-* `SIGELAB.view`: Formularios y componentes gráficos en Java Swing.
-
----
-
-## ⚙️ Configuración y Ejecución
-
-### 1. Base de Datos (SQL Server)
-1. Ejecute el script SQL completo para crear la base de datos `SIGELAB_DB` y sus tablas correspondientes (`Usuario`, `PerfilFacial`, `AuditoriaFacial`, `Laboratorio`, `TipoEquipo`, `Equipo`, `Prestamo`, `DetallePrestamo`, `Mantenimiento`, `Auditoria`).
-2. Verifique las credenciales de conexión en la clase `DatabaseConnection.java`.
-
-### 2. Ejecución de la Aplicación Java
-1. Abra el proyecto en su IDE (IntelliJ IDEA o Eclipse).
-2. Asegúrese de que Maven haya descargado todas las dependencias del archivo `pom.xml`.
-3. Ejecute la clase principal de inicio (`LoginForm.java`).
-
-### 3. Configuración del Reconocimiento Facial (Python)
-1. Asegúrese de tener Python instalado con la librería OpenCV (`pip install opencv-python`).
-2. Configure la ruta de acceso al script de verificación facial en la capa de servicio de autenticación de Java.
+## 🗄️ 4. Pasos para Crear la Base de Datos
+1. Abra **SQL Server Management Studio (SSMS)** o su gestor de bases de datos preferido conectado a su instancia de SQL Server.
+2. Cree una nueva base de datos ejecutando el comando:
+   ```sql
+   CREATE DATABASE SIGELAB_DB;
+   GO
+   USE SIGELAB_DB;
+   GO
+   ```
+3. Ejecute el script DDL completo provisto en el archivo del modelo de datos para crear todas las tablas institucionales requeridas: `Usuario`, `PerfilFacial`, `AuditoriaFacial`, `Laboratorio`, `TipoEquipo`, `Equipo`, `Prestamo`, `DetallePrestamo`, `Mantenimiento` y `Auditoria`.
 
 ---
 
-## 👥 Usuarios de Prueba
-* **Administrador:** `admin` / `admin123` (Acceso total)
-* **Encargado:** `encargado` / `encargado123` (Acceso operativo restringido)
+## 🔌 5. Configuración de Conexión
+1. Ubique la clase encargada de la conexión a la base de datos dentro del paquete `SIGELAB.config` (ej. `DatabaseConnection.java`).
+2. Verifique y ajuste los parámetros de conexión según su entorno local o servidor:
+   ```java
+   private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=SIGELAB_DB;encrypt=true;trustServerCertificate=true;";
+   private static final String USER = "tu_usuario_sql";
+   private static final String PASSWORD = "tu_contraseña_sql";
+   ```
+
+---
+
+## ⚙️ 6. Cómo Ejecutar la Aplicación
+1. Clone o descargue el repositorio del proyecto en su equipo local.
+2. Abra el proyecto utilizando un entorno de desarrollo compatible con Java y Maven (como **IntelliJ IDEA** o **Eclipse**).
+3. Espere a que Maven descargue y sincronice automáticamente todas las dependencias declaradas en el archivo `pom.xml`.
+4. Ubique la clase principal de inicio con interfaz gráfica de usuario (`LoginForm.java`) dentro del paquete `SIGELAB.view`.
+5. Ejecute la clase para lanzar el sistema de escritorio.
+
+---
+
+## 👤 7. Cómo Ejecutar el Componente Facial
+El subsistema de reconocimiento facial opera como un segundo factor obligatorio en el inicio de sesión:
+1. Asegúrese de tener instalado **Python 3.x** en su sistema operativo.
+2. Instale la librería OpenCV ejecutando en su terminal:
+   ```bash
+   pip install opencv-python
+   ```
+3. Verifique que la cámara web de su equipo se encuentre conectada y disponible.
+4. Al ingresar credenciales correctas en el `LoginForm` de Java, el sistema invocará de forma automatizada el script de verificación facial conectado a la tabla `PerfilFacial` y `AuditoriaFacial` en la base de datos.
+
+---
+
+## 🔑 8. Usuarios de Prueba
+### 👤 Comportamiento en el Primer Ingreso (Sin Perfil Facial Registrado)
+Si un usuario intenta iniciar sesión por primera vez y el sistema detecta mediante la consulta a la base de datos que aún no posee un registro en la tabla `PerfilFacial` (`perfil == null`), el sistema gestiona la situación de manera controlada:
+1. **Asistente de Registro (Enrollment):** Se notifica al operador que no se encuentra biometría asociada a su cuenta y se le da la opción de realizar el enrolamiento de su rostro por única vez.
+2. **Validación posterior:** Una vez registrado el embedding inicial, los subsiguientes accesos requerirán obligatoriamente la coincidencia biométrica exitosa (`VERIFY_EXITOSO`) para otorgar el ingreso al sistema (`RN-02`).
+El sistema incluye por defecto las siguientes cuentas sembradas en la base de datos para pruebas institucionales:
+* **Administrador (Acceso Completo):**
+  * *Usuario:* `admin`
+  * *Contraseña:* `admin`
+* **Encargado (Acceso Operativo Restringido):**
+  * *Usuario:* `evi`
+  * *Contraseña:* `encargado123`
+
+---
+
+## 📊 9. Funciones Principales del Sistema
+* **Autenticación Biométrica:** Doble factor de seguridad con usuario, contraseña y reconocimiento facial en el login.
+* **Control de Accesos por Roles:** Adaptación dinámica del menú según el perfil (`ADMINISTRADOR` o `ENCARGADO`) con validación estricta en la capa de negocio.
+* **Gestión de Inventario y QR:** Administración de laboratorios y equipos con sus 5 estados obligatorios (`DISPONIBLE`, `PRESTADO`, `DAÑADO`, `MANTENIMIENTO`, `DADO_DE_BAJA`) e identificación rápida mediante códigos **QR**.
+* **Préstamos Multiequipo y Devoluciones:** Encabezado y detalle para préstamos, control de devoluciones parciales/totales y estados de condición (`BUENO`, `DAÑADO`).
+* **Mantenimiento y Taller:** Registro y seguimiento de equipos enviados a mantenimiento correctivo o preventivo.
+* **Auditoría y Reportes:** Trazabilidad institucional de eventos críticos y consultas con filtros avanzados por fechas y estados.
