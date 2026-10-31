@@ -4,13 +4,22 @@ import SIGELAB.controller.EstadoEquipoController;
 import SIGELAB.model.EstadoEquipo;
 import SIGELAB.model.Laboratorio;
 import SIGELAB.service.LaboratorioService;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class InventarioEquipo extends JFrame {
     private JPanel PanelInventario;
@@ -27,6 +36,7 @@ public class InventarioEquipo extends JFrame {
     private JButton actualizarButton;
     private JButton limpiarButton;
     private JButton regresarAlMenuButton;
+    private JButton btnVerQR; // Botón para ver el QR
     private JTextField textField1; // Marca
     private JTextField textField2; // Modelo
     private JTextField textField3; // Número de serie
@@ -34,6 +44,8 @@ public class InventarioEquipo extends JFrame {
     private final EstadoEquipoController controller;
     private EstadoEquipo equipoSeleccionado;
     private int idSeleccionado = 0;
+
+    private static final String DIRECTORIO_QR = "qrs_inventario/";
 
     private static final String[] COLUMNAS = {"ID", "Lab ID", "Cód. Inventario", "Equipo", "Marca", "Modelo", "Nº Serie", "Tipo", "Estado", "Observaciones"};
     private final DefaultTableModel modeloTabla = new DefaultTableModel(COLUMNAS, 0) {
@@ -59,7 +71,7 @@ public class InventarioEquipo extends JFrame {
         refrescarTabla();
         limpiarFormulario();
 
-        setSize(1150, 680);
+        setSize(1150, 720);
         setMinimumSize(new Dimension(950, 600));
         setLocationRelativeTo(null);
     }
@@ -152,7 +164,10 @@ public class InventarioEquipo extends JFrame {
         panelScrollForm.add(new JScrollPane(panelFormulario), BorderLayout.CENTER);
         panelIzquierdo.add(panelScrollForm, BorderLayout.CENTER);
 
-        // Panel inferior de Botones de Acción
+        // Panel inferior de Botones de Acción + Botón Ver QR
+        JPanel panelAccionesContenedor = new JPanel(new BorderLayout(0, 8));
+        panelAccionesContenedor.setOpaque(false);
+
         JPanel panelAcciones = new JPanel(new GridLayout(2, 2, 8, 8));
         panelAcciones.setOpaque(false);
         panelAcciones.setBorder(BorderFactory.createTitledBorder(
@@ -176,7 +191,13 @@ public class InventarioEquipo extends JFrame {
         panelAcciones.add(actualizarButton);
         panelAcciones.add(limpiarButton);
 
-        panelIzquierdo.add(panelAcciones, BorderLayout.SOUTH);
+        btnVerQR = new JButton("🔍 Ver Código QR");
+        estilizarBoton(btnVerQR, false);
+
+        panelAccionesContenedor.add(panelAcciones, BorderLayout.CENTER);
+        panelAccionesContenedor.add(btnVerQR, BorderLayout.SOUTH);
+
+        panelIzquierdo.add(panelAccionesContenedor, BorderLayout.SOUTH);
         splitPane.setLeftComponent(panelIzquierdo);
 
         // 2. Panel Derecho: Tabla Estilizada
@@ -273,6 +294,7 @@ public class InventarioEquipo extends JFrame {
         if (actualizarButton != null) actualizarButton.addActionListener(e -> actualizar());
         if (limpiarButton != null) limpiarButton.addActionListener(e -> limpiarFormulario());
         if (regresarAlMenuButton != null) regresarAlMenuButton.addActionListener(e -> dispose());
+        if (btnVerQR != null) btnVerQR.addActionListener(e -> mostrarQRSeleccionado());
     }
 
     private void refrescarTabla() {
@@ -361,6 +383,87 @@ public class InventarioEquipo extends JFrame {
         if (textNombreEquipo != null) textNombreEquipo.requestFocusInWindow();
     }
 
+    // Método que genera y guarda físicamente la imagen PNG en disco al presionar Guardar (sin dependencias j2se)
+    private void generarYGuardarQRDisco(String codigoInventario) {
+        try {
+            File directorio = new File(DIRECTORIO_QR);
+            if (!directorio.exists()) {
+                directorio.mkdirs();
+            }
+
+            int ancho = 200;
+            int alto = 200;
+            Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+
+            BitMatrix bitMatrix = new MultiFormatWriter().encode(codigoInventario, BarcodeFormat.QR_CODE, ancho, alto, hints);
+            BufferedImage imagenQR = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_RGB);
+
+            for (int x = 0; x < ancho; x++) {
+                for (int y = 0; y < alto; y++) {
+                    imagenQR.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+                }
+            }
+
+            File archivoSalida = new File(DIRECTORIO_QR + codigoInventario + ".png");
+            ImageIO.write(imagenQR, "png", archivoSalida);
+
+        } catch (Exception e) {
+            System.err.println("Error al guardar la imagen QR en disco: " + e.getMessage());
+        }
+    }
+
+    private void mostrarQRSeleccionado() {
+        String codigo = textCodigoInventario != null ? textCodigoInventario.getText().trim() : "";
+        if (codigo.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione o ingrese un código de inventario válido.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            int ancho = 220;
+            int alto = 220;
+            Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+
+            BitMatrix bitMatrix = new MultiFormatWriter().encode(codigo, BarcodeFormat.QR_CODE, ancho, alto, hints);
+            BufferedImage imagenQR = new BufferedImage(ancho, alto, BufferedImage.TYPE_INT_RGB);
+
+            for (int x = 0; x < ancho; x++) {
+                for (int y = 0; y < alto; y++) {
+                    imagenQR.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+                }
+            }
+
+            // ==========================================
+            // GUARDA LA IMAGEN FÍSICAMENTE EN DISCO
+            // ==========================================
+            File directorio = new File("qrs_inventario/");
+            if (!directorio.exists()) {
+                directorio.mkdirs();
+            }
+            File archivoSalida = new File("qrs_inventario/" + codigo + ".png");
+            javax.imageio.ImageIO.write(imagenQR, "png", archivoSalida);
+            // ==========================================
+
+            JDialog dialogoQR = new JDialog(this, "Código QR - " + codigo, true);
+            dialogoQR.setLayout(new BorderLayout(10, 10));
+            dialogoQR.setSize(300, 350);
+            dialogoQR.setLocationRelativeTo(this);
+
+            JLabel lblQR = new JLabel(new ImageIcon(imagenQR), JLabel.CENTER);
+            JLabel lblInfo = new JLabel("Código: " + codigo, JLabel.CENTER);
+            lblInfo.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+            dialogoQR.add(lblInfo, BorderLayout.NORTH);
+            dialogoQR.add(lblQR, BorderLayout.CENTER);
+            dialogoQR.setVisible(true);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al generar o guardar el código QR: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private void guardar() {
         try {
             ItemLaboratorio labSeleccionado = comboBoxLAB != null ? (ItemLaboratorio) comboBoxLAB.getSelectedItem() : null;
@@ -377,7 +480,11 @@ public class InventarioEquipo extends JFrame {
 
             if (idSeleccionado == 0) {
                 controller.crearEquipo(labId, codigo, nombre, marca, modelo, numeroSerie, tipo, estado, observaciones);
-                JOptionPane.showMessageDialog(this, "Equipo registrado con éxito.", "Inventario", JOptionPane.INFORMATION_MESSAGE);
+
+                // GUARDA LA IMAGEN FÍSICAMENTE EN LA CARPETA qrs_inventario/ AL REGISTRAR
+                generarYGuardarQRDisco(codigo);
+
+                JOptionPane.showMessageDialog(this, "Equipo registrado y QR guardado con éxito.", "Inventario", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 equipoSeleccionado.setLaboratorioId(labId);
                 equipoSeleccionado.setCodigoInventario(codigo);
@@ -390,7 +497,11 @@ public class InventarioEquipo extends JFrame {
                 equipoSeleccionado.setObservaciones(observaciones);
 
                 controller.actualizar(equipoSeleccionado);
-                JOptionPane.showMessageDialog(this, "Equipo actualizado con éxito.", "Inventario", JOptionPane.INFORMATION_MESSAGE);
+
+                // ACTUALIZA O GUARDA LA IMAGEN EN LA CARPETA qrs_inventario/ AL MODIFICAR
+                generarYGuardarQRDisco(codigo);
+
+                JOptionPane.showMessageDialog(this, "Equipo actualizado y QR sincronizado con éxito.", "Inventario", JOptionPane.INFORMATION_MESSAGE);
             }
 
             limpiarFormulario();

@@ -103,11 +103,11 @@ public class DevolucionRepository {
                   AND estado_devolucion = 'PENDIENTE'
                 """;
 
+        // Actualiza el equipo sin restricción estricta de estado previo para evitar bloqueos en vencidos
         String actualizarEquipo = """
                 UPDATE Equipo
                 SET estado = ?
                 WHERE id = ?
-                  AND estado = 'PRESTADO'
                 """;
 
         String contarPendientes = """
@@ -180,9 +180,6 @@ public class DevolucionRepository {
                         }
                         if (!"PENDIENTE".equalsIgnoreCase(rs.getString("estado_devolucion"))) {
                             throw new IllegalStateException("Este equipo ya fue devuelto.");
-                        }
-                        if (!"PRESTADO".equalsIgnoreCase(rs.getString("estado_equipo"))) {
-                            throw new IllegalStateException("El equipo no está en estado PRESTADO.");
                         }
                         equipoId = rs.getInt("equipo_id");
                     }
